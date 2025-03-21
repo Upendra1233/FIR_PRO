@@ -73,6 +73,51 @@ class PSNEntryForm(forms.ModelForm):
             raise forms.ValidationError("Device PSN must be exactly 10 characters.")
         return device_psn
 
+    def clean(self):
+        cleaned_data = super().clean()
+        complaint_raised_through = cleaned_data.get('complaint_raised_through')
+        complaint_raised_through_other = self.data.get('complaint_raised_through_other')  # Get the raw data
+        service_engineer_name = cleaned_data.get('service_engineer_name')
+        service_engineer_name_other = self.data.get('service_engineer_name_other')  # Get raw data
+
+        # Handle "Complaint Raised Through"
+        if complaint_raised_through == 'others' and complaint_raised_through_other:
+            cleaned_data['complaint_raised_through'] = complaint_raised_through_other
+
+        # Handle "Service Engineer Name"
+        if service_engineer_name == 'others' and service_engineer_name_other:
+            cleaned_data['service_engineer_name'] = service_engineer_name_other
+
+        fields_with_others = [
+            'device_model',
+            'configuration',
+            'telco_status',
+            'active_profile',
+            'vehicle_type',
+            'vehicle_run',
+            'issue_identified',
+            'issue_analysis',
+            'device_to_be_sent'
+        ]
+
+        for field in fields_with_others:
+            dropdown_value = cleaned_data.get(field)
+            other_value = self.data.get(f'{field}_other')  # Get raw data from the request
+
+            if dropdown_value == 'others' and other_value:
+                # Replace the dropdown value with the custom value
+                cleaned_data[field] = other_value
+
+        external_modification = cleaned_data.get('external_modification')
+        external_modification_other = self.data.get('external_modification_other')  # Get raw data
+
+        if external_modification and 'Others' in external_modification and external_modification_other:
+            # Append the custom value to the external_modification list
+            external_modification.append(external_modification_other)
+            cleaned_data['external_modification'] = external_modification
+
+        return cleaned_data
+
 class EngineerResponseForm(forms.ModelForm):
     class Meta:
         model = PSNEntry

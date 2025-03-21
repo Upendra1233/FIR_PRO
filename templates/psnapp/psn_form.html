@@ -120,8 +120,19 @@
                             {{ form.customer_raised_issue|as_crispy_field }}
                         </div> 
                         <div class="col-md-3 mb-3">
-                            {{ form.complaint_raised_by|as_crispy_field }}
-                        </div> 
+                            <label for="complaint_raised_by">Complaint Raised By:</label>
+                            <select id="complaint_raised_by" name="complaint_raised_by" class="form-control">
+                                <option value="--">--</option>
+                                <option value="Dealer">Dealer</option>
+                                <option value="Customer">Customer</option>
+                                <option value="AL Field">AL Field</option>
+                                <option value="AL Service">AL Service</option>
+                                <option value="I-Alert">I-Alert</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="complaint_raised_by_other" name="complaint_raised_by_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
                         <div class="col-md-3 mb-3">
                             {{ form.complaint_raised_name|as_crispy_field }}
                         </div>
@@ -132,13 +143,40 @@
                             {{ form.contact_number|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.complaint_raised_through|as_crispy_field }}
+                            <label for="complaint_raised_through">Complaint Raised Through:</label>
+                            <select id="complaint_raised_through" name="complaint_raised_through" class="form-control">
+                                <option value="I-Alert">I-Alert</option>
+                                <option value="Mail">Mail</option>
+                                <option value="Telephone">Telephone</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <!-- Hidden input for custom text -->
+                            <input type="text" id="complaint_raised_through_other" name="complaint_raised_through_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.service_engineer_name|as_crispy_field }}
+                            <label for="service_engineer_name">Service Engineer Name:</label>
+                            <select id="service_engineer_name" name="service_engineer_name" class="form-control">
+                                <option value="Anil">Anil</option>
+                                <option value="Siva">Siva</option>
+                                <option value="Swamy">Swamy</option>
+                                <option value="Rishwanth">Rishwanth</option>
+                                <option value="Gayadhar">Gayadhar</option>
+                                <option value="Arun Maity">Arun Maity</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="service_engineer_name_other" name="service_engineer_name_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.device_model|as_crispy_field }}
+                            <label for="device_model">Device Model:</label>
+                            <select id="device_model" name="device_model" class="form-control">
+                                <option value="DL545">DL545</option>
+                                <option value="DL548">DL548</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="device_model_other" name="device_model_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                     </div>
 
@@ -153,7 +191,14 @@
                             {{ form.firmware|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.configuration|as_crispy_field }}
+                            <label for="configuration">Configuration:</label>
+                            <select id="configuration" name="configuration" class="form-control">
+                                <option value="Operational Mode">Operational Mode</option>
+                                <option value="Plant Mode">Plant Mode</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="configuration_other" name="configuration_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                     </div>
 
@@ -168,13 +213,28 @@
                             {{ form.date_of_sale_of_device|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.telco_status|as_crispy_field }}
+                            <label for="telco_status">Telco Status:</label>
+                            <select id="telco_status" name="telco_status" class="form-control">
+                                <option value="Bootstrap">Bootstrap</option>
+                                <option value="Commercial">Commercial</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="telco_status_other" name="telco_status_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            {{ form.active_profile|as_crispy_field }}
+                            <label for="active_profile">Active Profile:</label>
+                            <select id="active_profile" name="active_profile" class="form-control">
+                                <option value="Airtel">Airtel</option>
+                                <option value="BSNL">BSNL</option>
+                                <option value="Dual">Dual</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="active_profile_other" name="active_profile_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                         <div class="col-md-3 mb-3">
                             {{ form.vehicle_sale_date|as_crispy_field }}
@@ -197,7 +257,15 @@
                             {{ form.last_communication_in_darby|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.vehicle_type|as_crispy_field }}
+                            <label for="vehicle_type">Vehicle Type:</label>
+                            <select id="vehicle_type" name="vehicle_type" class="form-control">
+                                <option value="Tipper">Tipper</option>
+                                <option value="E-com">E-com</option>
+                                <option value="Boss">Boss</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="vehicle_type_other" name="vehicle_type_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                     </div>
                     <div class="row">
@@ -205,7 +273,14 @@
                             {{ form.vehicle_running_location|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.vehicle_run|as_crispy_field }}
+                            <label for="vehicle_run">Vehicle Run:</label>
+                            <select id="vehicle_run" name="vehicle_run" class="form-control">
+                                <option value="Kilometers">Kilometers</option>
+                                <option value="Hours">Hours</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="vehicle_run_other" name="vehicle_run_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                         <div class="col-md-3 mb-3">
                             {{ form.kilometers_hours|as_crispy_field }}
@@ -219,13 +294,29 @@
                         {{ form.vehicle_support_date|as_crispy_field }}
                     </div>
                     <div class="col-md-3 mb-3">
-                        {{ form.issue_identified|as_crispy_field }}
+                        <label for="issue_identified">Issue Identified:</label>
+                        <select id="issue_identified" name="issue_identified" class="form-control">
+                            <option value="Not Powering ON">Not Powering ON</option>
+                            <option value="NRD">NRD</option>
+                            <option value="NO-DATA">NO-DATA</option>
+                            <option value="others">Others</option>
+                        </select>
+                        <input type="text" id="issue_identified_other" name="issue_identified_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                     </div>
                     <div class="col-md-3 mb-3">
                         {{ form.external_modification|as_crispy_field }}
                     </div>
                     <div class="col-md-3 mb-3">
-                        {{ form.issue_analysis|as_crispy_field }}
+                        <label for="issue_analysis">Issue Analysis:</label>
+                        <select id="issue_analysis" name="issue_analysis" class="form-control">
+                            <option value="Disk Image">Disk Image</option>
+                            <option value="Sim-Reg issue">Sim-Reg issue</option>
+                            <option value="Battery Reset">Battery Reset</option>
+                            <option value="others">Others</option>
+                        </select>
+                        <input type="text" id="issue_analysis_other" name="issue_analysis_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                     </div>
                     <div class="row">
                         <div class="col-md-3 mb-3">
@@ -255,7 +346,15 @@
                             {{ form.hod_approval_status|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.device_to_be_sent|as_crispy_field }}
+                            <label for="device_to_be_sent">Device to be Sent:</label>
+                            <select id="device_to_be_sent" name="device_to_be_sent" class="form-control">
+                                <option value="Goa">Goa</option>
+                                <option value="Hyderabad">Hyderabad</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="others">Others</option>
+                            </select>
+                            <input type="text" id="device_to_be_sent_other" name="device_to_be_sent_other" 
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                         <div class="col-md-3 mb-3">
                             {{ form.call_status|as_crispy_field }}
@@ -388,6 +487,137 @@
                     }
                 })
                 .catch(error => console.error('Error:', error));
+            });
+
+            const complaintRaisedThroughDropdown = document.getElementById('complaint_raised_through');
+            const complaintRaisedThroughOtherInput = document.getElementById('complaint_raised_through_other');
+
+            complaintRaisedThroughDropdown.addEventListener('change', function () {
+                if (complaintRaisedThroughDropdown.value === 'others') {
+                    complaintRaisedThroughOtherInput.style.display = 'block';
+                    complaintRaisedThroughOtherInput.required = true; // Make it required
+                } else {
+                    complaintRaisedThroughOtherInput.style.display = 'none';
+                    complaintRaisedThroughOtherInput.required = false; // Remove required
+                    complaintRaisedThroughOtherInput.value = ''; // Clear the input
+                }
+            });
+
+            const serviceEngineerNameDropdown = document.getElementById('service_engineer_name');
+            const serviceEngineerNameOtherInput = document.getElementById('service_engineer_name_other');
+
+            serviceEngineerNameDropdown.addEventListener('change', function () {
+                if (serviceEngineerNameDropdown.value === 'others') {
+                    serviceEngineerNameOtherInput.style.display = 'block';
+                    serviceEngineerNameOtherInput.required = true; // Make it required
+                } else {
+                    serviceEngineerNameOtherInput.style.display = 'none';
+                    serviceEngineerNameOtherInput.required = false; // Remove required
+                    serviceEngineerNameOtherInput.value = ''; // Clear the input
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const complaintRaisedThroughDropdown = document.getElementById('complaint_raised_through');
+            const complaintRaisedThroughOtherInput = document.getElementById('complaint_raised_through_other');
+            const serviceEngineerNameDropdown = document.getElementById('service_engineer_name');
+            const serviceEngineerNameOtherInput = document.getElementById('service_engineer_name_other');
+
+            // Toggle "Complaint Raised Through" custom input
+            complaintRaisedThroughDropdown.addEventListener('change', function () {
+                if (complaintRaisedThroughDropdown.value === 'others') {
+                    complaintRaisedThroughOtherInput.style.display = 'block';
+                    complaintRaisedThroughOtherInput.required = true;
+                } else {
+                    complaintRaisedThroughOtherInput.style.display = 'none';
+                    complaintRaisedThroughOtherInput.required = false;
+                    complaintRaisedThroughOtherInput.value = ''; // Clear the input
+                }
+            });
+
+            // Toggle "Service Engineer Name" custom input
+            serviceEngineerNameDropdown.addEventListener('change', function () {
+                if (serviceEngineerNameDropdown.value === 'others') {
+                    serviceEngineerNameOtherInput.style.display = 'block';
+                    serviceEngineerNameOtherInput.required = true;
+                } else {
+                    serviceEngineerNameOtherInput.style.display = 'none';
+                    serviceEngineerNameOtherInput.required = false;
+                    serviceEngineerNameOtherInput.value = ''; // Clear the input
+                }
+            });
+
+            const fieldsWithOthers = [
+                'device_model',
+                'configuration',
+                'telco_status',
+                'active_profile',
+                'vehicle_type',
+                'vehicle_run',
+                'issue_identified',
+                'issue_analysis',
+                'device_to_be_sent'
+            ];
+
+            fieldsWithOthers.forEach(field => {
+                const dropdown = document.getElementById(field);
+                const otherInput = document.getElementById(`${field}_other`);
+
+                dropdown.addEventListener('change', function () {
+                    if (dropdown.value === 'others') {
+                        otherInput.style.display = 'block';
+                        otherInput.required = true;
+                    } else {
+                        otherInput.style.display = 'none';
+                        otherInput.required = false;
+                        otherInput.value = ''; // Clear the input
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const fieldsWithOthers = [
+                'telco_status',
+                'active_profile',
+                'vehicle_type',
+                'vehicle_run',
+                'issue_identified',
+                'issue_analysis',
+                'device_to_be_sent'
+            ];
+
+            fieldsWithOthers.forEach(field => {
+                const dropdown = document.getElementById(field);
+                const otherInput = document.getElementById(`${field}_other`);
+
+                dropdown.addEventListener('change', function () {
+                    if (dropdown.value === 'others') {
+                        otherInput.style.display = 'block';
+                        otherInput.required = true;
+                    } else {
+                        otherInput.style.display = 'none';
+                        otherInput.required = false;
+                        otherInput.value = ''; // Clear the input
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const complaintRaisedByDropdown = document.getElementById('complaint_raised_by');
+            const complaintRaisedByOtherInput = document.getElementById('complaint_raised_by_other');
+
+            complaintRaisedByDropdown.addEventListener('change', function () {
+                if (complaintRaisedByDropdown.value === 'others') {
+                    complaintRaisedByOtherInput.style.display = 'block';
+                    complaintRaisedByOtherInput.required = true; // Make it required
+                } else {
+                    complaintRaisedByOtherInput.style.display = 'none';
+                    complaintRaisedByOtherInput.required = false; // Remove required
+                    complaintRaisedByOtherInput.value = ''; // Clear the input
+                }
             });
         });
     </script>

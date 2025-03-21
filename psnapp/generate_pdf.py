@@ -2,10 +2,25 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Spacer
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+import pytz
+from datetime import datetime
 
 def generate_device_repair_request_pdf(data, file_path):
     doc = SimpleDocTemplate(file_path, pagesize=letter, topMargin=0.5 * inch, bottomMargin=0.5 * inch)
     elements = []
+
+    # Define IST timezone
+    ist = pytz.timezone('Asia/Kolkata')
+
+    # Helper function to convert datetime to IST
+    def convert_to_ist(dt):
+        if isinstance(dt, datetime):  # If it's a datetime object
+            return dt.astimezone(ist).strftime('%Y-%m-%d %H:%M:%S')
+        return 'N/A'
+
+    # Convert manager and HOD approval datetimes to IST
+    manager_approval_datetime = convert_to_ist(data.get('manager_approval_datetime', None))
+    hod_approval_datetime = convert_to_ist(data.get('hod_approval_datetime', None))
 
     # Header
     logo_image_path = "C:\\Users\\Admin\\Downloads\\DANLAW RAW LOGO.jpg"
@@ -17,7 +32,8 @@ def generate_device_repair_request_pdf(data, file_path):
         ["Customer", "O.E", "Format Req. No.", "ASS/011/08/21 Ver-2"],
         ["Document by", "After Sales Support Team", "Date", data.get('engineer_requested_date', 'N/A')]
     ]
-    header_table = Table(header_data, colWidths=[1.5 * inch, 2 * inch, 2 * inch, 2 * inch])
+    col_widths = [1.5 * inch, 2 * inch, 2 * inch, 2 * inch]  # Consistent column widths
+    header_table = Table(header_data, colWidths=col_widths)
     header_table.setStyle(TableStyle([
         ('SPAN', (0, 0), (1, 0)),  # Span the logo across two columns
         ('SPAN', (2, 0), (3, 0)),  # Span the title across two columns
@@ -43,7 +59,7 @@ def generate_device_repair_request_pdf(data, file_path):
     for i, (description, detail) in enumerate(data.get('details', {}).items(), start=1):
         table_data.append([str(i), description, str(detail) if detail is not None else 'N/A'])
 
-    table = Table(table_data, colWidths=[0.5 * inch, 3 * inch, 3.5 * inch])
+    table = Table(table_data, colWidths=[0.5 * inch, 3.5 * inch, 3.5 * inch])  # Consistent column widths
     table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Reduced font size
@@ -58,15 +74,19 @@ def generate_device_repair_request_pdf(data, file_path):
 
     # Footer
     signature_image_path = "C:\\Users\\Admin\\Downloads\\SR SIGNATURE.png"
-    signature_image = Image(signature_image_path, 1 * inch, 0.5 * inch)  # Reduced size
+    signature_image = Image(signature_image_path, 0.8 * inch, 0.4 * inch)  # Reduced size
+
+    # Extract manager email name
+    manager_email = data.get('manager_email', 'N/A')
+    manager_email_name = manager_email.split('@')[0] if '@' in manager_email else manager_email
 
     footer_data = [
         ["Approved By:", "Name", "Date", "Signature"],
         ["Initiated by- Service Eng.", data.get('service_engineer_name', 'N/A'), data.get('engineer_requested_date', 'N/A'), data.get('service_engineer_name', 'N/A')],
-        ["Service Manager", data.get('manager_email', 'N/A'), data.get('manager_approval_datetime', 'N/A'), data.get('manager_email', 'N/A')],
-        ["Sales & Service Head", "Rajendran Subramanian", data.get('hod_approval_datetime', 'N/A'), signature_image]
+        ["Service Manager", manager_email_name, manager_approval_datetime, manager_email_name],
+        ["Sales & Service Head", "Rajendran Subramanian", hod_approval_datetime, signature_image]
     ]
-    footer_table = Table(footer_data, colWidths=[2 * inch, 2.5 * inch, 1 * inch, 2 * inch])
+    footer_table = Table(footer_data, colWidths=[2 * inch, 2 * inch, 1.5 * inch, 2 * inch])  # Reduced third column width
     footer_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Reduced font size

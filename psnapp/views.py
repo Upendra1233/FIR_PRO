@@ -12,7 +12,7 @@ import csv
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
 import logging
-from datetime import datetime
+from datetime import datetime, date  # Import both datetime and date
 import pytz
 import os
 from .generate_pdf import generate_device_repair_request_pdf
@@ -83,9 +83,14 @@ def send_summary_email(entry):
         'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
     })
     recipient_list = [entry.manager_email]
-    cc_list = [settings.HOD_EMAIL, entry.engineer_email,'upendram@danlawtech.com']
+    cc_list = [settings.HOD_EMAIL, entry.engineer_email, 'upendram@danlawtech.com']
     email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, cc=cc_list)
     email.content_subtype = 'html'  # To indicate the email content is HTML
+
+    # Attach the uploaded file if it exists
+    if entry.upload_file:
+        email.attach_file(entry.upload_file.path)
+
     email.send()
 
 def thank_you(request):
@@ -116,23 +121,9 @@ def approve_request(request, id):
 
     email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [engineer_email])
     email.content_subtype = 'html'  # To indicate the email content is HTML
+    if entry.upload_file:
+        email.attach_file(entry.upload_file.path)
     email.send()
-
-    # Send email to the HOD
-    hod_email = settings.HOD_EMAIL  # Email address of the HOD
-    subject = 'FIR Request Approved by Manager - HOD Approval Required'
-    message = render_to_string('psnapp/hod_email.html', {
-        'entry': entry,
-        'csrf_token': csrf_token,
-        'approve_url': f"http://127.0.0.1:8000/approve_hod_request/{entry.id}/",
-        'reject_url': f"http://127.0.0.1:8000/reject_hod_request/{entry.id}/",
-         'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
-    })
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [hod_email], cc=[engineer_email, entry.manager_email,'upendram@danlawtech.com'],)
-    email.content_subtype = 'html'
-    email.send()
-
-    return HttpResponse('The request has been approved by the manager and sent to the HOD for approval. Mail has been sent to HOD, Once HOD approves, you and the Engineer will get an email.')
 
 def reject_request(request, id):
     entry = get_object_or_404(PSNEntry, id=id)
@@ -215,6 +206,8 @@ def approve_hod_request(request, id):
         cc=[settings.HOD_EMAIL]  # CC: Manager and HOD emails
     )
     email.attach_file(pdf_file_path)
+    if entry.upload_file:
+        email.attach_file(entry.upload_file.path)
     email.send()
 
     return HttpResponse('Thanks for approval. Engineer will receive confirmation to fill the additional details.')
@@ -241,17 +234,15 @@ def reject_hod_request(request, id):
     return HttpResponse('The request has been rejected by the HOD and the engineer has been notified.')
 
 def download_data(request):
-    # Get the current date and time in Indian Standard Time (IST)
+    # Get the Indian Standard Time (IST) timezone
     ist = pytz.timezone('Asia/Kolkata')
-    now = datetime.now(ist)
-    formatted_datetime = now.strftime('%d_%m_%Y_%H:%M')
 
-    # Create the HttpResponse object with the appropriate CSV header.
+    # Create the HttpResponse object with the appropriate CSV header
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="FIR_ENTRIES_{formatted_datetime}.csv"'
+    response['Content-Disposition'] = 'attachment; filename="FIR_ENTRIES.csv"'
 
     writer = csv.writer(response)
-    # Write the header row with the specified fields
+    # Write the header row
     writer.writerow([
         'Date of Complaint', 'Centralised ID', 'Unique ID', 'Customer Raised Issue', 'Complaint Raised By',
         'Complaint Raised Name', 'Contact Number', 'Complaint Raised Through', 'Service Engineer Name',
@@ -267,8 +258,31 @@ def download_data(request):
 
     entries = PSNEntry.objects.all()
     for entry in entries:
+        # Helper function to handle datetime conversion
+        def convert_to_ist(dt):
+            if isinstance(dt, datetime):  # If it's a datetime object
+                return dt.astimezone(ist).strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(dt, date):  # If it's a date object
+                dt_with_time = datetime.combine(dt, datetime.min.time())  # Add time (midnight)
+                return ist.localize(dt_with_time).strftime('%Y-%m-%d %H:%M:%S')
+            return 'N/A'
+
+        # Convert all datetime fields to IST
+        date_of_complaint = convert_to_ist(entry.date_of_complaint)
+        date_of_sale_of_device = convert_to_ist(entry.date_of_sale_of_device)
+        vehicle_sale_date = convert_to_ist(entry.vehicle_sale_date)
+        s_trigger_date = convert_to_ist(entry.s_trigger_date)
+        c_trigger_date = convert_to_ist(entry.c_trigger_date)
+        commercial_expiry_date = convert_to_ist(entry.commercial_expiry_date)
+        first_communication_in_darby = convert_to_ist(entry.first_communication_in_darby)
+        last_communication_in_darby = convert_to_ist(entry.last_communication_in_darby)
+        vehicle_support_date = convert_to_ist(entry.vehicle_support_date)
+        manager_approval_datetime = convert_to_ist(entry.manager_approval_datetime)
+        hod_approval_datetime = convert_to_ist(entry.hod_approval_datetime)
+
+        # Write the row
         writer.writerow([
-            entry.date_of_complaint.strftime('%Y-%m-%d %H:%M:%S') if entry.date_of_complaint else 'N/A',
+            date_of_complaint,
             entry.centralised_id,
             entry.unique_id,
             entry.complaint_raised_name,
@@ -284,21 +298,21 @@ def download_data(request):
             entry.configuration,
             entry.device_IMEI,
             entry.device_ICCID,
-            entry.date_of_sale_of_device.strftime('%Y-%m-%d %H:%M:%S') if entry.date_of_sale_of_device else 'N/A',
+            date_of_sale_of_device,
             entry.telco_status,
             entry.active_profile,
-            entry.vehicle_sale_date.strftime('%Y-%m-%d %H:%M:%S') if entry.vehicle_sale_date else 'N/A',
-            entry.s_trigger_date.strftime('%Y-%m-%d %H:%M:%S') if entry.s_trigger_date else 'N/A',
-            entry.c_trigger_date.strftime('%Y-%m-%d %H:%M:%S') if entry.c_trigger_date else 'N/A',
-            entry.commercial_expiry_date.strftime('%Y-%m-%d %H:%M:%S') if entry.commercial_expiry_date else 'N/A',
-            entry.first_communication_in_darby.strftime('%Y-%m-%d %H:%M:%S') if entry.first_communication_in_darby else 'N/A',
-            entry.last_communication_in_darby.strftime('%Y-%m-%d %H:%M:%S') if entry.last_communication_in_darby else 'N/A',
+            vehicle_sale_date,
+            s_trigger_date,
+            c_trigger_date,
+            commercial_expiry_date,
+            first_communication_in_darby,
+            last_communication_in_darby,
             entry.vehicle_type,
             entry.vehicle_running_location,
             entry.vehicle_run,
             entry.kilometers_hours,
             entry.main_battery_voltage,
-            entry.vehicle_support_date.strftime('%Y-%m-%d %H:%M:%S') if entry.vehicle_support_date else 'N/A',
+            vehicle_support_date,
             entry.issue_identified,
             entry.external_modification,
             entry.issue_analysis,
@@ -308,10 +322,10 @@ def download_data(request):
             entry.engineer_email,
             entry.manager_remarks,
             entry.manager_email,
-            entry.manager_approval_datetime.strftime('%Y-%m-%d %H:%M:%S') if entry.manager_approval_datetime else 'N/A',
+            manager_approval_datetime,
             entry.hod_remarks,
             entry.hod_approval_status,
-            entry.hod_approval_datetime.strftime('%Y-%m-%d %H:%M:%S') if entry.hod_approval_datetime else 'N/A',
+            hod_approval_datetime,
             entry.device_to_be_sent,
             entry.upload_file.url if entry.upload_file else 'N/A',
             entry.unique_id
