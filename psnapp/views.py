@@ -125,6 +125,24 @@ def approve_request(request, id):
         email.attach_file(entry.upload_file.path)
     email.send()
 
+    # Send email to the HOD
+    hod_email = settings.HOD_EMAIL  # Email address of the HOD
+    subject = 'FIR Request Approved by Manager - HOD Approval Required'
+    message = render_to_string('psnapp/hod_email.html', {
+        'entry': entry,
+        'csrf_token': csrf_token,
+        'approve_url': f"http://127.0.0.1:8000/approve_hod_request/{entry.id}/",
+        'reject_url': f"http://127.0.0.1:8000/reject_hod_request/{entry.id}/",
+         'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
+    })
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [hod_email], cc=[engineer_email, entry.manager_email,'upendram@danlawtech.com'],)
+    email.content_subtype = 'html'
+    if entry.upload_file:
+        email.attach_file(entry.upload_file.path)
+    email.send()
+
+    return HttpResponse('The request has been approved by the manager and sent to the HOD for approval. Mail has been sent to HOD, Once HOD approves, you and the Engineer will get an email.')
+
 def reject_request(request, id):
     entry = get_object_or_404(PSNEntry, id=id)
     

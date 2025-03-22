@@ -39,6 +39,19 @@
             justify-content: space-between;
             align-items: center;
         }
+        .icon-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .icon-container a {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+        .icon-container a:hover {
+            color: #ffcc00;
+        }
         .form-control, .form-select {
             border-radius: 8px;
             box-shadow: none;
@@ -81,14 +94,29 @@
     </style>
 </head>
 <body>
-     <div class="container form-container">
+    <div class="container form-container">
         <div class="card">
             <div class="card-header">
+                <!-- Left-side icons -->
+                <div class="icon-container">
+                    <!-- Icon for FIR Page -->
+                    <a href="{% url 'fir_page' %}" title="Go to FIR Page">
+                        <i class="fas fa-file-alt"></i>
+                    </a>
+                    <!-- Icon for New App -->
+                    <a href="{% url 'new_app_page' %}" title="Go to New App">
+                        <i class="fas fa-cogs"></i>
+                    </a>
+                </div>
+
+                <!-- Header Title -->
                 {% if edit_mode %}
                     Edit FIR Entry - {{ entry.id }}
                 {% else %}
                     FIR FORM -1
                 {% endif %}
+
+                <!-- Download Button -->
                 <a href="{% url 'download_data' %}" class="download-btn">
                     <i class="fas fa-download"></i>
                 </a>
@@ -145,6 +173,7 @@
                         <div class="col-md-3 mb-3">
                             <label for="complaint_raised_through">Complaint Raised Through:</label>
                             <select id="complaint_raised_through" name="complaint_raised_through" class="form-control">
+                                <option value="--">--</option>
                                 <option value="I-Alert">I-Alert</option>
                                 <option value="Mail">Mail</option>
                                 <option value="Telephone">Telephone</option>
@@ -157,12 +186,15 @@
                         <div class="col-md-3 mb-3">
                             <label for="service_engineer_name">Service Engineer Name:</label>
                             <select id="service_engineer_name" name="service_engineer_name" class="form-control">
+                                <option value="--">--</option>
                                 <option value="Anil">Anil</option>
+                                <option value="Arun">Arun</option>
+                                <option value="Arun Maity">Arun Maity</option>
+                                <option value="Eliyas">Eliyas</option>
+                                <option value="Gayadhar">Gayadhar</option>
+                                <option value="Rishwanth">Rishwanth</option>
                                 <option value="Siva">Siva</option>
                                 <option value="Swamy">Swamy</option>
-                                <option value="Rishwanth">Rishwanth</option>
-                                <option value="Gayadhar">Gayadhar</option>
-                                <option value="Arun Maity">Arun Maity</option>
                                 <option value="others">Others</option>
                             </select>
                             <input type="text" id="service_engineer_name_other" name="service_engineer_name_other" 
@@ -171,8 +203,10 @@
                         <div class="col-md-3 mb-3">
                             <label for="device_model">Device Model:</label>
                             <select id="device_model" name="device_model" class="form-control">
+                                <option value="Anil">--</option>
                                 <option value="DL545">DL545</option>
                                 <option value="DL548">DL548</option>
+                                <option value="Anil">DL320</option>
                                 <option value="others">Others</option>
                             </select>
                             <input type="text" id="device_model_other" name="device_model_other" 
@@ -193,6 +227,7 @@
                         <div class="col-md-3 mb-3">
                             <label for="configuration">Configuration:</label>
                             <select id="configuration" name="configuration" class="form-control">
+                                <option value="--">--</option>
                                 <option value="Operational Mode">Operational Mode</option>
                                 <option value="Plant Mode">Plant Mode</option>
                                 <option value="others">Others</option>
@@ -215,6 +250,7 @@
                         <div class="col-md-3 mb-3">
                             <label for="telco_status">Telco Status:</label>
                             <select id="telco_status" name="telco_status" class="form-control">
+                                <option value="--">--</option>
                                 <option value="Bootstrap">Bootstrap</option>
                                 <option value="Commercial">Commercial</option>
                                 <option value="others">Others</option>
@@ -228,6 +264,7 @@
                         <div class="col-md-3 mb-3">
                             <label for="active_profile">Active Profile:</label>
                             <select id="active_profile" name="active_profile" class="form-control">
+                                <option value="--">--</option>
                                 <option value="Airtel">Airtel</option>
                                 <option value="BSNL">BSNL</option>
                                 <option value="Dual">Dual</option>
@@ -259,9 +296,16 @@
                         <div class="col-md-3 mb-3">
                             <label for="vehicle_type">Vehicle Type:</label>
                             <select id="vehicle_type" name="vehicle_type" class="form-control">
+                                <option value="--">--</option>
                                 <option value="Tipper">Tipper</option>
                                 <option value="E-com">E-com</option>
                                 <option value="Boss">Boss</option>
+                                <option value="Haulage">Haulage</option>
+                                <option value="Passenger">Passenger</option>
+                                <option value="LCV">LCV</option>
+                                <option value="EV-LCV">EV-LCV</option>
+                                <option value="EV M&HV">EV M&HV</option>
+                                <option value="T&T">T&T</option>
                                 <option value="others">Others</option>
                             </select>
                             <input type="text" id="vehicle_type_other" name="vehicle_type_other" 
@@ -299,6 +343,11 @@
                             <option value="Not Powering ON">Not Powering ON</option>
                             <option value="NRD">NRD</option>
                             <option value="NO-DATA">NO-DATA</option>
+                            <option value="100%V Packet">100%V Packet</option>
+                            <option value="Partial V Packet">Partial V Packet</option>
+                            <option value="Latency">Latency</option>
+                            <option value="Data loss">Data loss</option>
+
                             <option value="others">Others</option>
                         </select>
                         <input type="text" id="issue_identified_other" name="issue_identified_other" 
@@ -310,9 +359,16 @@
                     <div class="col-md-3 mb-3">
                         <label for="issue_analysis">Issue Analysis:</label>
                         <select id="issue_analysis" name="issue_analysis" class="form-control">
+                            <option value="--">--</option>
                             <option value="Disk Image">Disk Image</option>
                             <option value="Sim-Reg issue">Sim-Reg issue</option>
+                            <option value="Sim Expired">Sim Expired</option>
+                            <option value="Disk Image">Disk Image</option>
                             <option value="Battery Reset">Battery Reset</option>
+                            <option value="VIC Issue">VIC Issue</option>
+                            <option value="CAN Issue">CAN Issue</option>
+                            <option value="SW-Issue">SW-Issue</option>
+                            <option value="GPS status">GPS status</option>
                             <option value="others">Others</option>
                         </select>
                         <input type="text" id="issue_analysis_other" name="issue_analysis_other" 

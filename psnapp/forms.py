@@ -25,7 +25,7 @@ class PSNEntryForm(forms.ModelForm):
             'manager_remarks': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Manager Remarks...', 'rows': 1, 'cols': 5}),
             'hod_remarks': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'HOD Remarks...', 'rows': 1, 'cols': 5}),
             'final_action_taken': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Final Action...', 'rows': 1, 'cols': 5}),
-            'customer_raised_issue':forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Name...', 'rows': 1, 'cols': 5}),
+            'customer_raised_issue':forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Issue...', 'rows': 1, 'cols': 5}),
         }
 
     def __init__(self, *args, **kwargs):
