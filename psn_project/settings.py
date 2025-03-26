@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Basic Django settings
 DEBUG = True  # Set to False in production for security
-ALLOWED_HOSTS = ['*']  # Change this in production to specific domain names
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # Change this in production to specific domain names
 # filepath: psn_project/settings.py
 SECRET_KEY = 'XzFm9th2F_hEtuxTrIQif8di1BgcPVT7Ol-XJRJixU_grh8_-T7Q1UesXDlg_JNyb-M'
 # Application definition
@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'psnapp',  # Your custom app (psnapp)
+    'sr_request',
+    'mapping_process',
     'crispy_forms',
     'crispy_bootstrap5',
 ]
@@ -106,14 +108,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-
-# The directory where collectstatic will collect static files for deployment.
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Additional locations the staticfiles app will traverse to find static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    BASE_DIR / 'static',  # This should point to your static directory
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # This is where collectstatic will store files
 
 # Media files (Uploaded by users)
 MEDIA_URL = '/media/'
@@ -185,7 +183,14 @@ ADMIN_SITE_TITLE = 'PSN Admin'
 
 # Manager and HOD email addresses
 MANAGER_EMAIL = 'sales@danlawtech.com'  # Manager's email address
-HOD_EMAIL = 'sales@danlawtech.com'  # HOD's email address
+HOD_EMAIL = 'rajendrans@danlawtech.com'  # HOD's email address
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+if DEBUG is False:
+    from django.conf.urls.static import static
+    from django.conf import settings
+
+    urlpatterns = []  # Define urlpatterns as an empty list
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

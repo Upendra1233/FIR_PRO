@@ -5,7 +5,8 @@ from psnapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.psn_form, name='psn_form'),
+    path('', views.homepage, name='homepage'),  # Homepage URL
+    path('fir_form', views.psn_form, name='psn_form'),
     path('success/', views.success, name='success'),
     path('thank_you/', views.thank_you, name='thank_you'),
     path('approve_request/<int:id>/', views.approve_request, name='approve_request'),

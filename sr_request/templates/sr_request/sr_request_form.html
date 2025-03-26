@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SR Request Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .form-container {
+            max-width: 95%;
+            margin: 30px auto;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 12px 12px 0 0;
+            padding: 15px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            box-shadow: none;
+            transition: all 0.3s ease-in-out;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .btn-submit {
+            background: linear-gradient(to right, #28a745, #218838);
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-submit:hover {
+            background: linear-gradient(to right, #218838, #1e7e34);
+        }
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container form-container">
+        <div class="card">
+            <div class="card-header">
+                Subscription Approval Request Form(SARF)
+            </div>
+            <div class="card-body">
+                <form id="sr-request-form" method="post" action="{% url 'sr_request_form' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    <li>{{ field }}: {{ errors|join:", " }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <!-- Engineer -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_engineer" class="form-label">Engineer</label>
+                            <select name="engineer" id="id_engineer" class="form-control">
+                                <option value="">-- Select Engineer --</option>
+                                <option value="Dilip">Dilip</option>
+                                <option value="Siva">Siva</option>
+                                <option value="Kunal">Kunal</option>
+                                <option value="Narendra">Narendra</option>
+                                <option value="Arun">Arun</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_engineer_other" name="engineer_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+
+                        <!-- Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_date" class="form-label">Request Date</label>
+                            <input type="datetime-local" name="date" id="id_date" class="form-control">
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_category" class="form-label">Category</label>
+                            <select name="category" id="id_category" class="form-control">
+                                <option value="">-- Select Category --</option>
+                                <option value="AIS 140">AIS 140</option>
+                                <option value="BS Extension">BS Extension</option>
+                                <option value="Commercial Activation">Commercial Activation</option>
+                                <option value="Validity Transfer">Validity Transfer</option>
+                                <option value="OTC RSU">OTC RSU</option>
+                                <option value="Resumption SR">Resumption SR</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_category_other" name="category_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+
+                        <!-- PSN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_psn" class="form-label">PSN</label>
+                            <input type="text" name="psn" id="id_psn" class="form-control" maxlength="10" placeholder="Enter 10-digit PSN">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- ICICID -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_icicid" class="form-label">ICICID</label>
+                            <input type="text" name="icicid" id="id_icicid" class="form-control" maxlength="20" placeholder="Enter 20-digit ICICID">
+                        </div>
+
+                        <!-- Plan -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_plan" class="form-label">Plan</label>
+                            <select name="plan" id="id_plan" class="form-control">
+                                <option value="">-- Select Plan --</option>
+                                <option value="Top-Up">Top-Up</option>
+                                <option value="Single Airtel">Single Airtel</option>
+                                <option value="Dual 12 Months">Dual 12 Months</option>
+                                <option value="Dual AIS140">Dual AIS140</option>
+                                <option value="Single BSNL">Single BSNL</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_plan_other" name="plan_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+
+                        <!-- Requestor Comments -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_requestor_comments" class="form-label">Requestor Comments</label>
+                            <textarea name="requestor_comments" id="id_requestor_comments" class="form-control" rows="1" placeholder="Enter your comments"></textarea>
+                        </div>
+
+                        <!-- SIM Status -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_sim_status_during_request" class="form-label">SIM Status During Request</label>
+                            <textarea name="sim_status_during_request" id="id_sim_status_during_request" class="form-control" rows="1" placeholder="SIM status during request"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Existing Validity -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_existing_validity" class="form-label">Existing Validity</label>
+                            <input type="datetime-local" name="existing_validity" id="id_existing_validity" class="form-control">
+                        </div>
+
+                        <!-- Requestor Validity Start Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_requestor_validity_start_date" class="form-label">Requestor Validity Start Date</label>
+                            <input type="datetime-local" name="requestor_validity_start_date" id="id_requestor_validity_start_date" class="form-control">
+                        </div>
+
+                        <!-- Requestor Validity End Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_requestor_validity_end_date" class="form-label">Requestor Validity End Date</label>
+                            <input type="datetime-local" name="requestor_validity_end_date" id="id_requestor_validity_end_date" class="form-control">
+                        </div>
+
+                        <!-- Billing To -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_billing_to" class="form-label">Billing To</label>
+                            <select name="billing_to" id="id_billing_to" class="form-control">
+                                <option value="">-- Select Billing To --</option>
+                                <option value="Good well">Good well</option>
+                                <option value="Customer">Customer</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Service">Service</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_billing_to_other" name="billing_to_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Remarks -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_remarks" class="form-label">Remarks</label>
+                            <textarea name="remarks" id="id_remarks" class="form-control" rows="1" placeholder="Enter remarks"></textarea>
+                        </div>
+
+                        <!-- HOD Remarks -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_hod_remarks" class="form-label">HOD Remarks</label>
+                            <textarea name="hod_remarks" id="id_hod_remarks" class="form-control" rows="1" placeholder="Enter HOD remarks"></textarea>
+                        </div>
+                        
+                            <!-- Engineer Email -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_engineer_email" class="form-label">Engineer Email</label>
+                                <input type="email" name="engineer_email" id="id_engineer_email" class="form-control" placeholder="Enter Engineer Email">
+                            </div>
+                        
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Message -->
+    <div id="popup-message" class="popup-message">Form submitted successfully!</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const psnInput = document.getElementById('id_psn');
+            const icicidInput = document.getElementById('id_icicid');
+            const engineerSelect = document.getElementById('id_engineer');
+            const engineerOtherInput = document.getElementById('id_engineer_other');
+            const categorySelect = document.getElementById('id_category');
+            const categoryOtherInput = document.getElementById('id_category_other');
+            const planSelect = document.getElementById('id_plan');
+            const planOtherInput = document.getElementById('id_plan_other');
+            const billingToSelect = document.getElementById('id_billing_to');
+            const billingToOtherInput = document.getElementById('id_billing_to_other');
+
+            // Allow only numeric input for PSN
+            psnInput.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+            });
+
+            // Allow only numeric input for ICICID
+            icicidInput.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+            });
+
+            // Show/hide "Other" input for Engineer
+            engineerSelect.addEventListener('change', function () {
+                if (this.value === 'Others') {
+                    engineerOtherInput.style.display = 'block';
+                } else {
+                    engineerOtherInput.style.display = 'none';
+                }
+            });
+
+            // Show/hide "Other" input for Category
+            categorySelect.addEventListener('change', function () {
+                if (this.value === 'Others') {
+                    categoryOtherInput.style.display = 'block';
+                } else {
+                    categoryOtherInput.style.display = 'none';
+                }
+            });
+
+            // Show/hide "Other" input for Plan
+            planSelect.addEventListener('change', function () {
+                if (this.value === 'Others') {
+                    planOtherInput.style.display = 'block';
+                } else {
+                    planOtherInput.style.display = 'none';
+                }
+            });
+                        // Show/hide "Other" input for Plan
+            planSelect.addEventListener('change', function () {
+                if (this.value === 'Others') {
+                    billingToOtherInput.style.display = 'block';
+                } else {
+                    billingToOtherInput.style.display = 'none';
+                }
+            });
+
+            // Handle form submission
+            document.getElementById('sr-request-form').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const form = event.target;
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Show the popup message
+                            const popup = document.getElementById('popup-message');
+                            popup.style.display = 'block';
+
+                            // Hide the popup after 3 seconds
+                            setTimeout(() => {
+                                popup.style.display = 'none';
+                                form.reset(); // Reset the form
+                            }, 3000);
+                        } else {
+                            alert('Error: ' + JSON.stringify(data.errors));
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            const fieldsWithOthers = [
+                { dropdown: 'id_engineer', otherInput: 'id_engineer_other' },
+                { dropdown: 'id_category', otherInput: 'id_category_other' },
+                { dropdown: 'id_plan', otherInput: 'id_plan_other' },
+                { dropdown: 'id_billing_to', otherInput: 'id_billing_to_other' },
+            ];
+
+            fieldsWithOthers.forEach(field => {
+                const dropdown = document.getElementById(field.dropdown);
+                const otherInput = document.getElementById(field.otherInput);
+
+                dropdown.addEventListener('change', function () {
+                    if (dropdown.value === 'Others') {
+                        otherInput.style.display = 'block';
+                        otherInput.required = true; // Make it required
+                    } else {
+                        otherInput.style.display = 'none';
+                        otherInput.required = false; // Remove required
+                        otherInput.value = ''; // Clear the input
+                    }
+                });
+
+                // Before form submission, copy the "Others" input value to the dropdown
+                const form = document.getElementById('sr-request-form');
+                form.addEventListener('submit', function () {
+                    if (dropdown.value === 'Others' && otherInput.value.trim() !== '') {
+                        dropdown.value = otherInput.value.trim(); // Replace "Others" with the entered text
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const billingToSelect = document.getElementById('id_billing_to');
+            const billingToOtherInput = document.getElementById('id_billing_to_other');
+
+            // Show/hide "Other" input for Billing To
+            billingToSelect.addEventListener('change', function () {
+                if (billingToSelect.value === 'Others') {
+                    billingToOtherInput.style.display = 'block';
+                    billingToOtherInput.required = true; // Make it required
+                } else {
+                    billingToOtherInput.style.display = 'none';
+                    billingToOtherInput.required = false; // Remove required
+                    billingToOtherInput.value = ''; // Clear the input
+                }
+            });
+
+            // Before form submission, copy the "Others" input value to the dropdown
+            const form = document.getElementById('sr-request-form');
+            form.addEventListener('submit', function () {
+                if (billingToSelect.value === 'Others' && billingToOtherInput.value.trim() !== '') {
+                    billingToSelect.value = billingToOtherInput.value.trim(); // Replace "Others" with the entered text
+                }
+            });
+        });
+    </script>
+</body>
+</html>

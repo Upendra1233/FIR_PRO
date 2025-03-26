@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping Process Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .form-container {
+            max-width: 95%;
+            margin: 30px auto;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 12px 12px 0 0;
+            padding: 15px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            box-shadow: none;
+            transition: all 0.3s ease-in-out;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .btn-submit {
+            background: linear-gradient(to right, #28a745, #218838);
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-submit:hover {
+            background: linear-gradient(to right, #218838, #1e7e34);
+        }
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container form-container">
+        <div class="card">
+            <div class="card-header">
+                Mapping Process Form
+            </div>
+            <div class="card-body">
+                <form id="mapping-process-form" method="post" action="{% url 'mapping_process_form' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    <li>{{ field }}: {{ errors|join:", " }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <!-- Mapping Requested Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_mapping_req_received_date" class="form-label">Mapping Requested Date</label>
+                            <input type="datetime-local" name="mapping_req_received_date" id="id_mapping_req_received_date" class="form-control">
+                        </div>
+
+                        <!-- Request Raised By -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_req_raised_by" class="form-label">Request Raised By</label>
+                            <select name="req_raised_by" id="id_req_raised_by" class="form-control">
+                                <option value="">-- Select User --</option>
+                                <option value="Dileep">Dileep</option>
+                                <option value="Kunal">Kunal</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_req_raised_by_other" name="req_raised_by_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+
+                        <!-- VIN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_vin" class="form-label">VIN</label>
+                            <input type="text" name="vin" id="id_vin" class="form-control" maxlength="17" placeholder="Enter VIN" required>
+                        </div>
+
+                        <!-- Old PSN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_psn" class="form-label">Old PSN</label>
+                            <input type="text" name="old_psn" id="id_old_psn" class="form-control" maxlength="10" placeholder="Enter Old PSN" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Date of Old Device Sales -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_date_of_old_device_sales" class="form-label">Date of Old Device Sales</label>
+                            <input type="date" name="date_of_old_device_sales" id="id_date_of_old_device_sales" class="form-control">
+                        </div>
+
+                        <!-- 1st S Activation of Old Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_first_s_activation_of_old_device" class="form-label">1st S Activation of Old Device</label>
+                            <input type="date" name="first_s_activation_of_old_device" id="id_first_s_activation_of_old_device" class="form-control">
+                        </div>
+
+                        <!-- 1st C Activation of Old Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_first_c_activation_of_old_device" class="form-label">1st C Activation of Old Device</label>
+                            <input type="date" name="first_c_activation_of_old_device" id="id_first_c_activation_of_old_device" class="form-control">
+                        </div>
+
+                        <!-- Old Device Telco Status -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_device_telco_status" class="form-label">Old Device Telco Status</label>
+                            <select name="old_device_telco_status" id="id_old_device_telco_status" class="form-control">
+                                <option value="">Select Status</option>
+                                <option value="Single Airtel">Single Airtel</option>
+                                <option value="Single BSNL">Single BSNL</option>
+                                <option value="Dual">Dual</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_old_device_telco_status_other" name="old_device_telco_status_other" class="form-control mt-2" style="display: none;" placeholder="Enter Other Telco Status">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Old Device Validity -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_device_validity" class="form-label">Old Device Validity</label>
+                            <input type="date" name="old_device_validity" id="id_old_device_validity" class="form-control">
+                        </div>
+
+                        <!-- Old Device Return Location -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_device_return_location" class="form-label">Old Device Return Location</label>
+                            <select name="old_device_return_location" id="id_old_device_return_location" class="form-control">
+                                <option value="">Select Location</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Hyd">Hyd</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_old_device_return_location_other" name="old_device_return_location_other" class="form-control mt-2" style="display: none;" placeholder="Enter Other Location">
+                        </div>
+
+                        <!-- New PSN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_new_psn" class="form-label">New PSN</label>
+                            <input type="text" name="new_psn" id="id_new_psn" class="form-control" maxlength="10" placeholder="Enter New PSN" required>
+                        </div>
+
+                        <!-- Current Card Status of New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_current_card_status_of_new_device" class="form-label">Current Card Status of New Device</label>
+                            <select name="current_card_status_of_new_device" id="id_current_card_status_of_new_device" class="form-control">
+                                <option value="">Select Status</option>
+                                <option value="Live">Live</option>
+                                <option value="Expired">Expired</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_current_card_status_of_new_device_other" name="current_card_status_of_new_device_other" class="form-control mt-2" style="display: none;" placeholder="Enter Other Status">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Activation Status of New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_activation_status_of_new_device" class="form-label">Activation Status of New Device</label>
+                            <select name="activation_status_of_new_device" id="id_activation_status_of_new_device" class="form-control">
+                                <option value="">Select Status</option>
+                                <option value="Bootstrap">Bootstrap</option>
+                                <option value="Commercial">Commercial</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_activation_status_of_new_device_other" name="activation_status_of_new_device_other" class="form-control mt-2" style="display: none;" placeholder="Enter Other Status">
+                        </div>
+
+                        <!-- New Device Telco Status -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_new_device_telco_status" class="form-label">New Device Telco Status</label>
+                            <select name="new_device_telco_status" id="id_new_device_telco_status" class="form-control">
+                                <option value="">Select Status</option>
+                                <option value="Single Airtel">Single Airtel</option>
+                                <option value="Single BSNL">Single BSNL</option>
+                                <option value="Dual">Dual</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <input type="text" id="id_new_device_telco_status_other" name="new_device_telco_status_other" class="form-control mt-2" style="display: none;" placeholder="Enter Other Telco Status">
+                        </div>
+
+                        <!-- Current Validity Status of New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_current_validity_status_of_new_device" class="form-label">Current Validity Status of New Device</label>
+                            <input type="date" name="current_validity_status_of_new_device" id="id_current_validity_status_of_new_device" class="form-control">
+                        </div>
+
+                        <!-- Added Validity for New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_added_validity_for_new_device" class="form-label">Added Validity for New Device</label>
+                            <textarea name="added_validity_for_new_device" id="id_added_validity_for_new_device" class="form-control" rows="1" placeholder="Enter additional validity details"></textarea>
+                        </div>
+
+                        <!-- HOD Remarks -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_hod_remarks" class="form-label">HOD Remarks (Optional)</label>
+                            <textarea name="hod_remarks" id="id_hod_remarks" class="form-control" rows="1" placeholder="Enter HOD Remarks"></textarea>
+                        </div>
+
+                        <!-- Mapping Completion Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_mapping_completion_date" class="form-label">Mapping Completion Date (Optional)</label>
+                            <input type="date" name="mapping_completion_date" id="id_mapping_completion_date" class="form-control">
+                        </div>
+
+                        <!-- Mapping Completed Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_mapping_completed_device" class="form-label">Mapping Completed Device (Optional)</label>
+                            <input type="text" name="mapping_completed_device" id="id_mapping_completed_device" class="form-control" placeholder="Enter Mapping Completed Device">
+                        </div>
+
+                        <!-- Warranty of the Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_warranty_of_the_device" class="form-label">Warranty of the Device (Optional)</label>
+                            <input type="date" name="warranty_of_the_device" id="id_warranty_of_the_device" class="form-control">
+                        </div>
+
+                    </div>
+                    
+
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Message -->
+    <div id="popup-message" class="popup-message">Form submitted successfully!</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const oldPsnInput = document.getElementById('id_old_psn');
+            const newPsnInput = document.getElementById('id_new_psn');
+            const vinInput = document.getElementById('id_vin');
+            const fieldsWithOthers = [
+                { dropdown: 'id_old_device_telco_status', otherInput: 'id_old_device_telco_status_other' },
+                { dropdown: 'id_old_device_return_location', otherInput: 'id_old_device_return_location_other' },
+                { dropdown: 'id_current_card_status_of_new_device', otherInput: 'id_current_card_status_of_new_device_other' },
+                { dropdown: 'id_activation_status_of_new_device', otherInput: 'id_activation_status_of_new_device_other' },
+                { dropdown: 'id_new_device_telco_status', otherInput: 'id_new_device_telco_status_other' },
+            ];
+
+            // Validate Old PSN (10 digits)
+            oldPsnInput.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numeric input
+            });
+
+            // Validate New PSN (10 digits)
+            newPsnInput.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numeric input
+            });
+
+            // Validate VIN (17 alphanumeric characters)
+            vinInput.addEventListener('input', function () {
+                this.value = this.value.replace(/[^A-Z0-9]/g, '').toUpperCase(); // Allow only uppercase alphanumeric input
+            });
+
+            // Handle "Others" dropdown options
+            fieldsWithOthers.forEach(field => {
+                const dropdown = document.getElementById(field.dropdown);
+                const otherInput = document.getElementById(field.otherInput);
+
+                dropdown.addEventListener('change', function () {
+                    if (dropdown.value === 'Others') {
+                        otherInput.style.display = 'block';
+                        otherInput.required = true;
+                    } else {
+                        otherInput.style.display = 'none';
+                        otherInput.required = false;
+                        otherInput.value = '';
+                    }
+                });
+            });
+
+            // Handle form submission
+            const form = document.getElementById('mapping-process-form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            const popup = document.getElementById('popup-message');
+                            popup.style.display = 'block';
+
+                            setTimeout(() => {
+                                popup.style.display = 'none';
+                                form.reset();
+                            }, 3000);
+                        } else {
+                            alert('Error: ' + JSON.stringify(data.errors));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting the form. Please try again.');
+                    });
+            });
+
+            const reqRaisedBySelect = document.getElementById('id_req_raised_by');
+            const reqRaisedByOtherInput = document.getElementById('id_req_raised_by_other');
+
+            // Show/hide "Other" input for "Request Raised By"
+            reqRaisedBySelect.addEventListener('change', function () {
+                if (this.value === 'Others') {
+                    reqRaisedByOtherInput.style.display = 'block';
+                    reqRaisedByOtherInput.required = true; // Make it required
+                } else {
+                    reqRaisedByOtherInput.style.display = 'none';
+                    reqRaisedByOtherInput.required = false; // Remove required
+                    reqRaisedByOtherInput.value = ''; // Clear the input
+                }
+            });
+
+            // Before form submission, copy the "Others" input value to the dropdown
+            form.addEventListener('submit', function () {
+                if (reqRaisedBySelect.value === 'Others' && reqRaisedByOtherInput.value.trim() !== '') {
+                    reqRaisedBySelect.value = reqRaisedByOtherInput.value.trim(); // Replace "Others" with the entered text
+                }
+            });
+        });
+    </script>
+</body>
+</html>

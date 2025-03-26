@@ -29,7 +29,7 @@ def generate_device_repair_request_pdf(data, file_path):
     header_data = [
         [logo_image, "", "FIR", ""],
         ["Product Code", data.get('device_model', 'N/A'), "Centralised ID", data.get('centralised_id', 'N/A')],
-        ["Customer", "O.E", "Format Req. No.", "ASS/011/08/21 Ver-2"],
+        ["Customer", "A.L", "Format Req. No.", "ASS/011/08/21 Ver-2"],
         ["Document by", "After Sales Support Team", "Date", data.get('engineer_requested_date', 'N/A')]
     ]
     col_widths = [1.5 * inch, 2 * inch, 2 * inch, 2 * inch]  # Consistent column widths
@@ -83,8 +83,8 @@ def generate_device_repair_request_pdf(data, file_path):
     footer_data = [
         ["Approved By:", "Name", "Date", "Signature"],
         ["Initiated by- Service Eng.", data.get('service_engineer_name', 'N/A'), data.get('engineer_requested_date', 'N/A'), data.get('service_engineer_name', 'N/A')],
-        ["Service Manager", manager_email_name, manager_approval_datetime, manager_email_name],
-        ["Sales & Service Head", "Rajendran Subramanian", hod_approval_datetime, signature_image]
+        ["Service Manager", 'Kunal', '.','.'],
+        ["Sales & Service Head", "Rajendran Subramanian", '.', '.']
     ]
     footer_table = Table(footer_data, colWidths=[2 * inch, 2 * inch, 1.5 * inch, 2 * inch])  # Reduced third column width
     footer_table.setStyle(TableStyle([

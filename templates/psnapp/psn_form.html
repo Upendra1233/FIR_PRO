@@ -39,19 +39,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        .icon-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .icon-container a {
-            color: white;
-            font-size: 1.5rem;
-            text-decoration: none;
-        }
-        .icon-container a:hover {
-            color: #ffcc00;
-        }
         .form-control, .form-select {
             border-radius: 8px;
             box-shadow: none;
@@ -94,29 +81,14 @@
     </style>
 </head>
 <body>
-    <div class="container form-container">
+     <div class="container form-container">
         <div class="card">
             <div class="card-header">
-                <!-- Left-side icons -->
-                <div class="icon-container">
-                    <!-- Icon for FIR Page -->
-                    <a href="{% url 'fir_page' %}" title="Go to FIR Page">
-                        <i class="fas fa-file-alt"></i>
-                    </a>
-                    <!-- Icon for New App -->
-                    <a href="{% url 'new_app_page' %}" title="Go to New App">
-                        <i class="fas fa-cogs"></i>
-                    </a>
-                </div>
-
-                <!-- Header Title -->
                 {% if edit_mode %}
                     Edit FIR Entry - {{ entry.id }}
                 {% else %}
                     FIR FORM -1
                 {% endif %}
-
-                <!-- Download Button -->
                 <a href="{% url 'download_data' %}" class="download-btn">
                     <i class="fas fa-download"></i>
                 </a>
@@ -363,7 +335,7 @@
                             <option value="Disk Image">Disk Image</option>
                             <option value="Sim-Reg issue">Sim-Reg issue</option>
                             <option value="Sim Expired">Sim Expired</option>
-                            <option value="Disk Image">Disk Image</option>
+                           
                             <option value="Battery Reset">Battery Reset</option>
                             <option value="VIC Issue">VIC Issue</option>
                             <option value="CAN Issue">CAN Issue</option>
@@ -379,16 +351,21 @@
                             {{ form.resolved_or_not|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
+                            {{ form.dealer_address|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3 mb-3">
                             {{ form.issue_description|as_crispy_field }}
                         </div>
                         <div class="col-md-3 mb-3">
                             {{ form.engineer_recommendation|as_crispy_field }}
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-3 mb-3">
                             {{ form.engineer_email|as_crispy_field }}
                         </div>
-                    </div>
-                    <div class="row">
+                    
+                  
                         <div class="col-md-3 mb-3">
                             {{ form.manager_remarks|as_crispy_field }}
                         </div>
@@ -398,6 +375,8 @@
                         <div class="col-md-3 mb-3">
                             {{ form.hod_remarks|as_crispy_field }}
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-3 mb-3">
                             {{ form.hod_approval_status|as_crispy_field }}
                         </div>
@@ -412,6 +391,7 @@
                             <input type="text" id="device_to_be_sent_other" name="device_to_be_sent_other" 
                                    class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
+                        
                         <div class="col-md-3 mb-3">
                             {{ form.call_status|as_crispy_field }}
                         </div>
@@ -477,6 +457,7 @@
                 'date_of_closure'
             ];
             const fieldsToShowIfNotResolved = [
+                'dealer_address',
                 'issue_description',
                 'engineer_recommendation',
                 'engineer_email',

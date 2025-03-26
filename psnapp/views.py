@@ -18,6 +18,9 @@ import os
 from .generate_pdf import generate_device_repair_request_pdf
 
 logger = logging.getLogger(__name__)
+def homepage(request):
+    # Render the homepage template
+    return render(request, 'psnapp/homepage.html')
 
 def generate_unique_number():
     last_entry = PSNEntry.objects.order_by('-unique_number').first()
@@ -83,7 +86,7 @@ def send_summary_email(entry):
         'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
     })
     recipient_list = [entry.manager_email]
-    cc_list = [settings.HOD_EMAIL, entry.engineer_email, 'upendram@danlawtech.com']
+    cc_list = [settings.HOD_EMAIL, entry.engineer_email]
     email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, cc=cc_list)
     email.content_subtype = 'html'  # To indicate the email content is HTML
 
@@ -119,7 +122,7 @@ def approve_request(request, id):
         'form_url': f"http://127.0.0.1:8000/engineer_response/{entry.id}/"
     })
 
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [engineer_email])
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [entry.engineer_email])
     email.content_subtype = 'html'  # To indicate the email content is HTML
     if entry.upload_file:
         email.attach_file(entry.upload_file.path)
@@ -135,7 +138,9 @@ def approve_request(request, id):
         'reject_url': f"http://127.0.0.1:8000/reject_hod_request/{entry.id}/",
          'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
     })
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [hod_email], cc=[engineer_email, entry.manager_email,'upendram@danlawtech.com'],)
+    recipient_list = [settings.HOD_EMAIL]
+    cc_list = [entry.manager_email, entry.engineer_email]
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [hod_email], cc=[engineer_email, entry.manager_email,'sales@danlawtech.com'],)
     email.content_subtype = 'html'
     if entry.upload_file:
         email.attach_file(entry.upload_file.path)
@@ -161,7 +166,7 @@ def reject_request(request, id):
         'entry': entry,
     })
 
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [engineer_email], cc=[entry.manager_email, settings.HOD_EMAIL,'upendram@danlawtech.com'])
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [engineer_email], cc=[entry.manager_email, settings.HOD_EMAIL,'sales@danlawtech.com'])
     email.content_subtype = 'html'  # To indicate the email content is HTML
     email.send()
 
@@ -183,26 +188,42 @@ def approve_hod_request(request, id):
         'engineer_requested_date': entry.engineer_requested_date.strftime('%d-%m-%Y'),
         'details': {
             'Service Request Number': entry.centralised_id,
-            'Date of communication failure': entry.last_communication_in_darby.strftime('%Y-%m-%d %H:%M:%S') if entry.last_communication_in_darby else 'N/A',
-            'Device Model': entry.device_model,
-            'Defective device PSN': entry.device_PSN,
-            'VIN Number': entry.VIN_number,
-            'Device IMEI': entry.device_IMEI,
-            'Device CCID': entry.device_ICCID,
-            'Date of Sale of Device': entry.date_of_sale_of_device.strftime('%d-%m-%Y') if entry.date_of_sale_of_device else 'N/A',
-            'S Trigger Date': entry.s_trigger_date.strftime('%d-%m-%Y') if entry.s_trigger_date else 'N/A',
-            'C Trigger Date': entry.c_trigger_date.strftime('%d-%m-%Y') if entry.c_trigger_date else 'N/A',
-            'Commercial Expiry date': entry.commercial_expiry_date.strftime('%d-%m-%Y') if entry.commercial_expiry_date else 'N/A',
-            'Active Profile (BSNL/Airtel/Dual)': entry.active_profile,
-            'Vehicle Type / Model': entry.vehicle_type,
-            'Failure Location Plant/ Field- Customer Address': entry.vehicle_running_location,
-            'Kilometers/Hours': entry.vehicle_run,
-            'Main Battery Voltage': entry.main_battery_voltage,
+            'Date of complaint ': entry.date_of_complaint.strftime('%d-%m-%Y') if entry.date_of_complaint else 'N/A',
+            'Complaint Raised By': entry.complaint_raised_by,
+            'Complaint Raised Name': entry.complaint_raised_name,
+            'Contact Number': entry.contact_number,
+            'Complaint Raised Through': entry.complaint_raised_through,
             'Service Engineer Name': entry.service_engineer_name,
-            'Reason for Replacement/Repair': entry.engineer_recommendation,
-            'Darby Last communication date': entry.last_communication_in_darby.strftime('%Y-%m-%d %H:%M:%S') if entry.last_communication_in_darby else 'N/A',
-            'Device Replacement request Initiation date': entry.engineer_requested_date.strftime('%Y-%m-%d %H:%M:%S'),
-            'Returnable / Non-Returnable': entry.engineer_recommendation,
+            'Device Model': entry.device_model,
+            'Device PSN': entry.device_PSN,
+            'VIN Number': entry.VIN_number,
+            'Firmware' : entry.firmware,
+            'Configuration' : entry.configuration,
+            'Device IMEI': entry.device_IMEI,
+            'Device ICCID': entry.device_ICCID,
+            'Date of Sale of Device': entry.date_of_sale_of_device.strftime('%d-%m-%Y') if entry.date_of_sale_of_device else 'N/A',
+            'Telco Status': entry.telco_status,
+            'Active Profile': entry.active_profile,
+            'S Trigger Date': entry.s_trigger_date.strftime('%d-%m-%Y') if entry.s_trigger_date else 'N/A',
+            'S Trigger Date': entry.s_trigger_date.strftime('%d-%m-%Y') if entry.s_trigger_date else 'N/A',
+            'Commercial Expiry Date': entry.commercial_expiry_date.strftime('%d-%m-%Y') if entry.commercial_expiry_date else 'N/A',
+            'First communication in Darby': entry.first_communication_in_darby.strftime('%Y-%m-%d %H:%M:%S') if entry.first_communication_in_darby else 'N/A',
+            'Last communication in Darby': entry.last_communication_in_darby.strftime('%Y-%m-%d %H:%M:%S') if entry.last_communication_in_darby else 'N/A',
+            'Vehicle support Date': entry.vehicle_support_date.strftime('%d-%m-%Y') if entry.vehicle_support_date else 'N/A',
+            'Vehicle sale Date': entry.vehicle_sale_date.strftime('%d-%m-%Y') if entry.vehicle_sale_date else 'N/A',
+            'Vehicle Running Location': entry.vehicle_running_location,
+            'Kilometers/Hours': entry.vehicle_run,
+            'Vehicle Run': entry.kilometers_hours,
+            'Main Battery Voltage': entry.main_battery_voltage,
+            'Issue Identified': entry.issue_identified,
+            'Issue Analysis': entry.issue_analysis,
+            'External Modification': entry.external_modification,
+            'Issue Description': entry.issue_description,
+            'Engineer Recommendation': entry.engineer_recommendation,
+            'Device sent to': entry.device_to_be_sent,
+            'Dealer Location' : entry.dealer_address,
+            'Manager Remarks': entry.manager_remarks,
+            'HOD Remarks': entry.hod_remarks,
         },
         'service_engineer_name': entry.service_engineer_name,
         'manager_email': entry.manager_email,
@@ -217,11 +238,11 @@ def approve_hod_request(request, id):
 
     # Send email with PDF attachment
     email = EmailMessage(
-        'Device Repair Request',
+        f'Device Repair Request- {entry.centralised_id}',
         'Please find the attached Device Repair Request.',
         settings.DEFAULT_FROM_EMAIL,
         [entry.engineer_email],  # To: Engineer's email
-        cc=[settings.HOD_EMAIL]  # CC: Manager and HOD emails
+        cc=[entry.manager_email,settings.HOD_EMAIL]  # CC: Manager and HOD emails
     )
     email.attach_file(pdf_file_path)
     if entry.upload_file:
@@ -245,7 +266,7 @@ def reject_hod_request(request, id):
     subject = 'PSN Request Rejected by HOD'
     message = render_to_string('psnapp/engineer_rejection_email.html', {'entry': entry})
     
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [engineer_email], cc=[manager_email, hod_email,'upendram@danlawtech.com'])
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [engineer_email], cc=[manager_email, hod_email,'sales@danlawtech.com'])
     email.content_subtype = 'html'
     email.send()
     
@@ -269,7 +290,7 @@ def download_data(request):
         'C Trigger Date', 'Commercial Expiry Date', 'First Communication in Darby', 'Last Communication in Darby',
         'Vehicle Type', 'Vehicle Running Location', 'Vehicle Run', 'Kilometers/Hours', 'Main Battery Voltage',
         'Vehicle Support Date', 'Issue Identified', 'External Modification', 'Issue Analysis', 'Resolved or Not',
-        'Issue Description', 'Engineer Recommendation', 'Engineer Email', 'Manager Remarks', 'Manager Email',
+        'Dealer','Issue Description', 'Engineer Recommendation', 'Engineer Email', 'Manager Remarks', 'Manager Email',
         'Manager Approval Datetime', 'HOD Remarks', 'HOD Approval Status', 'HOD Approval Datetime', 'Device to be Sent',
         'Upload File', 'Unique ID'
     ])
@@ -335,6 +356,7 @@ def download_data(request):
             entry.external_modification,
             entry.issue_analysis,
             entry.resolved_or_not,
+            entry.dealer_address,
             entry.issue_description,
             entry.engineer_recommendation,
             entry.engineer_email,

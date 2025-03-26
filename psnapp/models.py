@@ -64,6 +64,7 @@ class PSNEntry(models.Model):
     ]
     resolved_or_not = models.CharField(max_length=4, choices=RESOLVED_CHOICES, default='Select one')
     unique_id = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    dealer_address=models.TextField(null=True, blank=True)
     issue_description = models.TextField(null=True, blank=True)
     engineer_email = models.EmailField(null=True, blank=True)
     manager_remarks = models.TextField(null=True, blank=True)

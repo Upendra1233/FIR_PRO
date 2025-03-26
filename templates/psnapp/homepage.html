@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .logo-container {
+            text-align: center;
+            margin-top: 30px;
+            position: relative; /* Make the container relative to position elements inside it */
+        }
+
+        /* Static Logo Style */
+        .logo-static {
+            max-width: 200px; /* Adjust the size of the static logo */
+            height: auto;
+            position: absolute; /* Position it absolutely inside the container */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto; /* Center it inside the container */
+            z-index: 2; /* Make sure static logo appears above rotating logo */
+        }
+
+        /* Rotating Logo Style */
+        .rotating-logo {
+            max-width: 400px; /* Adjust the size of the rotating logo */
+            height: auto;
+            animation: rotate 5s linear infinite; /* Rotation animation */
+            z-index: 1; /* Make sure rotating logo appears below the static logo */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin-top: 50px;
+        }
+        .icon-container a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 2rem;
+            text-align: center;
+        }
+        .icon-container a:hover {
+            color: #0056b3;
+        }
+        .icon-container i {
+            font-size: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Title Section -->
+        <h1 class="text-center mt-4">Welcome to Danlaw Service Support</h1>
+
+        <!-- Icon Section -->
+        <div class="icon-container">
+            <!-- Icon for FIR Form -->
+            <a href="{% url 'psn_form' %}" title="FIR Form">
+                <i class="fas fa-file-alt"></i>
+                <p>FIR Form</p>
+            </a>
+            <!-- Icon for SR Request -->
+            <a href="{% url 'sr_request_form' %}" title="SR Request">
+                <i class="fas fa-cogs"></i>
+                <p>SR Request</p>
+            </a>
+            <!-- Icon for Mapping Process -->
+            <a href="{% url 'mapping_process_form' %}" title="Mapping Process">
+                <i class="fas fa-sync"></i>
+                <p>Mapping Process</p>
+            </a>
+        </div>
+        
+        <!-- Service Logo Section -->
+        {% load static %}
+        <div class="logo-container">
+            <!-- Static logo is positioned on top of the rotating logo -->
+            <img src="{% static 'images/DANLAW_RAW_LOGO-removebg-preview.png' %}" alt="Danlaw Logo" class="logo-static">
+            <!-- Rotating logo -->
+            <img src="{% static 'images/service_logo-removebg-preview.png' %}" alt="Danlaw Logo" class="rotating-logo">
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

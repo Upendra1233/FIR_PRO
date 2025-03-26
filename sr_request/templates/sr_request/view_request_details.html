@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>SR Request Details - Request No: {{ sr_request.id }}</h2>
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>PSN</th>
+                <td>{{ sr_request.psn }}</td>
+            </tr>
+            <tr>
+                <th>Engineer</th>
+                <td>{{ sr_request.engineer }}</td>
+            </tr>
+            <tr>
+                <th>Category</th>
+                <td>{{ sr_request.category }}</td>
+            </tr>
+            <tr>
+                <th>Plan</th>
+                <td>{{ sr_request.plan }}</td>
+            </tr>
+            <tr>
+                <th>Billing To</th>
+                <td>{{ sr_request.billing_to }}</td>
+            </tr>
+            <tr>
+                <th>Requestor Comments</th>
+                <td>{{ sr_request.requestor_comments }}</td>
+            </tr>
+            <tr>
+                <th>SIM Status During Request</th>
+                <td>{{ sr_request.sim_status_during_request }}</td>
+            </tr>
+            <tr>
+                <th>Requestor Validity Start Date</th>
+                <td>{{ sr_request.requestor_validity_start_date }}</td>
+            </tr>
+            <tr>
+                <th>Requestor Validity End Date</th>
+                <td>{{ sr_request.requestor_validity_end_date }}</td>
+            </tr>
+            <tr>
+                <th>Remarks</th>
+                <td>{{ sr_request.remarks }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
