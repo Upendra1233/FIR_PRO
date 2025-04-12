@@ -4,6 +4,8 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 import pytz
 from datetime import datetime
+from django.conf import settings  # Import settings to access STATICFILES_DIRS or STATIC_ROOT
+from django.templatetags.static import static  # Import static to resolve static file paths
 
 def generate_device_repair_request_pdf(data, file_path):
     doc = SimpleDocTemplate(file_path, pagesize=letter, topMargin=0.5 * inch, bottomMargin=0.5 * inch)
@@ -19,8 +21,8 @@ def generate_device_repair_request_pdf(data, file_path):
         return 'N/A'
 
     # Convert manager and HOD approval datetimes to IST
-    manager_approval_datetime = convert_to_ist(data.get('manager_approval_datetime', None))
-    hod_approval_datetime = convert_to_ist(data.get('hod_approval_datetime', None))
+    manager_approval_datetime_1 = convert_to_ist(data.get('manager_approval_datetime', None))
+    hod_approval_datetime_1 = convert_to_ist(data.get('hod_approval_datetime', None))
 
     # Header
     logo_image_path = "C:\\Users\\Admin\\Downloads\\DANLAW RAW LOGO.jpg"
@@ -73,7 +75,8 @@ def generate_device_repair_request_pdf(data, file_path):
     elements.append(table)
 
     # Footer
-    signature_image_path = "C:\\Users\\Admin\\Downloads\\SR SIGNATURE.png"
+    
+    signature_image_path = "C:\\Users\\Admin\\Downloads\\DANLAW_RAW_LOGO-removebg-preview.png"
     signature_image = Image(signature_image_path, 0.8 * inch, 0.4 * inch)  # Reduced size
 
     # Extract manager email name
@@ -83,8 +86,8 @@ def generate_device_repair_request_pdf(data, file_path):
     footer_data = [
         ["Approved By:", "Name", "Date", "Signature"],
         ["Initiated by- Service Eng.", data.get('service_engineer_name', 'N/A'), data.get('engineer_requested_date', 'N/A'), data.get('service_engineer_name', 'N/A')],
-        ["Service Manager", 'Kunal', '.','.'],
-        ["Sales & Service Head", "Rajendran Subramanian", '.', '.']
+        ["Service Manager", 'Kunal', data.get('manager_approval_datetime_1', 'N/A'),manager_email_name],
+        ["Sales & Service Head", "Rajendran Subramanian", data.get('hod_approval_datetime_1', 'N/A'), signature_image]
     ]
     footer_table = Table(footer_data, colWidths=[2 * inch, 2 * inch, 1.5 * inch, 2 * inch])  # Reduced third column width
     footer_table.setStyle(TableStyle([

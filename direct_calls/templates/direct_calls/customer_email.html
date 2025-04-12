@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ticket Created for Your Request</title>
+    <style>        
+    th {
+        text-align: left; /* Align table headers to the left */
+        background-color: rgba(128, 128, 128, 0.965); /* Optional: Light gray background for headers */
+        padding: 5px; /* Add padding for better readability */
+    }
+    td {
+        padding: 5px; /* Add padding for table cells */
+    }
+    </style>
+
+</head>
+<body>
+    <div>
+        <h2>Dear Customer,</h2>
+        <p>We have created a ticket for your request. Below are the details:</p>
+        <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>Ticket Number</th>
+                    <td>{{ entry.unique_id }}</td>
+                </tr>
+                <tr>
+                    <th>Chassis Number (VIN)</th>
+                    <td>{{ entry.vin }}</td>
+                </tr>
+                <tr>
+                    <th>Assigned Engineer</th>
+                    <td>{{ entry.complaint_assigned_to }}</td>
+                </tr>
+                <tr>
+                    <th>Engineer Contact Number</th>
+                    <td>{{ entry.engineer_contact_number }}</td>
+                </tr>
+                <tr>
+                    <th>Engineer Email</th>
+                    <td>{{ entry.submitted_to_email }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>If you have any questions, feel free to contact us.</p>
+        <p>Thank you,<br>Customer Support Team</p>
+    </div>
+</body>
+</html>

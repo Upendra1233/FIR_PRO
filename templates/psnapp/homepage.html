@@ -67,9 +67,30 @@
         .icon-container i {
             font-size: 4rem;
         }
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        .logout-link {
+            font-size: 1.2rem;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .logout-link:hover {
+            color: #0056b3;
+        }
+        .account-info {
+            font-size: 1rem;
+            color: #333;
+        }
     </style>
 </head>
 <body>
+    <!-- Logout Section -->
+
+
     <div class="container">
         <!-- Title Section -->
         <h1 class="text-center mt-4">Welcome to Danlaw Service Support</h1>
@@ -90,6 +111,14 @@
             <a href="{% url 'mapping_process_form' %}" title="Mapping Process">
                 <i class="fas fa-sync"></i>
                 <p>Mapping Process</p>
+            </a>
+            <a href="{% url 'manager_form' %}" title="Direct calls">
+                <i class="fas fa-phone-alt"></i>
+                <p>Direct calls</p>
+            </a>
+            <a href="{% url 'add_billing_data' %}" title="Billing data">
+                <i class="fas fa-file-alt"></i>
+                <p>Billing Data</p>
             </a>
         </div>
         

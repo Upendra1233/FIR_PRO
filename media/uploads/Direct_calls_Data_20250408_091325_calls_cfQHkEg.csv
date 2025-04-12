@@ -1,0 +1,52 @@
+1,"psn = models.CharField(max_length=10, null=True, blank=True, verbose_name=""PSN"")","psn = models.CharField(max_length=10, null=True, blank=True, verbose_name=""PSN"")"
+2,"device_model = models.CharField(max_length=100, null=True, blank=True)","device_model = models.CharField(max_length=100, null=True, blank=True)"
+3,"    telco_status = models.CharField(max_length=50, null=True, blank=True)","    telco_status = models.CharField(max_length=50, null=True, blank=True)"
+4,"    active_profile = models.CharField(max_length=50, null=True, blank=True)","    active_profile = models.CharField(max_length=50, null=True, blank=True)"
+5,    activation_start_date = models.DateTimeField(,    activation_start_date = models.DateTimeField(
+,"        null=True,","        null=True,"
+,"        blank=True,","        blank=True,"
+,"        verbose_name=""Activation Start Date""","        verbose_name=""Activation Start Date"""
+,    ),    )
+6,    activation_end_date = models.DateTimeField(,    activation_end_date = models.DateTimeField(
+,"        null=True,","        null=True,"
+,"        blank=True,","        blank=True,"
+,"        verbose_name=""Activation End Date""","        verbose_name=""Activation End Date"""
+,    ),    )
+7,"    vehicle_sale_date = models.DateField(null=True, blank=True)","    vehicle_sale_date = models.DateField(null=True, blank=True)"
+8,"    first_communication_in_darby = models.DateTimeField(null=True, blank=True)","    first_communication_in_darby = models.DateTimeField(null=True, blank=True)"
+9,"    last_communication_in_darby = models.DateTimeField(null=True, blank=True)","    last_communication_in_darby = models.DateTimeField(null=True, blank=True)"
+9(1),"    vehicle_type = models.CharField(max_length=50, null=True, blank=True)","    vehicle_type = models.CharField(max_length=50, null=True, blank=True)"
+10,"    vehicle_run = models.CharField(max_length=50, null=True, blank=True)","    vehicle_run = models.CharField(max_length=50, null=True, blank=True)"
+11,"    kilometers_hours = models.IntegerField(null=True, blank=True)","    kilometers_hours = models.IntegerField(null=True, blank=True)"
+11(1),"    main_battery_voltage = models.FloatField(null=True, blank=True)","    main_battery_voltage = models.FloatField(null=True, blank=True)"
+12,"    vehicle_running_location = models.CharField(max_length=100, null=True, blank=True)","    vehicle_running_location = models.CharField(max_length=100, null=True, blank=True)"
+13,"    state = models.CharField(max_length=100, null=True, blank=True)","    state = models.CharField(max_length=100, null=True, blank=True)"
+13(1),"    region = models.CharField(max_length=50, null=True, blank=True)","    region = models.CharField(max_length=50, null=True, blank=True)"
+13(2),"    contact_person_name = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Contact Person Name"")","    contact_person_name = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Contact Person Name"")"
+14,    contact_person_number = models.CharField(,    contact_person_number = models.CharField(
+,"        max_length=10,","        max_length=10,"
+,"        null=True,","        null=True,"
+,"        blank=True,","        blank=True,"
+,        validators=[,        validators=[
+,            RegexValidator(,            RegexValidator(
+,"                regex=r'^\d{10}$',","                regex=r'^\d{10}$',"
+,"                message=""Contact Person Number must be exactly 10 digits.""","                message=""Contact Person Number must be exactly 10 digits."""
+,            ),            )
+,"        ],","        ],"
+,"        verbose_name=""Contact Person Number""","        verbose_name=""Contact Person Number"""
+,    ),    )
+15,"    contact_category = models.CharField(max_length=50, null=True, blank=True, verbose_name=""Contact Category"")","    contact_category = models.CharField(max_length=50, null=True, blank=True, verbose_name=""Contact Category"")"
+16,"    issue_identified = models.CharField(max_length=100, null=True, blank=True)","    issue_identified = models.CharField(max_length=100, null=True, blank=True)"
+17,"    issue_analysis = models.CharField(max_length=100, null=True, blank=True)","    issue_analysis = models.CharField(max_length=100, null=True, blank=True)"
+18,"    exist_software = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Existing Software"")","    exist_software = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Existing Software"")"
+19,"    updated_software = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Updated Software"")","    updated_software = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Updated Software"")"
+20,"    final_action_taken = models.TextField(null=True, blank=True)","    final_action_taken = models.TextField(null=True, blank=True)"
+21,"    finalised_issue_category = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Finalised Issue Category"")","    finalised_issue_category = models.CharField(max_length=100, null=True, blank=True, verbose_name=""Finalised Issue Category"")"
+22,    upload_file_01 = models.FileField(,    upload_file_01 = models.FileField(
+,"        upload_to='uploads/',","        upload_to='uploads/',"
+,"        null=True,","        null=True,"
+,"        blank=True,","        blank=True,"
+,"        verbose_name=""Upload File""","        verbose_name=""Upload File"""
+,    ),    )
+23,"    call_status = models.CharField(max_length=20, null=True, blank=True)","    call_status = models.CharField(max_length=20, null=True, blank=True)"
+24,"    date_of_closure = models.DateTimeField(null=True, blank=True)","    date_of_closure = models.DateTimeField(null=True, blank=True)"

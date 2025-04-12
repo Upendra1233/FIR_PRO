@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Data Entry Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            position: relative;
+        }
+        .form-header i {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .form-footer button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-footer button:hover {
+            background-color: #218838;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-container">
+            <div class="form-header">
+                Billing Data Entry Form
+                <i class="fas fa-download"></i>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="invoice_no">Invoice No.</label>
+                        <input type="text" id="invoice_no" name="invoice_no" class="form-control" placeholder="Enter Invoice No.">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="invoice_date">Invoice Date</label>
+                        <input type="date" id="invoice_date" name="invoice_date" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="product">Product</label>
+                        <input type="text" id="product" name="product" class="form-control" placeholder="Enter Product">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="qty">Quantity</label>
+                        <input type="number" id="qty" name="qty" class="form-control" placeholder="Enter Quantity">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="part_sub_category">Part Sub Category</label>
+                        <input type="text" id="part_sub_category" name="part_sub_category" class="form-control" placeholder="Enter Part Sub Category">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="item_sub_category">Item Sub Category</label>
+                        <input type="text" id="item_sub_category" name="item_sub_category" class="form-control" placeholder="Enter Item Sub Category">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="part_no">Part No.</label>
+                        <input type="text" id="part_no" name="part_no" class="form-control" placeholder="Enter Part No.">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="customer_name">Customer's Name</label>
+                        <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="Enter Customer's Name">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" class="form-control" placeholder="Enter Location">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="invoice_value_without_gst">Invoice Value without GST</label>
+                        <input type="number" step="0.01" id="invoice_value_without_gst" name="invoice_value_without_gst" class="form-control" placeholder="Enter Value">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="total_invoice_value_with_gst">Total Invoice Value with GST</label>
+                        <input type="number" step="0.01" id="total_invoice_value_with_gst" name="total_invoice_value_with_gst" class="form-control" placeholder="Enter Value">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="credited_amount">Credited Amount</label>
+                        <input type="number" step="0.01" id="credited_amount" name="credited_amount" class="form-control" placeholder="Enter Amount">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="tds_amount">TDS Amount</label>
+                        <input type="number" step="0.01" id="tds_amount" name="tds_amount" class="form-control" placeholder="Enter Amount">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="gap">GAP</label>
+                        <input type="number" step="0.01" id="gap" name="gap" class="form-control" placeholder="Enter GAP">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="theoretical_payment_due_date">Theoretical Payment Due Date</label>
+                        <input type="date" id="theoretical_payment_due_date" name="theoretical_payment_due_date" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="grn_no">GRN No.</label>
+                        <input type="text" id="grn_no" name="grn_no" class="form-control" placeholder="Enter GRN No.">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="actual_grn_delivery_date">Actual GRN/Delivery Date</label>
+                        <input type="date" id="actual_grn_delivery_date" name="actual_grn_delivery_date" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="due_date">Due Date</label>
+                        <input type="date" id="due_date" name="due_date" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="payment_status">Payment Status</label>
+                        <input type="text" id="payment_status" name="payment_status" class="form-control" placeholder="Enter Payment Status">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="received_date">Received Date</label>
+                        <input type="date" id="received_date" name="received_date" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="transporter_name">Transporter Name</label>
+                        <input type="text" id="transporter_name" name="transporter_name" class="form-control" placeholder="Enter Transporter Name">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="docket_no">Docket No.</label>
+                        <input type="text" id="docket_no" name="docket_no" class="form-control" placeholder="Enter Docket No.">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="date_of_shipment">Date of Shipment</label>
+                        <input type="date" id="date_of_shipment" name="date_of_shipment" class="form-control">
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <button type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

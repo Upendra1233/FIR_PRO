@@ -6,7 +6,7 @@ from crispy_forms.layout import Submit
 class SRRequestForm(forms.ModelForm):
     class Meta:
         model = SRRequest
-        fields = '__all__'
+        exclude = ['unique_id']  # Exclude unique_id from the form
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'existing_validity': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
@@ -27,7 +27,10 @@ class SRRequestForm(forms.ModelForm):
             'sr_success_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'engineer_email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter Engineer Email'}),
-        
+            'old_psn': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Old PSN'}),  # Old PSN
+            'old_iccid': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Old ICCID'}),  # Old ICCID
+            'old_sim_status': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter Old Sim Status', 'rows': 1}),  # Old Sim Status
+            'old_validity': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),  # Old Validity
         }
 
     def __init__(self, *args, **kwargs):
@@ -39,6 +42,17 @@ class SRRequestForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Submit'))
 
 class SRDetailsForm(forms.ModelForm):
+    class Meta:
+        model = SRRequest
+        fields = ['new_sr_no', 'sr_date', 'sr_success_date', 'status']
+        widgets = {
+            'new_sr_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter New SR No'}),
+            'sr_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'sr_success_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class NewSRDetailsForm(forms.ModelForm):
     class Meta:
         model = SRRequest
         fields = ['new_sr_no', 'sr_date', 'sr_success_date', 'status']

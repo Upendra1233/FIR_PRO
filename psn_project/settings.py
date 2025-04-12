@@ -18,15 +18,14 @@ def main():
 if __name__ == '__main__':
     main()
 
-# Define the base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Basic Django settings
-DEBUG = True  # Set to False in production for security
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # Change this in production to specific domain names
-# filepath: psn_project/settings.py
+
+DEBUG = True 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
+
 SECRET_KEY = 'XzFm9th2F_hEtuxTrIQif8di1BgcPVT7Ol-XJRJixU_grh8_-T7Q1UesXDlg_JNyb-M'
-# Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -34,27 +33,31 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'psnapp',  # Your custom app (psnapp)
-    'sr_request',
-    'mapping_process',
+    'psnapp',  # fir page-1
+    'sr_request', # Sr-request page-3
+    'mapping_process',  #mp -page -2
+    'direct_calls',     #calls -page 4
+    'billing_data',    #billing -page 5
     'crispy_forms',
     'crispy_bootstrap5',
+    'accounts',  # Add the accounts app here
 ]
 
-# Middleware
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',  # Ensure this line is included
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+ # Add the custom middleware here
 ]
 
 ROOT_URLCONF = 'psn_project.urls'
 
-# Templates
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -71,18 +74,18 @@ TEMPLATES = [
     },
 ]
 
-# WSGI application
+# WSGI application path 
 WSGI_APPLICATION = 'psn_project.wsgi.application'
 
-# Database configuration (SQLite used in this example)
+# Database configuration (SQLite used in this example) need  to change while produ
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',  # You can change this for production DB like PostgreSQL or MySQL
+        'NAME': BASE_DIR / 'db.sqlite3',  
     }
 }
 
-# Password validation
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -98,46 +101,40 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Localization settings
+
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'  # Indian time zone
+TIME_ZONE = 'Asia/Kolkata'  # Set timezone to IST
 USE_I18N = True
-USE_TZ = True
+USE_TZ = True  # Enable timezone support
 
-# settings.py
 
-# Static files (CSS, JavaScript, Images)
+
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # This should point to your static directory
+    BASE_DIR / 'static',  
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # This is where collectstatic will store files
+STATIC_ROOT = BASE_DIR / 'staticfiles'  
 
-# Media files (Uploaded by users)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email settings (to send emails)
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mulaupendrareddy@gmail.com'  # Replace with your email address
-EMAIL_HOST_PASSWORD = 'wvdf wkoy whiz nvvv'  # Replace with your App Password
+EMAIL_HOST_USER = 'mulaupendrareddy@gmail.com' 
+EMAIL_HOST_PASSWORD = 'wvdf wkoy whiz nvvv'  
 DEFAULT_FROM_EMAIL = 'mulaupendrareddy@gmail.com'
 EMAIL_SUBJECT_PREFIX = '[FIR Request] '
 
-# For production, use environment variables for sensitive data like passwords
-# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Uncomment to use environment variable
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Uncomment to use environment variable
 
-# Site domain (can be used for generating absolute links in emails)
-SITE_DOMAIN = '127.0.0.1:8000'  # For local development, change for production
+SITE_DOMAIN = '127.0.0.1:8000' 
 
-# Logging configuration (write errors to a log file)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -145,7 +142,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'django_error.log',  # Log file
+            'filename': BASE_DIR / 'django_error.log',  
         },
     },
     'loggers': {
@@ -157,33 +154,25 @@ LOGGING = {
     },
 }
 
-# Caching settings (optional, for production setup)
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#         'LOCATION': '127.0.0.1:11211',
-#     }
-# }
 
-# CSRF settings (for security)
-CSRF_COOKIE_SECURE = True  # Only set this to True if you use HTTPS
-SESSION_COOKIE_SECURE = True  # Only set this to True if you use HTTPS
+CSRF_COOKIE_SECURE = True  
+SESSION_COOKIE_SECURE = True  # Only set this to True if when we use HTTPS
 
-# Security settings (important for production)
+#
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# CSRF_TRUSTED_ORIGINS to allow access from trusted domains (useful for production)
+
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
 
-# Customize your admin site title and header
+
 ADMIN_SITE_HEADER = 'PSN Project Admin'
 ADMIN_SITE_TITLE = 'PSN Admin'
 
 # Manager and HOD email addresses
-MANAGER_EMAIL = 'sales@danlawtech.com'  # Manager's email address
-HOD_EMAIL = 'rajendrans@danlawtech.com'  # HOD's email address
+MANAGER_EMAIL = 'sales@danlawtech.com'  
+HOD_EMAIL = 'rajendrans@danlawtech.com'  
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -192,5 +181,5 @@ if DEBUG is False:
     from django.conf.urls.static import static
     from django.conf import settings
 
-    urlpatterns = []  # Define urlpatterns as an empty list
+    urlpatterns = []  
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

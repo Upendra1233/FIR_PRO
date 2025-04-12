@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 import uuid
 from multiselectfield import MultiSelectField
+from django.utils.timezone import now
 
 def generate_unique_number():
     return str(uuid.uuid4())
@@ -13,21 +14,21 @@ class PSNEntry(models.Model):
     date_of_complaint = models.DateTimeField(blank=True, null=True)
     customer_raised_issue = models.TextField(null=True, blank=True)
     manager_remarks = models.TextField(null=True, blank=True)
-    complaint_raised_by = models.CharField(max_length=20, null=True, blank=True)
+    complaint_raised_by = models.CharField(max_length=40, null=True, blank=True)
     complaint_raised_name = models.CharField(max_length=100, default='')
     contact_number = models.CharField(max_length=10, null=True, blank=True)
-    complaint_raised_through = models.CharField(max_length=20,null=True, blank=True)
-    service_engineer_name = models.CharField(max_length=20, null=True, blank=True)
+    complaint_raised_through = models.CharField(max_length=30,null=True, blank=True)
+    service_engineer_name = models.CharField(max_length=30, null=True, blank=True)
     device_model = models.CharField(max_length=20,null=True, blank=True)
     device_PSN = models.CharField(max_length=10, null=True, blank=True)
-    VIN_number = models.CharField(max_length=100, null=True, blank=True)
+    VIN_number = models.CharField(max_length=17, null=True, blank=True)
     firmware = models.CharField(max_length=100, null=True, blank=True)
     configuration = models.CharField(max_length=100, null=True, blank=True)
     device_IMEI = models.BigIntegerField(blank=True, null=True)
-    device_ICCID = models.CharField(max_length=20)  # Ensure this is a CharField
+    device_ICCID = models.CharField(max_length=40)  # Ensure this is a CharField
     date_of_sale_of_device = models.DateField(null=True, blank=True)
-    telco_status = models.CharField(max_length=20, null=True, blank=True)
-    active_profile = models.CharField(max_length=20, null=True, blank=True)
+    telco_status = models.CharField(max_length=40, null=True, blank=True)
+    active_profile = models.CharField(max_length=40, null=True, blank=True)
     vehicle_sale_date = models.DateField(null=True, blank=True)
     s_trigger_date = models.DateTimeField(null=True, blank=True)
     c_trigger_date = models.DateTimeField(null=True, blank=True)
@@ -35,13 +36,13 @@ class PSNEntry(models.Model):
     first_communication_in_darby = models.DateTimeField(null=True, blank=True)
     last_communication_in_darby = models.DateTimeField(null=True, blank=True)
     vehicle_support_date = models.DateTimeField(null=True, blank=True)
-    vehicle_type = models.CharField(max_length=20, null=True, blank=True)
+    vehicle_type = models.CharField(max_length=40, null=True, blank=True)
     vehicle_running_location = models.CharField(max_length=255, null=True, blank=True)
-    vehicle_run = models.CharField(max_length=20, null=True, blank=True)
+    vehicle_run = models.CharField(max_length=40, null=True, blank=True)
     kilometers_hours = models.IntegerField(null=True, blank=True, verbose_name="Kilometers/Hours")
     main_battery_voltage = models.FloatField(null=True, blank=True)
-    issue_identified = models.CharField(max_length=20, null=True, blank=True)
-    issue_analysis = models.CharField(max_length=20, null=True, blank=True)
+    issue_identified = models.CharField(max_length=40, null=True, blank=True)
+    issue_analysis = models.CharField(max_length=40, null=True, blank=True)
     EXTERNAL_MODIFICATION_CHOICES = [
         ('--','--'),
         ('Air Horn', 'Air Horn'),
@@ -63,7 +64,7 @@ class PSNEntry(models.Model):
         ('No', 'No'),
     ]
     resolved_or_not = models.CharField(max_length=4, choices=RESOLVED_CHOICES, default='Select one')
-    unique_id = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    unique_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
     dealer_address=models.TextField(null=True, blank=True)
     issue_description = models.TextField(null=True, blank=True)
     engineer_email = models.EmailField(null=True, blank=True)
@@ -108,8 +109,31 @@ class PSNEntry(models.Model):
     upload_file = models.FileField(upload_to='uploads/', null=True, blank=True)
     centralised_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     engineer_requested_date = models.DateTimeField(auto_now_add=True)  # Automatically set the current datetime when created
+ # New field to track processing status
 
     def __str__(self):
         return self.unique_id if self.unique_id else 'PSN Entry'
+
+    def save(self, *args, **kwargs):
+        if not self.unique_id:  # Generate unique ID only if it doesn't exist
+            current_date = now()
+            year = current_date.strftime('%y')  # Last two digits of the year
+            month = current_date.strftime('%m')  # Two-digit month
+
+            # Find the last entry in the database for the current year and month
+            last_entry = PSNEntry.objects.filter(unique_id__startswith=f"{self.service_engineer_name}-{year}{month}").order_by('-unique_id').first()
+
+            if last_entry:
+                # Extract the last four digits (sequence number) from the last unique ID
+                last_sequence_number = int(last_entry.unique_id[-4:])
+                sequence_number = last_sequence_number + 1
+            else:
+                # Start from 0000 if no entries exist for the current year and month
+                sequence_number = 0
+
+            # Generate the unique ID in the format SR-YYMMNNNN
+            self.unique_id = f"{self.service_engineer_name}-{year}{month}{sequence_number:04d}"
+
+        super().save(*args, **kwargs)
 
 # JavaScript code has been moved to a separate file: static/js/external_modification.js

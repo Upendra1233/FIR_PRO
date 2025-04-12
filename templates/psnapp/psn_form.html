@@ -89,7 +89,7 @@
                 {% else %}
                     FIR FORM -1
                 {% endif %}
-                <a href="{% url 'download_data' %}" class="download-btn">
+                <a href="{% url 'downloaddata' %}" class="download-btn">
                     <i class="fas fa-download"></i>
                 </a>
             </div>
@@ -312,6 +312,7 @@
                     <div class="col-md-3 mb-3">
                         <label for="issue_identified">Issue Identified:</label>
                         <select id="issue_identified" name="issue_identified" class="form-control">
+                            <option value="--">--</option>
                             <option value="Not Powering ON">Not Powering ON</option>
                             <option value="NRD">NRD</option>
                             <option value="NO-DATA">NO-DATA</option>
@@ -335,7 +336,7 @@
                             <option value="Disk Image">Disk Image</option>
                             <option value="Sim-Reg issue">Sim-Reg issue</option>
                             <option value="Sim Expired">Sim Expired</option>
-                           
+                            <option value="Device Not Powering ON">Device Not Powering ON</option>
                             <option value="Battery Reset">Battery Reset</option>
                             <option value="VIC Issue">VIC Issue</option>
                             <option value="CAN Issue">CAN Issue</option>
@@ -553,6 +554,20 @@
                     serviceEngineerNameOtherInput.value = ''; // Clear the input
                 }
             });
+
+            const complaintRaisedByDropdown = document.getElementById('complaint_raised_by');
+            const complaintRaisedByOtherInput = document.getElementById('complaint_raised_by_other');
+
+            complaintRaisedByDropdown.addEventListener('change', function () {
+                if (complaintRaisedByDropdown.value === 'others') {
+                    complaintRaisedByOtherInput.style.display = 'block';
+                    complaintRaisedByOtherInput.required = true; // Make it required
+                } else {
+                    complaintRaisedByOtherInput.style.display = 'none';
+                    complaintRaisedByOtherInput.required = false; // Remove required
+                    complaintRaisedByOtherInput.value = ''; // Clear the input
+                }
+            });
         });
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -586,6 +601,7 @@
             });
 
             const fieldsWithOthers = [
+                'complaint_raised_by',
                 'device_model',
                 'configuration',
                 'telco_status',

@@ -1,0 +1,520 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+<div class="container form-container">
+    <div class="card">
+        <div class="card-header">
+            Engineer Form - PART B
+        </div>
+        <div class="card-body">
+            {% if is_closed %}
+                <div class="alert alert-info text-center">
+                    <strong>Form is closed and cannot be edited.</strong>
+                </div>
+            {% endif %}
+            <form id="engineer-form" method="post" enctype="multipart/form-data" {% if is_closed %}style="pointer-events: none; opacity: 0.6;"{% endif %}>
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                <li>{{ field }}: {{ errors|join:", " }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="text-center">Customer Input(READ) - PART A</h5>
+                        <div class="border p-3 rounded" style="border: 2px solid #007bff; background-color: #f8f9fa;">
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="date_of_complaint">Date of Complaint:</label>
+                                <input type="text" id="date_of_complaint" class="form-control" value="{{ entry.date_of_complaint }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised_from_location">Complaint Raised Location:</label>
+                                <input type="text" id="complaint_raised_from_location" class="form-control" value="{{ entry.complaint_raised_from_location }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="customer_raised_issue">Customer Voice:</label>
+                                <input type="text" id="customer_raised_issue" class="form-control" value="{{ entry.customer_raised_issue }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised">Complaint Raised:</label>
+                                <input type="text" id="complaint_raised" class="form-control" value="{{ entry.complaint_raised }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised_by">Complaint Raised By:</label>
+                                <input type="text" id="complaint_raised_by" class="form-control" value="{{ entry.complaint_raised_by }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="contact_number">Contact Number:</label>
+                                <input type="text" id="contact_number" class="form-control" value="{{ entry.contact_number }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="customer_mail_id">Customer Mail ID:</label>
+                                <input type="email" id="customer_mail_id" class="form-control" value="{{ entry.customer_mail_id }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised_through">Complaint Raised Through:</label>
+                                <input type="text" id="complaint_raised_through" class="form-control" value="{{ entry.complaint_raised_through }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_received_by">Complaint Received By:</label>
+                                <input type="text" id="complaint_received_by" class="form-control" value="{{ entry.complaint_received_by }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="vin">VIN:</label>
+                                <input type="text" id="vin" class="form-control" value="{{ entry.vin }}" readonly>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_assigned_to">Complaint Assigned To:</label>
+                                <input type="text" id="complaint_assigned_to" class="form-control" value="{{ entry.complaint_assigned_to }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="submitted_to_email">Complaint Assigned Email ID:</label>
+                                <input type="email" id="submitted_to_email" class="form-control" value="{{ entry.submitted_to_email }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="engineer_contact_number">Complaint Assigned Contact Number:</label>
+                                <input type="text" id="engineer_contact_number" class="form-control" value="{{ entry.engineer_contact_number }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="call_type">Complaint Type:</label>
+                                <input type="text" id="call_type" class="form-control" value="{{ entry.call_type }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="ticket_no">I Alert Ticket No:</label>
+                                <input type="text" id="ticket_no" class="form-control" value="{{ entry.ticket_no }}" readonly>
+                            </div>
+                    </div>
+                </div>
+                <h4 class="text-center">Engineer's Input - PART B</h4><br>
+                <div class="row">
+                    <!-- PSN -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.psn|as_crispy_field }}
+                    </div>
+                
+                    <!-- Device Model -->
+                    <div class="col-md-3 mb-3">
+                        <label for="device_model">Device Model:</label>
+                        <select id="device_model" name="device_model" class="form-control" {% if is_closed %}disabled{% endif %}>
+                            <option value="--" {% if form.device_model.value == "--" %}selected{% endif %}>--</option>
+                            <option value="DL548" {% if form.device_model.value == "DL548" %}selected{% endif %}>DL548</option>
+                            <option value="DL545" {% if form.device_model.value == "DL545" %}selected{% endif %}>DL545</option>
+                            <option value="DL310" {% if form.device_model.value == "DL310" %}selected{% endif %}>DL310</option>
+                            <option value="connect all" {% if form.device_model.value == "connect all" %}selected{% endif %}>Connect all</option>
+                            <option value="others" {% if form.device_model.value == "others" %}selected{% endif %}>Others</option>
+                        </select>
+                        <input type="text" id="device_model_other" name="device_model_other"
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify..." {% if is_closed %}disabled{% endif %}>
+                    </div>
+                    <!-- Telco Status -->
+                    <div class="col-md-3 mb-3">
+                        <label for="telco_status">Telco Status:</label>
+                        <select id="telco_status" name="telco_status" class="form-control">
+                            <option value="--" {% if form.telco_status.value == "--" %}selected{% endif %}>--</option>
+                            <option value="Bootstrap" {% if form.telco_status.value == "Bootstrap" %}selected{% endif %}>Bootstrap</option>
+                            <option value="Commercial" {% if form.telco_status.value == "Commercial" %}selected{% endif %}>Commercial</option>
+                            <option value="Others" {% if form.telco_status.value == "Others" %}selected{% endif %}>Others</option>
+                        </select>
+                        <input type="text" id="telco_status_other" name="telco_status_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                    </div>
+                
+                    <!-- Active Profile -->
+                    <div class="col-md-3 mb-3">
+                        <label for="active_profile">Active Profile:</label>
+                        <select id="active_profile" name="active_profile" class="form-control">
+                            <option value="--" {% if form.active_profile.value == "--" %}selected{% endif %}>--</option>
+                            <option value="Airtel" {% if form.active_profile.value == "Airtel" %}selected{% endif %}>Airtel</option>
+                            <option value="BSNL" {% if form.active_profile.value == "BSNL" %}selected{% endif %}>BSNL</option>
+                            <option value="Dual" {% if form.active_profile.value == "Dual" %}selected{% endif %}>Dual</option>
+                            <option value="Others" {% if form.active_profile.value == "Others" %}selected{% endif %}>Others</option>
+                        </select>
+                        <input type="text" id="active_profile_other" name="active_profile_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                    </div>
+                
+                    <!-- Activation Start Date -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.activation_start_date|as_crispy_field }}
+                    </div>
+                
+                    <!-- Activation End Date -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.activation_end_date|as_crispy_field }}
+                    </div>
+                
+                    <!-- Vehicle Sale Date -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.vehicle_sale_date|as_crispy_field }}
+                    </div>
+                
+                    <!-- First Communication in Darby -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.first_communication_in_darby|as_crispy_field }}
+                    </div>
+                
+                    <!-- Last Communication in Darby -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.last_communication_in_darby|as_crispy_field }}
+                    </div>
+                
+                    <!-- Vehicle Type -->
+                    <div class="col-md-3 mb-3">
+                        <label for="vehicle_type">Vehicle Type:</label>
+                        <div id="vehicle_type_container">
+                            <select id="vehicle_type" name="vehicle_type" class="form-control">
+                                <option value="--" {% if form.vehicle_type.value == "--" %}selected{% endif %}>--</option>
+                                <option value="Tipper" {% if form.vehicle_type.value == "Tipper" %}selected{% endif %}>Tipper</option>
+                                <option value="E-com" {% if form.vehicle_type.value == "E-com" %}selected{% endif %}>E-com</option>
+                                <option value="Boss" {% if form.vehicle_type.value == "Boss" %}selected{% endif %}>Boss</option>
+                                <option value="Haulage" {% if form.vehicle_type.value == "Haulage" %}selected{% endif %}>Haulage</option>
+                                <option value="Passenger" {% if form.vehicle_type.value == "Passenger" %}selected{% endif %}>Passenger</option>
+                                <option value="LCV" {% if form.vehicle_type.value == "LCV" %}selected{% endif %}>LCV</option>
+                                <option value="EV-LCV" {% if form.vehicle_type.value == "EV-LCV" %}selected{% endif %}>EV-LCV</option>
+                                <option value="EV M&HV" {% if form.vehicle_type.value == "EV M&HV" %}selected{% endif %}>EV M&HV</option>
+                                <option value="T&T" {% if form.vehicle_type.value == "T&T" %}selected{% endif %}>T&T</option>
+                                <option value="Others" {% if form.vehicle_type.value == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="vehicle_type_other" name="vehicle_type_other"
+                            class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+                    </div>
+                
+                    <!-- Vehicle Run -->
+                    <div class="col-md-3 mb-3">
+                        <label for="vehicle_run">Vehicle Run:</label>
+                        <select id="vehicle_run" name="vehicle_run" class="form-control">
+                            <option value="Kilometers">Kilometers</option>
+                            <option value="Hours">Hours</option>
+                            <option value="others">Others</option>
+                        </select>
+                        <input type="text" id="vehicle_run_other" name="vehicle_run_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                    </div>
+                
+                    <!-- Kilometers/Hours -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.kilometers_hours|as_crispy_field }}
+                    </div>
+                
+                    <!-- Main Battery Voltage -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.main_battery_voltage|as_crispy_field }}
+                    </div>
+                
+                    <!-- Vehicle Running Location -->
+                    <div class="col-md-3 mb-3">
+                        <label for="vehicle_running_location">Vehicle Running Location:</label>
+                        <input type="text" id="vehicle_running_location" name="vehicle_running_location" 
+                               class="form-control" placeholder="Enter Vehicle Running Location" 
+                               pattern="^[A-Z\s]+$" title="Only uppercase letters and spaces are allowed."
+                               value="{{ form.vehicle_running_location.value|default_if_none:'' }}">
+                    </div>
+                
+                    <div class="col-md-3 mb-3">
+                        <label for="state">State:</label>
+                        <select id="state" name="state" class="form-control">
+                            <option value="--" {% if form.state.value == "--" %}selected{% endif %}>--</option>
+                            <option value="Andhra Pradesh" {% if form.state.value == "Andhra Pradesh" %}selected{% endif %}>Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh" {% if form.state.value == "Arunachal Pradesh" %}selected{% endif %}>Arunachal Pradesh</option>
+                            <option value="Assam" {% if form.state.value == "Assam" %}selected{% endif %}>Assam</option>
+                            <option value="Bihar" {% if form.state.value == "Bihar" %}selected{% endif %}>Bihar</option>
+                            <option value="Chhattisgarh" {% if form.state.value == "Chhattisgarh" %}selected{% endif %}>Chhattisgarh</option>
+                            <option value="Goa" {% if form.state.value == "Goa" %}selected{% endif %}>Goa</option>
+                            <option value="Gujarat" {% if form.state.value == "Gujarat" %}selected{% endif %}>Gujarat</option>
+                            <option value="Haryana" {% if form.state.value == "Haryana" %}selected{% endif %}>Haryana</option>
+                            <option value="Himachal Pradesh" {% if form.state.value == "Himachal Pradesh" %}selected{% endif %}>Himachal Pradesh</option>
+                            <option value="Jharkhand" {% if form.state.value == "Jharkhand" %}selected{% endif %}>Jharkhand</option>
+                            <option value="Karnataka" {% if form.state.value == "Karnataka" %}selected{% endif %}>Karnataka</option>
+                            <option value="Kerala" {% if form.state.value == "Kerala" %}selected{% endif %}>Kerala</option>
+                            <option value="Madhya Pradesh" {% if form.state.value == "Madhya Pradesh" %}selected{% endif %}>Madhya Pradesh</option>
+                            <option value="Maharashtra" {% if form.state.value == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+                            <option value="Manipur" {% if form.state.value == "Manipur" %}selected{% endif %}>Manipur</option>
+                            <option value="Meghalaya" {% if form.state.value == "Meghalaya" %}selected{% endif %}>Meghalaya</option>
+                            <option value="Mizoram" {% if form.state.value == "Mizoram" %}selected{% endif %}>Mizoram</option>
+                            <option value="Nagaland" {% if form.state.value == "Nagaland" %}selected{% endif %}>Nagaland</option>
+                            <option value="Odisha" {% if form.state.value == "Odisha" %}selected{% endif %}>Odisha</option>
+                            <option value="Punjab" {% if form.state.value == "Punjab" %}selected{% endif %}>Punjab</option>
+                            <option value="Rajasthan" {% if form.state.value == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
+                            <option value="Tamil Nadu" {% if form.state.value == "Tamil Nadu" %}selected{% endif %}>Tamil Nadu</option>
+                            <option value="Telangana" {% if form.state.value == "Telangana" %}selected{% endif %}>Telangana</option>
+                            <option value="Tripura" {% if form.state.value == "Tripura" %}selected{% endif %}>Tripura</option>
+                            <option value="Uttar Pradesh" {% if form.state.value == "Uttar Pradesh" %}selected{% endif %}>Uttar Pradesh</option>
+                            <option value="Uttarakhand" {% if form.state.value == "Uttarakhand" %}selected{% endif %}>Uttarakhand</option>
+                            <option value="West Bengal" {% if form.state.value == "West Bengal" %}selected{% endif %}>West Bengal</option>
+                            <option value="Others" {% if form.state.value == "Others" %}selected{% endif %}>Others</option>
+                        </select>
+                        <input type="text" id="state_other" name="state_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                    </div>
+                    
+                
+                    <!-- Region -->
+                    <div class="col-md-3 mb-3">
+                        <label for="region">Region:</label>
+                        <select id="region" name="region" class="form-control">
+                            <option value="--" {% if form.region.value == "--" %}selected{% endif %}>--</option>
+                            <option value="East" {% if form.region.value == "East" %}selected{% endif %}>East</option>
+                            <option value="West" {% if form.region.value == "West" %}selected{% endif %}>West</option>
+                            <option value="North" {% if form.region.value == "North" %}selected{% endif %}>North</option>
+                            <option value="South" {% if form.region.value == "South" %}selected{% endif %}>South</option>
+                            <option value="Central" {% if form.region.value == "Central" %}selected{% endif %}>Central</option>
+                            <option value="Others" {% if form.region.value == "Others" %}selected{% endif %}>Others</option>
+                        </select>
+                        <input type="text" id="region_other" name="region_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                    </div>
+                
+                    <!-- Contact Person Name -->
+                    <div class="col-md-3 mb-3">
+                        <label for="contact_person_name">Contact Person Name:</label>
+                        <input type="text" id="contact_person_name" name="contact_person_name" 
+                               class="form-control" placeholder="Enter Contact Person Name" 
+                               pattern="^[A-Z\s]+$" title="Only uppercase letters and spaces are allowed."
+                               value="{{ form.contact_person_name.value|default_if_none:'' }}">
+                    </div>
+                
+<!-- Contact Person Number -->
+<div class="col-md-3 mb-3">
+    <label for="contact_person_number">Contact Person Number:</label>
+    <input type="text" id="contact_person_number" name="contact_person_number" 
+           class="form-control" placeholder="Enter Contact Person Number" maxlength="10"
+           value="{{ form.contact_person_number.value|default_if_none:'' }}">
+</div>
+
+                
+<!-- Contact Category -->
+<div class="col-md-3 mb-3">
+    <label for="contact_category">Contact Category:</label>
+    <select id="contact_category" name="contact_category" class="form-control">
+        <option value="--" {% if form.contact_category.value == "--" %}selected{% endif %}>--</option>
+        <option value="Driver" {% if form.contact_category.value == "Driver" %}selected{% endif %}>Driver</option>
+        <option value="Owner" {% if form.contact_category.value == "Owner" %}selected{% endif %}>Owner</option>
+        <option value="Mechanic" {% if form.contact_category.value == "Mechanic" %}selected{% endif %}>Mechanic</option>
+        <option value="Fleet Manager" {% if form.contact_category.value == "Fleet Manager" %}selected{% endif %}>Fleet Manager</option>
+        <option value="Others" {% if form.contact_category.value == "Others" %}selected{% endif %}>Others</option>
+    </select>
+    <input type="text" id="contact_category_other" name="contact_category_other" 
+           class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+</div>
+<!-- Issue Identified -->
+<div class="col-md-3 mb-3">
+    <label for="issue_identified">Issue Identified:</label>
+    <select id="issue_identified" name="issue_identified" class="form-control">
+        <option value="--" {% if form.issue_identified.value == "--" %}selected{% endif %}>--</option>
+        <option value="Not Powering ON" {% if form.issue_identified.value == "Not Powering ON" %}selected{% endif %}>Not Powering ON</option>
+        <option value="NRD" {% if form.issue_identified.value == "NRD" %}selected{% endif %}>NRD</option>
+        <option value="NO-DATA" {% if form.issue_identified.value == "NO-DATA" %}selected{% endif %}>NO-DATA</option>
+        <option value="100%V Packet" {% if form.issue_identified.value == "100%V Packet" %}selected{% endif %}>100%V Packet</option>
+        <option value="Partial V Packet" {% if form.issue_identified.value == "Partial V Packet" %}selected{% endif %}>Partial V Packet</option>
+        <option value="Latency" {% if form.issue_identified.value == "Latency" %}selected{% endif %}>Latency</option>
+        <option value="Data loss" {% if form.issue_identified.value == "Data loss" %}selected{% endif %}>Data loss</option>
+        <option value="GPS Issue" {% if form.issue_identified.value == "GPS Issue" %}selected{% endif %}>GPS Issue</option>
+        <option value="CAN Issue" {% if form.issue_identified.value == "CAN Issue" %}selected{% endif %}>CAN Issue</option>
+        <option value="Others" {% if form.issue_identified.value == "Others" %}selected{% endif %}>Others</option>
+    </select>
+    <input type="text" id="issue_identified_other" name="issue_identified_other" 
+           class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+</div>
+                
+<!-- Issue Analysis -->
+<div class="col-md-3 mb-3">
+    <label for="issue_analysis">Issue Analysis:</label>
+    <select id="issue_analysis" name="issue_analysis" class="form-control">
+        <option value="--" {% if form.issue_analysis.value == "--" %}selected{% endif %}>--</option>
+        <option value="Disk Image" {% if form.issue_analysis.value == "Disk Image" %}selected{% endif %}>Disk Image</option>
+        <option value="Sim-Reg Issue" {% if form.issue_analysis.value == "Sim-Reg Issue" %}selected{% endif %}>Sim-Reg Issue</option>
+        <option value="Sim Expired" {% if form.issue_analysis.value == "Sim Expired" %}selected{% endif %}>Sim Expired</option>
+        <option value="Device Not Powering ON" {% if form.issue_analysis.value == "Device Not Powering ON" %}selected{% endif %}>Device Not Powering ON</option>
+        <option value="Battery Reset" {% if form.issue_analysis.value == "Battery Reset" %}selected{% endif %}>Battery Reset</option>
+        <option value="VIC Issue" {% if form.issue_analysis.value == "VIC Issue" %}selected{% endif %}>VIC Issue</option>
+        <option value="CAN Issue" {% if form.issue_analysis.value == "CAN Issue" %}selected{% endif %}>CAN Issue</option>
+        <option value="SW-Issue" {% if form.issue_analysis.value == "SW-Issue" %}selected{% endif %}>SW-Issue</option>
+        <option value="GPS Status" {% if form.issue_analysis.value == "GPS Status" %}selected{% endif %}>GPS Status</option>
+        <option value="Others" {% if form.issue_analysis.value == "Others" %}selected{% endif %}>Others</option>
+    </select>
+    <input type="text" id="issue_analysis_other" name="issue_analysis_other" 
+           class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+</div>
+                
+                    <!-- Existing Software -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.exist_software|as_crispy_field }}
+                    </div>
+                
+                    <!-- Updated Software -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.updated_software|as_crispy_field }}
+                    </div>
+                
+                    <!-- Final Action Taken -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.final_action_taken|as_crispy_field }}
+                    </div>
+                
+                    <!-- Finalised Issue Category -->
+<!-- Finalised Issue Category -->
+<div class="col-md-3 mb-3">
+    <label for="finalised_issue_category">Finalised Issue Category:</label>
+    <select id="finalised_issue_category" name="finalised_issue_category" class="form-control">
+        <option value="--" {% if form.finalised_issue_category.value == "--" %}selected{% endif %}>--</option>
+        <option value="32P Reset (32 Pin connector Reset)" {% if form.finalised_issue_category.value == "32P Reset (32 Pin connector Reset)" %}selected{% endif %}>32P Reset (32 Pin connector Reset)</option>
+        <option value="BRD (Device Battery Reset)" {% if form.finalised_issue_category.value == "BRD (Device Battery Reset)" %}selected{% endif %}>BRD (Device Battery Reset)</option>
+        <option value="CI (Customer Issue)" {% if form.finalised_issue_category.value == "CI (Customer Issue)" %}selected{% endif %}>CI (Customer Issue)</option>
+        <option value="DDR (Device Replacement)" {% if form.finalised_issue_category.value == "DDR (Device Replacement)" %}selected{% endif %}>DDR (Device Replacement)</option>
+        <option value="DTA (Device Taken for Repair)" {% if form.finalised_issue_category.value == "DTA (Device Taken for Repair)" %}selected{% endif %}>DTA (Device Taken for Repair)</option>
+        <option value="DD (Device Damaged)" {% if form.finalised_issue_category.value == "DD (Device Damaged)" %}selected{% endif %}>DD (Device Damaged)</option>
+        <option value="DM (Dashboard Modification)" {% if form.finalised_issue_category.value == "DM (Dashboard Modification)" %}selected{% endif %}>DM (Dashboard Modification)</option>
+        <option value="FR (Fuse Resolved)" {% if form.finalised_issue_category.value == "FR (Fuse Resolved)" %}selected{% endif %}>FR (Fuse Resolved)</option>
+        <option value="OCI (Operational Config Issue)" {% if form.finalised_issue_category.value == "OCI (Operational Config Issue)" %}selected{% endif %}>OCI (Operational Config Issue)</option>
+        <option value="OTN (Old to New Software)" {% if form.finalised_issue_category.value == "OTN (Old to New Software)" %}selected{% endif %}>OTN (Old to New Software)</option>
+        <option value="UM (Under Monitoring)" {% if form.finalised_issue_category.value == "UM (Under Monitoring)" %}selected{% endif %}>UM (Under Monitoring)</option>
+        <option value="WI (Wiring Issue)" {% if form.finalised_issue_category.value == "WI (Wiring Issue)" %}selected{% endif %}>WI (Wiring Issue)</option>
+        <option value="Others" {% if form.finalised_issue_category.value == "Others" %}selected{% endif %}>Others</option>
+    </select>
+                        <input type="text" id="finalised_issue_category_other" name="finalised_issue_category_other" 
+                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                            </div>
+                    <!-- Upload File -->
+                    <div class="col-md-3 mb-3">
+                        <label for="upload_file_01">Upload File:</label>
+                        <input type="file" id="upload_file_01" name="upload_file_01" class="form-control">
+                    </div>
+                    <!-- Call Status -->
+                    <div class="col-md-3 mb-3">
+                        <label for="call_status">Call Status:</label>
+                        <select id="call_status" name="call_status" class="form-control">
+                            <option value="--" {% if form.call_status.value == "--" %}selected{% endif %}>--</option>
+                            <option value="Pending" {% if form.call_status.value == "Pending" %}selected{% endif %}>Pending</option>
+                            <option value="Resolved" {% if form.call_status.value == "Resolved" %}selected{% endif %}>Resolved</option>
+                            <option value="Closed" {% if form.call_status.value == "Closed" %}selected{% endif %}>Closed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="hod_comment" class="form-label">HOD Comments</label>
+                        <textarea id="hod_comment" name="hod_comment" class="form-control" placeholder="Enter HOD Comments" rows="1">
+                            {{ form.hod_comment.value|default_if_none:'' }}
+                        </textarea>
+                    </div>
+                
+                    <!-- Date of Closure -->
+                    <div class="col-md-3 mb-3">
+                        {{ form.date_of_closure|as_crispy_field }}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                {% if not is_closed %}
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg" 
+                            style="background: linear-gradient(to right, #007bff, #00b342); 
+                                   color: white; 
+                                   border: none; 
+                                   border-radius: 8px; 
+                                   padding: 10px 20px; 
+                                   transition: all 0.3s ease;">
+                        Submit
+                    </button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Message -->
+<div id="popup-message" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000;">
+    Form saved successfully!
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('engineer-form');
+        const popupMessage = document.getElementById('popup-message');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show the popup message
+                    popupMessage.textContent = data.message;
+                    popupMessage.style.display = 'block';
+
+                    // Hide the popup after 3 seconds and refresh the page
+                    setTimeout(() => {
+                        popupMessage.style.display = 'none';
+                        location.reload(); // Refresh the page
+                    }, 3000);
+                } else {
+                    // Handle form errors (if any)
+                    console.error('Form errors:', data.errors);
+                    alert('There was an error saving the form. Please check the fields.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An unexpected error occurred.');
+            });
+        });
+
+       
+
+        // Automatically convert input to uppercase for Contact Person Name
+        const contactPersonName = document.getElementById('contact_person_name');
+        contactPersonName.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Automatically convert input to uppercase for Vehicle Running Location
+        const vehicleRunningLocation = document.getElementById('vehicle_running_location');
+        vehicleRunningLocation.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Restrict Contact Person Number to numeric input only
+        const contactPersonNumber = document.getElementById('contact_person_number');
+        contactPersonNumber.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10); // Limit to 10 digits
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Action Required</title>
+</head>
+<body>
+    <h2>Action Required for Call {{ direct_call.id }}</h2>
+    <p>Your request has been approved. Please fill out the additional details:</p>
+    <a href="{{ form_url }}" style="color: blue;">Fill Details</a>
+</body>
+</html>

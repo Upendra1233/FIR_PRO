@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping Process Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 95%;
+            margin: 30px auto;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 12px 12px 0 0;
+            padding: 15px;
+        }
+        .form-control {
+            border-radius: 8px;
+        }
+        .btn-submit {
+            background: linear-gradient(to right, #28a745, #218838);
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+        }
+        .btn-submit:hover {
+            background: linear-gradient(to right, #218838, #1e7e34);
+        }
+        .read-only-message {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #ffc107;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container form-container">
+        <div class="card">
+            <div class="card-header">
+                Mapping Process Form
+            </div>
+            <div class="card-body">
+                {% if read_only %}
+                    <div class="read-only-message">
+                        This form is read-only because the manager has approved the request.
+                    </div>
+                {% endif %}
+                <form id="mapping-process-form" method="post" action="{% url 'mapping_process_editable_form' instance.id %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <!-- Mapping Requested Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_mapping_req_received_date" class="form-label">Mapping Requested Date</label>
+                            <input type="datetime-local" name="mapping_req_received_date" id="id_mapping_req_received_date" class="form-control" value="{{ instance.mapping_req_received_date|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Request Raised By -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_req_raised_by" class="form-label">Request Raised By</label>
+                            <select name="req_raised_by" id="id_req_raised_by" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select User --</option>
+                                <option value="Dileep" {% if instance.req_raised_by == "Dileep" %}selected{% endif %}>Dileep</option>
+                                <option value="Kunal" {% if instance.req_raised_by == "Kunal" %}selected{% endif %}>Kunal</option>
+                                <option value="Others" {% if instance.req_raised_by == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="id_req_raised_by_other" name="req_raised_by_other" class="form-control mt-2" style="display: none;" placeholder="Please specify..." {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- VIN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_vin" class="form-label">VIN</label>
+                            <input type="text" name="vin" id="id_vin" class="form-control" maxlength="17" value="{{ instance.vin }}" placeholder="Enter VIN" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Old PSN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_psn" class="form-label">Old PSN</label>
+                            <input type="text" name="old_psn" id="id_old_psn" class="form-control" maxlength="20" value="{{ instance.old_psn }}" placeholder="Enter Old PSN" {% if read_only %}readonly{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Date of Old Device Sales -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_date_of_old_device_sales" class="form-label">Date of Old Device Sales</label>
+                            <input type="date" name="date_of_old_device_sales" id="id_date_of_old_device_sales" class="form-control" value="{{ instance.date_of_old_device_sales|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- 1st S Activation of Old Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_first_s_activation_of_old_device" class="form-label">1st S Activation of Old Device</label>
+                            <input type="date" name="first_s_activation_of_old_device" id="id_first_s_activation_of_old_device" class="form-control" value="{{ instance.first_s_activation_of_old_device|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- 1st C Activation of Old Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_first_c_activation_of_old_device" class="form-label">1st C Activation of Old Device</label>
+                            <input type="date" name="first_c_activation_of_old_device" id="id_first_c_activation_of_old_device" class="form-control" value="{{ instance.first_c_activation_of_old_device|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Old Device Telco Status -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_device_telco_status" class="form-label">Old Device Telco Status</label>
+                            <select name="old_device_telco_status" id="id_old_device_telco_status" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Status --</option>
+                                <option value="Single Airtel" {% if instance.old_device_telco_status == "Single Airtel" %}selected{% endif %}>Single Airtel</option>
+                                <option value="Single BSNL" {% if instance.old_device_telco_status == "Single BSNL" %}selected{% endif %}>Single BSNL</option>
+                                <option value="Dual" {% if instance.old_device_telco_status == "Dual" %}selected{% endif %}>Dual</option>
+                                <option value="Others" {% if instance.old_device_telco_status == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="id_old_device_telco_status_other" name="old_device_telco_status_other" class="form-control mt-2" style="display: none;" placeholder="Please specify..." {% if read_only %}readonly{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Old Device Validity -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_device_validity" class="form-label">Old Device Validity</label>
+                            <input type="date" name="old_device_validity" id="id_old_device_validity" class="form-control" value="{{ instance.old_device_validity|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Old Device Return Location -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_device_return_location" class="form-label">Old Device Return Location</label>
+                            <select name="old_device_return_location" id="id_old_device_return_location" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Location --</option>
+                                <option value="Goa" {% if instance.old_device_return_location == "Goa" %}selected{% endif %}>Goa</option>
+                                <option value="Hyd" {% if instance.old_device_return_location == "Hyd" %}selected{% endif %}>Hyd</option>
+                                <option value="Others" {% if instance.old_device_return_location == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="id_old_device_return_location_other" name="old_device_return_location_other" class="form-control mt-2" style="display: none;" placeholder="Please specify..." {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Current Card Status of New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_current_card_status_of_new_device" class="form-label">Current Card Status of New Device</label>
+                            <select name="current_card_status_of_new_device" id="id_current_card_status_of_new_device" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Status --</option>
+                                <option value="Live" {% if instance.current_card_status_of_new_device == "Live" %}selected{% endif %}>Live</option>
+                                <option value="Expired" {% if instance.current_card_status_of_new_device == "Expired" %}selected{% endif %}>Expired</option>
+                                <option value="Others" {% if instance.current_card_status_of_new_device == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+
+                        <!-- Activation Status of New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_activation_status_of_new_device" class="form-label">Activation Status of New Device</label>
+                            <select name="activation_status_of_new_device" id="id_activation_status_of_new_device" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Status --</option>
+                                <option value="Bootstrap" {% if instance.activation_status_of_new_device == "Bootstrap" %}selected{% endif %}>Bootstrap</option>
+                                <option value="Commercial" {% if instance.activation_status_of_new_device == "Commercial" %}selected{% endif %}>Commercial</option>
+                                <option value="Others" {% if instance.activation_status_of_new_device == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- New Device Telco Status -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_new_device_telco_status" class="form-label">New Device Telco Status</label>
+                            <select name="new_device_telco_status" id="id_new_device_telco_status" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Status --</option>
+                                <option value="Single Airtel" {% if instance.new_device_telco_status == "Single Airtel" %}selected{% endif %}>Single Airtel</option>
+                                <option value="Single BSNL" {% if instance.new_device_telco_status == "Single BSNL" %}selected{% endif %}>Single BSNL</option>
+                                <option value="Dual" {% if instance.new_device_telco_status == "Dual" %}selected{% endif %}>Dual</option>
+                                <option value="Others" {% if instance.new_device_telco_status == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+
+                        <!-- Current Validity Status of New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_current_validity_status_of_new_device" class="form-label">Current Validity Status of New Device</label>
+                            <input type="date" name="current_validity_status_of_new_device" id="id_current_validity_status_of_new_device" class="form-control" value="{{ instance.current_validity_status_of_new_device|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Added Validity for New Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_added_validity_for_new_device" class="form-label">Added Validity for New Device</label>
+                            <textarea name="added_validity_for_new_device" id="id_added_validity_for_new_device" class="form-control" rows="1" {% if read_only %}readonly{% endif %}>{{ instance.added_validity_for_new_device }}</textarea>
+                        </div>
+
+                        <!-- New PSN -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_new_psn" class="form-label">New PSN</label>
+                            <input type="text" name="new_psn" id="id_new_psn" class="form-control" maxlength="20" value="{{ instance.new_psn }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Submitted By -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_submitted_by" class="form-label">Submitted By</label>
+                            <input type="email" name="submitted_by" id="id_submitted_by" class="form-control" value="{{ instance.submitted_by }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- HOD Remarks -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_hod_remarks" class="form-label">HOD Remarks</label>
+                            <textarea name="hod_remarks" id="id_hod_remarks" class="form-control" rows="1" {% if read_only %}readonly{% endif %}>{{ instance.hod_remarks }}</textarea>
+                        </div>
+
+                        <!-- Mapping Done By -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_mapping_done_by" class="form-label">Mapping Done By</label>
+                            <input type="text" name="mapping_done_by" id="id_mapping_done_by" class="form-control" value="{{ instance.mapping_done_by }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Mapping Completion Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_mapping_completion_date" class="form-label">Mapping Completion Date</label>
+                            <input type="date" name="mapping_completion_date" id="id_mapping_completion_date" class="form-control" value="{{ instance.mapping_completion_date|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Warranty of the Device -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_warranty_of_the_device" class="form-label">Warranty of the Device</label>
+                            <input type="date" name="warranty_of_the_device" id="id_warranty_of_the_device" class="form-control" value="{{ instance.warranty_of_the_device|date:'Y-m-d' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Call Type -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_call_type" class="form-label">Call Type</label>
+                            <select name="call_type" id="id_call_type" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Call Type --</option>
+                                <option value="Direct Call" {% if instance.call_type == "Direct Call" %}selected{% endif %}>Direct Call</option>
+                                <option value="I Alert Call" {% if instance.call_type == "I Alert Call" %}selected{% endif %}>I Alert Call</option>
+                            </select>
+                        </div>
+
+                        <!-- Ticket No (conditionally displayed) -->
+                        <div class="col-md-3 mb-3" id="ticket_no_container" style="display: none;">
+                            <label for="id_ticket_no" class="form-label">Ticket No</label>
+                            <input type="text" name="ticket_no" id="id_ticket_no" class="form-control" value="{{ instance.ticket_no }}" placeholder="Enter Ticket No" {% if read_only %}readonly{% endif %}>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        {% if not read_only %}
+                            <button type="submit" class="btn-submit">Submit</button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const callTypeField = document.getElementById('id_call_type');
+            const ticketNoContainer = document.getElementById('ticket_no_container');
+            const ticketNoField = document.getElementById('id_ticket_no');
+
+            // Function to toggle the Ticket No field
+            function toggleTicketNoField() {
+                if (callTypeField.value === 'Direct Call') {
+                    ticketNoContainer.style.display = 'block';
+                    ticketNoField.required = true; // Make Ticket No required
+                } else {
+                    ticketNoContainer.style.display = 'none';
+                    ticketNoField.required = false; // Remove required attribute
+                    ticketNoField.value = ''; // Clear the value
+                }
+            }
+
+            // Add event listener to Call Type field
+            callTypeField.addEventListener('change', toggleTicketNoField);
+
+            // Initialize the visibility of the Ticket No field on page load
+            toggleTicketNoField();
+        });
+    </script>
+</body>
+</html>

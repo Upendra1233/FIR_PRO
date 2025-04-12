@@ -4,19 +4,7 @@ from .models import MappingProcess
 class MappingProcessForm(forms.ModelForm):
     class Meta:
         model = MappingProcess
-        fields = '__all__'
-        widgets = {
-            'mapping_req_received_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'date_of_old_device_sales': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'first_s_activation_of_old_device': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'first_c_activation_of_old_device': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'old_device_validity': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'current_validity_status_of_new_device': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'mapping_completion_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'warranty_of_the_device': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'added_validity_for_new_device': forms.Textarea(attrs={'rows': 1, 'class': 'form-control'}),
-            'hod_remarks': forms.Textarea(attrs={'rows': 1, 'class': 'form-control'}),
-        }
+        fields = '__all__'  # Include all fields from the model
 
     def __init__(self, *args, **kwargs):
         super(MappingProcessForm, self).__init__(*args, **kwargs)
@@ -33,4 +21,11 @@ class MappingProcessForm(forms.ModelForm):
         if cleaned_data.get('activation_status_of_new_device') == 'Others' and not cleaned_data.get('activation_status_of_new_device_other'):
             self.add_error('activation_status_of_new_device_other', 'This field is required when "Others" is selected.')
 
+        # Example: Ensure `req_raised_by` is not empty
+        req_raised_by = cleaned_data.get('req_raised_by')
+        if not req_raised_by:
+            self.add_error('req_raised_by', 'This field is required.')
+
         return cleaned_data
+
+MappingProcess.objects.all()

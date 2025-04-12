@@ -2,10 +2,94 @@
 <html>
 <head>
     <title>Action Required</title>
+    <style>
+
+
+
+
+        .btn-link:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
     <h2>Action Required for SR Request {{ sr_request.psn }}</h2>
-    <p>Your request has been approved. Please fill out the additional details:</p>
-    <a href="{{ form_url }}" style="color: blue;">Fill Details</a>
+    <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>Request ID</th>
+                <td>{{ sr_request.id }}</td>
+            </tr>
+            <tr>
+                <th>PSN</th>
+                <td>{{ sr_request.psn }}</td>
+            </tr>
+            <tr>
+                <th>Engineer</th>
+                <td>{{ sr_request.engineer }}</td>
+            </tr>
+            <tr>
+                <th>Category</th>
+                <td>{{ sr_request.category }}</td>
+            </tr>
+            <tr>
+                <th>Plan</th>
+                <td>{{ sr_request.plan }}</td>
+            </tr>
+            <tr>
+                <th>Billing To</th>
+                <td>{{ sr_request.billing_to }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ sr_request.status }}</td>
+            </tr>
+            <tr>
+                <th>Requestor Comments</th>
+                <td>{{ sr_request.requestor_comments }}</td>
+            </tr>
+            <tr>
+                <th>SIM Status During Request</th>
+                <td>{{ sr_request.sim_status_during_request }}</td>
+            </tr>
+            <tr>
+                <th>Requestor Validity Start Date</th>
+                <td>{{ sr_request.requestor_validity_start_date }}</td>
+            </tr>
+            <tr>
+                <th>Requestor Validity End Date</th>
+                <td>{{ sr_request.requestor_validity_end_date }}</td>
+            </tr>
+            <tr>
+                <th>Remarks</th>
+                <td>{{ sr_request.remarks }}</td>
+            </tr>
+            <tr>
+                <th>New SR No</th>
+                <td>{{ sr_request.new_sr_no }}</td>
+            </tr>
+            <tr>
+                <th>SR Date</th>
+                <td>{{ sr_request.sr_date }}</td>
+            </tr>
+            <tr>
+                <th>SR Success Date</th>
+                <td>{{ sr_request.sr_success_date }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="container">
+               <p>Your request has been approved. Please click the button below to fill out the additional details:</p>
+        <a href="{{ form_url }}" class="btn-link">Fill Details</a>
+        <div class="footer">
+            <p>Thank you,<br>Support Team</p>
+        </div>
+    </div>
 </body>
 </html>
