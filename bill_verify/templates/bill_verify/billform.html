@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Verification Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-top: 40px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-radius: 12px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-size: 1.3rem;
+            text-align: left;
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-header .fa-download {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .form-control, .form-select {
+            font-size: 0.95rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+        .main-header {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .main-header h2 {
+            font-weight: 600;
+            color: #007bff;
+        }
+        .top-right-alert {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 9999;
+            min-width: 250px;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: none;
+            text-align: left;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Bill Verification Form
+                <a href="{% url 'bill_verify:download_csv' %}" class="fa fa-download" title="Download CSV" style="cursor:pointer; font-size:1.5rem; color:white; margin-left:10px;"></a>
+            </div>
+            <div class="card-body">
+
+                <form method="post" enctype="multipart/form-data" id="billForm">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.final_po.label_tag }}
+                            {{ form.final_po }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.po_no.label_tag }}
+                            {{ form.po_no }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.service_line.label_tag }}
+                            {{ form.service_line }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.po_date.label_tag }}
+                            {{ form.po_date }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.service_activity.label_tag }}
+                            {{ form.service_activity }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.service_qty.label_tag }}
+                            {{ form.service_qty }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.total_po_qty.label_tag }}
+                            {{ form.total_po_qty }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.total_balance_qty.label_tag }}
+                            {{ form.total_balance_qty }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.customer_name.label_tag }}
+                            {{ form.customer_name }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.profile_type.label_tag }}
+                            {{ form.profile_type }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.customer_price.label_tag }}
+                            {{ form.customer_price }}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.tenure.label_tag }}
+                            {{ form.tenure }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.bill_year.label_tag }}
+                            {{ form.bill_year }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.sr_month.label_tag }}
+                            {{ form.sr_month }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.start_month.label_tag }}
+                            {{ form.start_month }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.end_month.label_tag }}
+                            {{ form.end_month }}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.validity_date.label_tag }}
+                            {{ form.validity_date }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.billed_for.label_tag }}
+                            <div id="billedForWrapper">
+                                {% if form.instance.billed_for %}
+                                    {% for val in form.instance.billed_for.split %}
+                                        <input type="text" name="billed_for" class="form-control mb-2 billed-for-input" value="{{ val }}" placeholder="Billed For">
+                                    {% endfor %}
+                                {% else %}
+                                    <input type="text" name="billed_for" class="form-control mb-2 billed-for-input" placeholder="Billed For">
+                                {% endif %}
+                            </div>
+                            <button type="button" id="addBilledForBtn" class="btn btn-sm btn-secondary">
+                                <i class="fa fa-plus"></i> Add
+                            </button>
+                        </div>
+
+                        <!-- Invoice Number -->
+                        <div class="col-md-4">
+                            {{ form.invoice_number.label_tag }}
+                            <div id="invoiceNumbersWrapper">
+                                {% if form.instance.invoice_number %}
+                                    {% for num in form.instance.invoice_number.split %}
+                                        <input type="text" name="invoice_number" class="form-control mb-2 invoice-number-input" value="{{ num }}" placeholder="Invoice Number">
+                                    {% endfor %}
+                                {% else %}
+                                    <input type="text" name="invoice_number" class="form-control mb-2 invoice-number-input" placeholder="Invoice Number">
+                                {% endif %}
+                            </div>
+                            <button type="button" id="addInvoiceNumberBtn" class="btn btn-sm btn-secondary">
+                                <i class="fa fa-plus"></i> Add
+                            </button>
+                        </div>
+
+                        <!-- Invoice Date -->
+                        <div class="col-md-4">
+                            {{ form.invoice_date.label_tag }}
+                            <div id="invoiceDatesWrapper">
+                                {% if form.instance.invoice_date %}
+                                    {% for dt in form.instance.invoice_date.split %}
+                                        <input type="text" name="invoice_date" class="form-control mb-2 invoice-date-input" value="{{ dt }}" placeholder="Invoice Date">
+                                    {% endfor %}
+                                {% else %}
+                                    <input type="text" name="invoice_date" class="form-control mb-2 invoice-date-input" placeholder="Invoice Date">
+                                {% endif %}
+                            </div>
+                            <button type="button" id="addInvoiceDateBtn" class="btn btn-sm btn-secondary">
+                                <i class="fa fa-plus"></i> Add
+                            </button>
+                        </div>
+
+                        <!-- Invoice Qty -->
+                        <div class="col-md-4">
+                            {{ form.invoice_qty.label_tag }}
+                            <div id="invoiceQtyWrapper">
+                                {% if form.instance.invoice_qty %}
+                                    {% for qty in form.instance.invoice_qty.split %}
+                                        <input type="text" name="invoice_qty" class="form-control mb-2 invoice-qty-input" value="{{ qty }}" placeholder="Invoice Qty">
+                                    {% endfor %}
+                                {% else %}
+                                    <input type="text" name="invoice_qty" class="form-control mb-2 invoice-qty-input" placeholder="Invoice Qty">
+                                {% endif %}
+                            </div>
+                            <button type="button" id="addInvoiceQtyBtn" class="btn btn-sm btn-secondary">
+                                <i class="fa fa-plus"></i> Add
+                            </button>
+                        </div>
+
+
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-primary px-5">Submit</button>
+                    </div>
+                </form>
+
+                {% if form.errors %}
+                  <div class="alert alert-danger">
+                    {{ form.errors }}
+                  </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+    <div id="topRightAlert" class="top-right-alert" role="alert">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add new inputs for all multi-value fields
+            document.getElementById('addInvoiceNumberBtn').addEventListener('click', function() {
+                const wrapper = document.getElementById('invoiceNumbersWrapper');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'invoice_number';
+                input.className = 'form-control mb-2 invoice-number-input';
+                input.placeholder = 'Invoice Number';
+                wrapper.appendChild(input);
+            });
+            document.getElementById('addInvoiceQtyBtn').addEventListener('click', function() {
+                const wrapper = document.getElementById('invoiceQtyWrapper');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'invoice_qty';
+                input.className = 'form-control mb-2 invoice-qty-input';
+                input.placeholder = 'Invoice Qty';
+                wrapper.appendChild(input);
+            });
+            document.getElementById('addBilledForBtn').addEventListener('click', function() {
+                const wrapper = document.getElementById('billedForWrapper');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'billed_for';
+                input.className = 'form-control mb-2 billed-for-input';
+                input.placeholder = 'Billed For';
+                wrapper.appendChild(input);
+            });
+            document.getElementById('addInvoiceDateBtn').addEventListener('click', function() {
+                const wrapper = document.getElementById('invoiceDatesWrapper');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'invoice_date';
+                input.className = 'form-control mb-2 invoice-date-input';
+                input.placeholder = 'Invoice Date';
+                wrapper.appendChild(input);
+            });
+
+            // On form submit, join all values for each field
+            document.getElementById('billForm').addEventListener('submit', function(e) {
+                // Invoice Numbers
+                const numInputs = document.querySelectorAll('.invoice-number-input');
+                let numValues = [];
+                numInputs.forEach(input => {
+                    if (input.value.trim()) numValues.push(input.value.trim());
+                });
+                if (numInputs.length > 0) {
+                    numInputs[0].value = numValues.join(' ');
+                    for (let i = 1; i < numInputs.length; i++) {
+                        numInputs[i].parentNode.removeChild(numInputs[i]);
+                    }
+                }
+                // Invoice Qty
+                const qtyInputs = document.querySelectorAll('.invoice-qty-input');
+                let qtyValues = [];
+                qtyInputs.forEach(input => {
+                    if (input.value.trim()) qtyValues.push(input.value.trim());
+                });
+                if (qtyInputs.length > 0) {
+                    qtyInputs[0].value = qtyValues.join(' ');
+                    for (let i = 1; i < qtyInputs.length; i++) {
+                        qtyInputs[i].parentNode.removeChild(qtyInputs[i]);
+                    }
+                }
+                // Billed For
+                const billedInputs = document.querySelectorAll('.billed-for-input');
+                let billedValues = [];
+                billedInputs.forEach(input => {
+                    if (input.value.trim()) billedValues.push(input.value.trim());
+                });
+                if (billedInputs.length > 0) {
+                    billedInputs[0].value = billedValues.join(' ');
+                    for (let i = 1; i < billedInputs.length; i++) {
+                        billedInputs[i].parentNode.removeChild(billedInputs[i]);
+                    }
+                }
+                // Invoice Dates
+                const dateInputs = document.querySelectorAll('.invoice-date-input');
+                let dateValues = [];
+                dateInputs.forEach(input => {
+                    if (input.value.trim()) dateValues.push(input.value.trim());
+                });
+                if (dateInputs.length > 0) {
+                    dateInputs[0].value = dateValues.join(' ');
+                    for (let i = 1; i < dateInputs.length; i++) {
+                        dateInputs[i].parentNode.removeChild(dateInputs[i]);
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const customerNameSelect = document.getElementById('customer_name');
+            const profileSelect = document.getElementById('profile_type');
+            const customerPriceInput = document.getElementById('customer_price');
+            /*
+            const priceMap = {
+                "AL M&HCV": {"AIR TEL": "60", "BSNL": "50", "DUAL": "66"},
+                "ALEV": {"AIR TEL": "60", "BSNL": "50", "DUAL": "66"},
+                "ALGS": {"AIR TEL": "45", "BSNL": "40"},
+                "AL LCV": {"AIR TEL": "45", "BSNL": "40"},
+                "DTIL ENGG-DL548": {"AIR TEL": "49.5", "BSNL": "27", "DUAL": "66"},
+                "DTIL SERVICE-DL548": {"AIR TEL": "49.5", "BSNL": "27", "DUAL": "66"},
+                "SENSORISE-DL548": {"AIR TEL": "49.5", "BSNL": "27", "DUAL": "66"},
+                "SENSORISE LCV GS": {"AIR TEL": "38", "BSNL": "25"},
+                "DTIL ENGG-LCV, GS": {"AIR TEL": "45"},
+                "DTIL SERVICE -LCV, GS ": {"AIR TEL": "45"}
+            }; */
+
+            function setCustomerPrice() {
+                const customer = customerNameSelect.value;
+                const profile = profileSelect.value;
+                if (priceMap[customer] && priceMap[customer][profile]) {
+                    customerPriceInput.value = priceMap[customer][profile];
+                } else {
+                    customerPriceInput.value = '';
+                }
+            }
+
+            customerNameSelect.addEventListener('change', setCustomerPrice);
+            profileSelect.addEventListener('change', setCustomerPrice);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var alertBox = document.getElementById('topRightAlert');
+            if (alertBox && alertBox.textContent.trim() !== "") {
+                alertBox.style.display = 'block';
+                setTimeout(function() {
+                    alertBox.style.display = 'none';
+                }, 3000); // Hide after 3 seconds
+            }
+        });
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    flatpickr("#multiInvoiceDate", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        onClose: function(selectedDates, dateStr, instance) {
+            // Join selected dates as space-separated string
+            const formatted = selectedDates.map(d => instance.formatDate(d, "Y-m-d")).join(' ');
+            instance.input.value = formatted;
+        }
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    flatpickr("#multiBilledFor", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        onClose: function(selectedDates, dateStr, instance) {
+            // Join selected dates as space-separated string
+            const formatted = selectedDates.map(d => instance.formatDate(d, "Y-m-d")).join(' ');
+            instance.input.value = formatted;
+        }
+    });
+});
+</script>
+{% if detail_mode %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#billForm input, #billForm select, #billForm textarea').forEach(function(el) {
+        el.setAttribute('readonly', 'readonly');
+        el.setAttribute('disabled', 'disabled');
+    });
+    document.querySelector('#billForm button[type="submit"]').style.display = 'none';
+});
+</script>
+{% endif %}
+<script>
+// filepath: c:\Users\Admin\Desktop\FIR_PRO\bill_verify\templates\bill_verify\billform.html
+document.addEventListener('DOMContentLoaded', function() {
+    function enableFlatpickrOnFocus(selector) {
+        document.body.addEventListener('focusin', function(e) {
+            if (e.target.matches(selector) && !e.target._flatpickr) {
+                flatpickr(e.target, {
+                    mode: "multiple",
+                    dateFormat: "Y-m-d",
+                    allowInput: true,
+                    onClose: function(selectedDates, dateStr, instance) {
+                        const formatted = selectedDates.map(d => instance.formatDate(d, "Y-m-d")).join(' ');
+                        instance.input.value = formatted;
+                    }
+                });
+                e.target._flatpickr.open();
+            }
+        });
+    }
+    enableFlatpickrOnFocus('.billed-for-input');
+    enableFlatpickrOnFocus('.invoice-date-input');
+});
+</script>
+</body>
+</html>

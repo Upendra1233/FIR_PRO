@@ -1,468 +1,341 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Direct Call Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f4f6f9;
-        }
-        .form-container {
-            max-width: 95%;
-            margin: 30px auto;
-        }
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background: linear-gradient(to right, #007bff, #00c6ff);
-            color: white;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-radius: 12px 12px 0 0;
-            padding: 15px;
-        }
-        .form-control, .form-select {
-            border-radius: 8px;
-            box-shadow: none;
-            transition: all 0.3s ease-in-out;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
-        }
-        .btn-submit {
-            background: linear-gradient(to right, #28a745, #218838);
-            color: white;
-            font-size: 1.2rem;
-            padding: 12px;
-            width: 100%;
-            border-radius: 8px;
-            transition: all 0.3s ease-in-out;
-        }
-        .btn-submit:hover {
-            background: linear-gradient(to right, #218838, #1e7e34);
-        }
-        .popup-message {
-            position: fixed;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #28a745;
-            color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            display: none;
-        }
-    </style>
-               <head>
-                <!-- Include Font Awesome -->
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-            </head>
-</head>
-<body>
-    <div class="container form-container">
-        <div class="card">
+<style>
+body{background-color:#f4f6f9}
+.form-container{max-width:95%;margin:30px auto}
+.card{border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,.1)}
+.card-header{background:linear-gradient(90deg,#007bff,#00c6ff);color:#fff;text-align:center;font-size:1.5rem;font-weight:700;border-radius:12px 12px 0 0;padding:15px}
+.card-header a{float:right;color:#fff}
+.form-control,.form-select{border-radius:8px;box-shadow:none;transition:all .3s}
+.form-control:focus,.form-select:focus{border-color:#007bff;box-shadow:0 0 10px rgba(0,123,255,.2)}
+.btn-submit{background:linear-gradient(90deg,#28a745,#218838);color:#fff;font-size:1.2rem;padding:12px;width:100%;border-radius:8px;transition:all .3s}
+.btn-submit:hover{background:linear-gradient(90deg,#218838,#1e7e34)}
+.popup-message{position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);background:#28a745;color:#fff;padding:20px;border-radius:5px;box-shadow:0 4px 8px rgba(0,0,0,.2);z-index:1000;display:none}
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
-            <div class="card-header">
-               CRSC Direct call form
-                <span style="float: right;">
-                    <a href="{% url 'download_csv' %}" style="padding: 5px 10px; border-radius: 5px; text-decoration: none; color: #ffffff; font-size: 1.2rem;">
-                        <i class="fas fa-download fa-2x"></i>
-                    </a>
-                </span>
-            </div>
-
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data" id="managerForm">
-                    {% csrf_token %}
-                    <div class="row">
-                        <!-- Row 1 -->
-                        <div class="col-md-3 mb-3">
-                            <label for="id_date_of_complaint">Date of Complaint:</label>
-                            <input type="text" id="id_date_of_complaint" name="date_of_complaint" 
-                                   class="form-control" value="{{ form.date_of_complaint.value|date:'Y-m-d\TH:i' }}" readonly>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="complaint_raised_from_location">Complaint Raised Location:</label>
-                            <input type="text" id="complaint_raised_from_location" name="complaint_raised_from_location" class="form-control" placeholder="Enter location">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="customer_raised_issue">Customer Voice:</label>
-                            <input type="text" id="customer_raised_issue" name="customer_raised_issue" class="form-control" placeholder="Enter customer voice">
-                        </div>
-
-                        <!-- Row 2 -->
-                        <div class="col-md-3 mb-3">
-                            <label for="complaint_raised">Complaint Raised:</label>
-                            <select id="complaint_raised" name="complaint_raised" class="form-control">
-                                <option value="--">--</option>
-                                <option value="Dealer">Dealer</option>
-                                <option value="Customer">Customer</option>
-                                <option value="AL Field">AL Field</option>
-                                <option value="AL Service">AL Service</option>
-                                <option value="I-Alert">I-Alert</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <input type="text" id="complaint_raised_other" name="complaint_raised_other" 
-                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>
-<!-- Complaint Raised By -->
-<div class="col-md-3 mb-3">
-    <label for="complaint_raised_by">Complaint Raised By:</label>
-    <input type="text" id="complaint_raised_by" name="complaint_raised_by" 
-           class="form-control" placeholder="Enter name" required>
-</div>
-                        <div class="col-md-3 mb-3">
-                            <label for="contact_number">Contact Number:</label>
-                            <input type="tel" id="contact_number" name="contact_number" class="form-control" placeholder="Enter contact number">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="customer_mail_id">Customer Mail ID:</label>
-                            <input type="email" id="customer_mail_id" name="customer_mail_id" class="form-control" placeholder="Enter customer email">
-                        </div>
-                        <!-- Row 3 -->
-                        <div class="col-md-3 mb-3">
-                            <label for="complaint_raised_through">Complaint Raised Through:</label>
-                            <select id="complaint_raised_through" name="complaint_raised_through" class="form-control">
-                                <option value="--">--</option>
-                                <option value="I-Alert">I-Alert</option>
-                                <option value="Mail">Mail</option>
-                                <option value="Telephone">Telephone</option>
-                                <option value="DBM NRD">DBM NRD</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <input type="text" id="complaint_raised_through_other" name="complaint_raised_through_other" 
-                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="complaint_received_by">Complaint Received By:</label>
-                            <input type="text" id="complaint_received_by" name="complaint_received_by" class="form-control" placeholder="Enter name">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="vin">VIN:</label>
-                            <input type="text" id="vin" name="vin" class="form-control" placeholder="Enter VIN">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            {{ form.psn|as_crispy_field }}
-                        </div>
-                        <!-- Row 4 -->
-                        <div class="col-md-3 mb-3">
-                            <label for="complaint_assigned_to">Complaint Assigned To:</label>
-                            <select id="complaint_assigned_to" name="complaint_assigned_to" class="form-control">
-                                <option value="--">--</option>
-                                <option value="Anil">Anil</option>
-                                <option value="Arun Maity">Arun Maity</option>
-                                <option value="Eliyas">Eliyas</option>
-                                <option value="Gayadhar">Gayadhar</option>
-                                <option value="Swamy">Swamy</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <input type="text" id="complaint_assigned_to_other" name="complaint_assigned_to_other" 
-                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="submitted_to_email">Complaint Assigned Email ID:</label>
-                            <input type="email" id="submitted_to_email" name="submitted_to_email" class="form-control" placeholder="Enter email">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="engineer_contact_number">Complaint Assigned Contact Number:</label>
-                            <input type="tel" id="engineer_contact_number" name="engineer_contact_number" class="form-control" placeholder="Enter engineer contact number">
-                        </div>
-                        <!-- Row 5 -->
-
-                        <div class="col-md-3 mb-3">
-                            <label for="upload_file">Upload File:</label>
-                            <input type="file" id="upload_file" name="upload_file" class="form-control">
-                        </div>
-                   
-
-
-                    <!-- Call Type -->
-                    <div class="col-md-3 mb-3">
-                        <label for="id_call_type" class="form-label">Call Type</label>
-                        <select id="id_call_type" name="call_type" class="form-control">
-                            <option value="--">--</option>
-                            <option value="Direct Call">Direct Call</option>
-                            <option value="I Alert Call">I Alert Call</option>
-                     
-                        </select>
-                        <input type="text" id="call_type_other" name="call_type_other" 
-                               class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                    </div>
-
-    <!-- Ticket No (conditionally displayed) -->
-    <div class="col-md-3 mb-3" id="ticket_no_container" style="display: none;">
-        <label for="id_ticket_no" class="form-label">IAlert Ticket No</label>
-        <input type="text" name="ticket_no" id="id_ticket_no" class="form-control" value="{{ instance.ticket_no }}" placeholder="Enter Ticket No" {% if read_only %}readonly{% endif %}>
+<div class="container form-container">
+  <div class="card">
+    <div class="card-header">
+      CRSC Calls Form - Part A
+      <a href="{% url 'download_csv' %}"><i class="fas fa-download fa-2x"></i></a>
     </div>
-</div>
+    <div class="card-body">
+      <form method="post" action="{{ request.path }}" enctype="multipart/form-data" id="managerForm">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label>Date of Complaint:</label>
+            <input id="id_date_of_complaint" name="date_of_complaint" class="form-control" type="datetime-local" {% if instance.date_of_complaint %}value="{{ instance.date_of_complaint|date:'Y-m-d\\TH:i' }}"{% endif %} readonly>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label>Complaint Raised Location:</label>
+            <input id="complaint_raised_from_location" name="complaint_raised_from_location" class="form-control" value="{{ instance.complaint_raised_from_location }}">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label>Customer Voice:</label>
+            <input id="customer_raised_issue" name="customer_raised_issue" class="form-control" value="{{ instance.customer_raised_issue }}">
+          </div>
 
+          <div class="col-md-3 mb-3">
+            <label>Complaint Raised:</label>
+            <select id="complaint_raised" name="complaint_raised" class="form-control">
+              <option value="" {% if not instance.complaint_raised %}selected{% endif %}>--</option>
+              <option value="Dealer" {% if instance.complaint_raised == 'Dealer' %}selected{% endif %}>Dealer</option>
+              <option value="Customer" {% if instance.complaint_raised == 'Customer' %}selected{% endif %}>Customer</option>
+              <option value="Owner" {% if instance.complaint_raised == 'Owner' %}selected{% endif %}>Owner</option>
+              <option value="Driver" {% if instance.complaint_raised == 'Driver' %}selected{% endif %}>Driver</option>
+              <option value="Fleet Manager" {% if instance.complaint_raised == 'Fleet Manager' %}selected{% endif %}>Fleet Manager</option>
+              <option value="AL Field" {% if instance.complaint_raised == 'AL Field' %}selected{% endif %}>AL Field</option>
+              <option value="AL Service" {% if instance.complaint_raised == 'AL Service' %}selected{% endif %}>AL Service</option>
+              <option value="I-Alert" {% if instance.complaint_raised == 'I-Alert' %}selected{% endif %}>I-Alert</option>
+              <option value="others" {% if instance.complaint_raised == 'others' or instance.complaint_raised_other %}selected{% endif %}>Others</option>
+            </select>
+            <input id="complaint_raised_other" name="complaint_raised_other" class="form-control mt-2" placeholder="Specify" value="{{ instance.complaint_raised_other }}" {% if not instance.complaint_raised == 'others' and not instance.complaint_raised_other %}disabled="true"{% endif %}>
+            <script>document.getElementById('complaint_raised_other').style.display = "{% if instance.complaint_raised == 'others' or instance.complaint_raised_other %}block{% else %}none{% endif %}";</script>
+          </div>
 
+          <div class="col-md-3 mb-3">
+            <label>Complaint Raised By:</label>
+            <input id="complaint_raised_by" name="complaint_raised_by" class="form-control" value="{{ instance.complaint_raised_by }}">
+          </div>
 
-                    <!-- Submit Button -->
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-submit" onclick="this.disabled=true; this.form.submit();">Submit</button>
-                    </div>
-                </form>
-            </div>
+          <div class="col-md-3 mb-3">
+            <label>Contact Number(Callback;Driver;Service):</label>
+            <input id="contact_number" name="contact_number" class="form-control" type="tel" value="{{ instance.contact_number }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Customer Mail ID (semicolon separated):</label>
+            <input id="customer_mail_id" name="customer_mail_id" class="form-control" type="text" placeholder="email1@example.com;email2@example.com" value="{{ instance.customer_mail_id }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Vehicle Available in Workshop:</label>
+            <select id="vehicle_avl_in_workshop" name="vehicle_avl_in_workshop" class="form-control">
+              <option value="" {% if not instance.vehicle_avl_in_workshop %}selected{% endif %}></option>
+              <option value="Yes" {% if instance.vehicle_avl_in_workshop == 'Yes' %}selected{% endif %}>Yes</option>
+              <option value="No" {% if instance.vehicle_avl_in_workshop == 'No' %}selected{% endif %}>No</option>
+            </select>
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Complaint Raised Through:</label>
+            <select id="complaint_raised_through" name="complaint_raised_through" class="form-control">
+              <option value="" {% if not instance.complaint_raised_through %}selected{% endif %}>--</option>
+              <option value="I-Alert" {% if instance.complaint_raised_through == 'I-Alert' %}selected{% endif %}>I-Alert</option>
+              <option value="Mail" {% if instance.complaint_raised_through == 'Mail' %}selected{% endif %}>Mail</option>
+              <option value="Telephone" {% if instance.complaint_raised_through == 'Telephone' %}selected{% endif %}>Telephone</option>
+              <option value="DBM NRD" {% if instance.complaint_raised_through == 'DBM NRD' %}selected{% endif %}>DBM NRD</option>
+              <option value="I-Alert PD API" {% if instance.complaint_raised_through == 'I-Alert PD API' %}selected{% endif %}>I-Alert PD API</option>
+              <option value="others" {% if instance.complaint_raised_through == 'others' or instance.complaint_raised_through_other %}selected{% endif %}>Others</option>
+            </select>
+            <input id="complaint_raised_through_other" name="complaint_raised_through_other" class="form-control mt-2" placeholder="Specify" value="{{ instance.complaint_raised_through_other }}" {% if not instance.complaint_raised_through == 'others' and not instance.complaint_raised_through_other %}disabled="true"{% endif %}>
+            <script>document.getElementById('complaint_raised_through_other').style.display = "{% if instance.complaint_raised_through == 'others' or instance.complaint_raised_through_other %}block{% else %}none{% endif %}";</script>
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Complaint Received By:</label>
+            <input id="complaint_received_by" name="complaint_received_by" class="form-control" value="{{ instance.complaint_received_by }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>VIN:</label>
+            <input id="vin" name="vin" class="form-control" maxlength="17" value="{{ instance.vin }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>PSN:</label>
+            <input id="psn" name="psn" class="form-control" value="{{ instance.psn }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Complaint Assigned To:</label>
+            <select id="complaint_assigned_to" name="complaint_assigned_to" class="form-control">
+              <option value="" {% if not instance.complaint_assigned_to %}selected{% endif %}>--</option>
+              <option value="Eliyas" {% if instance.complaint_assigned_to == 'Eliyas' %}selected{% endif %}>Eliyas</option>
+              <option value="Gayadhar" {% if instance.complaint_assigned_to == 'Gayadhar' %}selected{% endif %}>Gayadhar</option>
+              <option value="Dilip Kumar" {% if instance.complaint_assigned_to == 'Dilip Kumar' %}selected{% endif %}>Dilip Kumar</option>
+              <option value="Swamy" {% if instance.complaint_assigned_to == 'Swamy' %}selected{% endif %}>Swamy</option>
+              <option value="Rishwanth" {% if instance.complaint_assigned_to == 'Rishwanth' %}selected{% endif %}>Rishwanth</option>
+              <option value="Siva" {% if instance.complaint_assigned_to == 'Siva' %}selected{% endif %}>Siva</option>
+              <option value="Arun G" {% if instance.complaint_assigned_to == 'Arun G' %}selected{% endif %}>Arun G</option>
+              <option value="Yoga" {% if instance.complaint_assigned_to == 'Yoga' %}selected{% endif %}>Yoga</option>
+              <option value="Narendra" {% if instance.complaint_assigned_to == 'Narendra' %}selected{% endif %}>Narendra</option>
+              <option value="others" {% if instance.complaint_assigned_to == 'others' or instance.complaint_assigned_to_other %}selected{% endif %}>Others</option>
+            </select>
+            <input id="complaint_assigned_to_other" name="complaint_assigned_to_other" class="form-control mt-2" placeholder="Specify" value="{{ instance.complaint_assigned_to_other }}" {% if not instance.complaint_assigned_to == 'others' and not instance.complaint_assigned_to_other %}disabled="true"{% endif %}>
+            <script>document.getElementById('complaint_assigned_to_other').style.display = "{% if instance.complaint_assigned_to == 'others' or instance.complaint_assigned_to_other %}block{% else %}none{% endif %}";</script>
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Complaint Assigned Email ID:</label>
+            <input id="submitted_to_email" name="submitted_to_email" class="form-control" type="email" value="{{ instance.submitted_to_email }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Complaint Assigned Contact Number:</label>
+            <input id="engineer_contact_number" name="engineer_contact_number" class="form-control" type="tel" value="{{ instance.engineer_contact_number }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Upload File:</label>
+            <input id="upload_file" name="upload_file" class="form-control" type="file">
+            {% if instance.upload_file %}<div class="mt-1">Current File: <a href="{{ instance.upload_file.url }}" target="_blank">{{ instance.upload_file.name }}</a></div>{% endif %}
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Call Type:</label>
+            <select id="id_call_type" name="call_type" class="form-control">
+              <option value="" {% if not instance.call_type %}selected{% endif %}></option>
+              <option value="Direct Call" {% if instance.call_type == 'Direct Call' %}selected{% endif %}>Direct Call</option>
+              <option value="I Alert Call" {% if instance.call_type == 'I Alert Call' %}selected{% endif %}>I Alert Call</option>
+              <option value="DBM NRD" {% if instance.call_type == 'DBM NRD' %}selected{% endif %}>DBM NRD</option>
+              <option value="Plant Call" {% if instance.call_type == 'Plant Call' %}selected{% endif %}>Plant Call</option>
+              <option value="others" {% if instance.call_type == 'others' or instance.call_type_other %}selected{% endif %}>Others</option>
+            </select>
+            <input id="call_type_other" name="call_type_other" class="form-control mt-2" placeholder="Specify" value="{{ instance.call_type_other }}" {% if not instance.call_type == 'others' and not instance.call_type_other %}disabled="true"{% endif %}>
+            <script>document.getElementById('call_type_other').style.display = "{% if instance.call_type == 'others' or instance.call_type_other %}block{% else %}none{% endif %}";</script>
+          </div>
+
+          <div id="ticket_no_container" class="col-md-3 mb-3" style="display:none">
+            <label>IAlert Ticket No:</label>
+            <input id="id_ticket_no" name="ticket_no" class="form-control" maxlength="5" value="{{ instance.ticket_no }}">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Updated Contact No:</label>
+            <input id="id_updated_contact_no" name="updated_contact_no" class="form-control" value="{{ instance.updated_contact_no }}">
+          </div>
+
+        <div class="col-md-3 mb-3">
+            <label>IAlert Timestamp:</label>
+            <input id="id_ialert_tk_timestamp" name="ialert_tk_timestamp" class="form-control" type="datetime-local" {% if instance.ialert_tk_timestamp %}value="{{ instance.ialert_tk_timestamp|date:'Y-m-d\\TH:i' }}"{% endif %}>
+          </div>
         </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-submit" id="submitBtn">Submit</button>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
 
-    <!-- Popup Message -->
-    <div id="popupMessage" class="popup-message">
-        Your form is submitted!
-    </div>
+<div id="popupMessage" style="display:none;position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);background:#28a745;color:#fff;padding:16px;border-radius:6px;z-index:1000">Your form is submitted!</div>
 
+{% if messages %}{% for message in messages %}<div class="alert alert-success">{{ message }}</div>{% endfor %}{% endif %}
 
-
-    <!-- JavaScript for Popup and Refresh -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('managerForm');
-            const popupMessage = document.getElementById('popupMessage');
-            const submitButton = form.querySelector('button[type="submit"]');
-    
-            // Handle form submission
-            form.addEventListener('submit', function (event) {
-                event.preventDefault(); // Prevent default form submission
-                submitButton.disabled = true; // Disable the submit button to prevent multiple clicks
-    
-                const formData = new FormData(form);
-    
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show the popup message
-                        popupMessage.style.display = 'block';
-    
-                        // Hide the popup after 3 seconds and refresh the page
-                        setTimeout(() => {
-                            popupMessage.style.display = 'none';
-                            location.reload(); // Refresh the page
-                        }, 3000);
-                    } else {
-                        alert('There was an error: ' + (data.message || 'Please check the form.'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An unexpected error occurred. Please try again.');
-                })
-                .finally(() => {
-                    submitButton.disabled = false; // Re-enable the submit button in case of an error
-                });
-            });
-    
-            // Handle "Others" dropdown behavior
-            const fieldsWithOthers = [
-                { dropdown: 'complaint_raised', otherInput: 'complaint_raised_other' },
-                { dropdown: 'complaint_raised_through', otherInput: 'complaint_raised_through_other' },
-                { dropdown: 'complaint_assigned_to', otherInput: 'complaint_assigned_to_other' },
-                { dropdown: 'call_type', otherInput: 'call_type_other' },
-            ];
-    
-            fieldsWithOthers.forEach(field => {
-                const dropdown = document.getElementById(field.dropdown);
-                const otherInput = document.getElementById(field.otherInput);
-    
-                dropdown.addEventListener('change', function () {
-                    if (dropdown.value === 'others') {
-                        otherInput.style.display = 'block';    
-                        otherInput.required = true;
-                    } else {
-                        otherInput.style.display = 'none';
-                        otherInput.required = false;
-                        otherInput.value = ''; // Clear the value when not needed
-                    }
-                });
-            });
-    
-            // Validation for VIN and Contact Numbers
-            const vinField = document.getElementById('vin');
-            const contactFields = [
-                document.getElementById('contact_number'),
-                document.getElementById('engineer_contact_number'),
-                document.getElementById('additional_contact_number'), // Added new contact field
-            ];
-    
-            vinField.addEventListener('input', function () {
-                this.value = this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, 17);
-            });
-    
-            contactFields.forEach(field => {
-                field.addEventListener('input', function () {
-                    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
-                });
-            });
-
-            // Automatically convert input to uppercase for Complaint Raised By
-            const complaintRaisedBy = document.getElementById('complaint_raised_by');
-            complaintRaisedBy.addEventListener('input', function () {
-                this.value = this.value.toUpperCase();
-            });
-        });
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dateOfComplaintField = document.getElementById('id_date_of_complaint');
-        if (!dateOfComplaintField.value) {
-            const now = new Date();
-
-            // Convert to IST (UTC+5:30)
-            const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
-            const istTime = new Date(now.getTime() + istOffset);
-
-            // Format as 'YYYY-MM-DDTHH:mm'
-            const year = istTime.getFullYear();
-            const month = String(istTime.getMonth() + 1).padStart(2, '0');
-            const day = String(istTime.getDate()).padStart(2, '0');
-            const hours = String(istTime.getHours()).padStart(2, '0');
-            const minutes = String(istTime.getMinutes()).padStart(2, '0');
-            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
-
-            dateOfComplaintField.value = formattedDate;
-        }
-    });
-</script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dateOfComplaintField = document.getElementById('id_date_of_complaint');
+const ENGINEER_DATA = {
+  "Eliyas": {email: "eliyasp@danlawtech.com", phone: "8675933448"},
+  "Gayadhar": {email: "gayadharm@danlawtech.com", phone: "9045096146"},
+  "Dilip Kumar": {email: "dilipkumarn@danlawtech.com", phone: "8667228349"},
+  "Swamy": {email: "swamyv@danlawtech.com", phone: "8374551199"},
+  "Rishwanth": {email: "rishwanthr@danlawtech.com", phone: "8940509404"},
+  "Siva": {email: "sivanambirajant@danlawtech.com", phone: "6383793547"},
+  "Arun G": {email: "arung@danlawtech.com", phone: "8608871951"},
+  "Yoga": {email: "yoganandam@danlawtech.com", phone: "7358035825"},
+  "Narendra": {email: "narendrareddyg@danlawtech.com", phone: "8438121252"}
+};
 
-        function updateDateOfComplaint() {
-            const now = new Date();
+const CALL_TYPE_EMAILS = {
+  "I Alert Call": "Lakshminarayanan.Sankar@hindujatech.com",
+  "DBM NRD": "afsarbasha.a@hindujatech.com"
+};
 
-            // Convert to IST (UTC+5:30) only if the time is in UTC
-            const istTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60 * 1000) + (5.5 * 60 * 60 * 1000));
+const FIELD_OTHERS = [
+  {dd: 'complaint_raised', inp: 'complaint_raised_other'},
+  {dd: 'complaint_raised_through', inp: 'complaint_raised_through_other'},
+  {dd: 'complaint_assigned_to', inp: 'complaint_assigned_to_other'},
+  {dd: 'id_call_type', inp: 'call_type_other'}
+];
 
-            // Format as 'YYYY-MM-DDTHH:mm'
-            const year = istTime.getFullYear();
-            const month = String(istTime.getMonth() + 1).padStart(2, '0');
-            const day = String(istTime.getDate()).padStart(2, '0');
-            const hours = String(istTime.getHours()).padStart(2, '0');
-            const minutes = String(istTime.getMinutes()).padStart(2, '0');
-            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+function setIST() {
+  const f = document.getElementById('id_date_of_complaint');
+  if (!f.value) {
+    const now = new Date(), ist = new Date(now.getTime());
+    const y = ist.getFullYear(), m = String(ist.getMonth()+1).padStart(2,'0'), d = String(ist.getDate()).padStart(2,'0'), h = String(ist.getHours()).padStart(2,'0'), mi = String(ist.getMinutes()).padStart(2,'0');
+    f.value = `${y}-${m}-${d}T${h}:${mi}`;
+  }
+}
 
-            dateOfComplaintField.value = formattedDate;
-        }
+function toggleOthers(ddId, inpId) {
+  const dd = document.getElementById(ddId), inp = document.getElementById(inpId);
+  if (dd && inp) {
+    const toggle = () => {
+      if (dd.value === 'others') {
+        inp.style.display = 'block';
+        inp.required = true;
+        inp.removeAttribute('disabled');
+      } else {
+        inp.style.display = 'none';
+        inp.required = false;
+        inp.value = '';
+        inp.setAttribute('disabled', 'true');
+      }
+    };
+    dd.addEventListener('change', toggle);
+    toggle();
+  }
+}
 
-        // Update the field immediately on page load
-        updateDateOfComplaint();
+function formatInput(id, regex, maxLen) {
+  const f = document.getElementById(id);
+  if (f) f.addEventListener('input', () => {
+    f.value = f.value.replace(new RegExp(`[${regex}]`, 'g'), '').slice(0, maxLen);
+  });
+}
 
-        // Update the field every minute
-        setInterval(updateDateOfComplaint, 60000); // 60000ms = 1 minute
+document.addEventListener('DOMContentLoaded', function() {
+  setIST();
+  FIELD_OTHERS.forEach(f => toggleOthers(f.dd, f.inp));
+
+  // VIN format
+  formatInput('vin', '^A-HJ-NPR-Z0-9', 17);
+  document.getElementById('vin').addEventListener('blur', function() {
+    if (this.value && this.value.length !== 17) alert('VIN must be exactly 17 characters.');
+  });
+
+  // Contact format
+  ['contact_number', 'engineer_contact_number'].forEach(id => {
+    formatInput(id, '^0-9;', 35);
+    document.getElementById(id).addEventListener('blur', function() {
+      if (this.value && this.value.length !== 10) alert('Contact Number must be exactly 10 digits.');
     });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const callTypeField = document.getElementById('id_call_type');
-        const ticketNoContainer = document.getElementById('ticket_no_container');
-        const ticketNoField = document.getElementById('id_ticket_no');
+  });
 
-        // Function to toggle the Ticket No field
-        function toggleTicketNoField() {
-            if (callTypeField.value === 'I Alert Call') {
-                ticketNoContainer.style.display = 'block';
-                ticketNoField.required = true; // Make Ticket No required
-            } else {
-                ticketNoContainer.style.display = 'none';
-                ticketNoField.required = false; // Remove required attribute
-                ticketNoField.value = ''; // Clear the value
-            }
-        }
+  // Ticket format
+  const ticketField = document.getElementById('id_ticket_no');
+  if (ticketField) ticketField.addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
+  });
 
-        // Add event listener to Call Type field
-        callTypeField.addEventListener('change', toggleTicketNoField);
+  // Uppercase
+  document.getElementById('complaint_raised_by').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+  });
 
-        // Initialize the visibility of the Ticket No field on page load
-        toggleTicketNoField();
+  // Call type logic
+  const callType = document.getElementById('id_call_type'), ticketContainer = document.getElementById('ticket_no_container'), customerMail = document.getElementById('customer_mail_id');
+  if (callType) {
+    callType.addEventListener('change', function() {
+      ticketContainer.style.display = (this.value === 'I Alert Call') ? 'block' : 'none';
+      document.getElementById('id_ticket_no').required = (this.value === 'I Alert Call');
+      customerMail.value = CALL_TYPE_EMAILS[this.value] || '';
     });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const callTypeField = document.getElementById('id_call_type');
-        const ticketNoContainer = document.getElementById('ticket_no_container');
-        const ticketNoField = document.getElementById('id_ticket_no');
+    callType.dispatchEvent(new Event('change'));
+  }
 
-        // Function to toggle the Ticket No field
-        function toggleTicketNoField() {
-            if (callTypeField.value === 'I Alert Call') {
-                ticketNoContainer.style.display = 'block';
-                ticketNoField.required = true; // Make Ticket No required
-            } else {
-                ticketNoContainer.style.display = 'none';
-                ticketNoField.required = false; // Remove required attribute
-                ticketNoField.value = ''; // Clear the value
-            }
-        }
-
-        // Add event listener to Call Type field
-        callTypeField.addEventListener('change', toggleTicketNoField);
-
-        // Initialize the visibility of the Ticket No field on page load
-        toggleTicketNoField();
-
-        // Enforce 5-digit limit for Ticket No
-        ticketNoField.addEventListener('input', function () {
-            this.value = this.value.replace(/[^0-9]/g, ''); // Allow only digits
-            if (this.value.length > 5) {
-                this.value = this.value.slice(0, 5); // Limit to 5 digits
-            }
-        });
+  // Engineer mapping
+  const assignedTo = document.getElementById('complaint_assigned_to'), emailField = document.getElementById('submitted_to_email'), phoneField = document.getElementById('engineer_contact_number');
+  if (assignedTo) {
+    assignedTo.addEventListener('change', function() {
+      const d = ENGINEER_DATA[this.value] || {email: '', phone: ''};
+      if (emailField) emailField.value = d.email;
+      if (phoneField) phoneField.value = d.phone;
     });
+    assignedTo.dispatchEvent(new Event('change'));
+  }
+
+  // Email validation for multiple emails
+  function validateEmails(emailString) {
+    if (!emailString.trim()) return true; // Allow empty
+    const emails = emailString.split(';').map(e => e.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emails.every(email => !email || emailRegex.test(email));
+  }
+
+  // Form submit
+  const form = document.getElementById('managerForm'), submitBtn = document.getElementById('submitBtn'), popup = document.getElementById('popupMessage');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+
+    // Validate customer email IDs
+    const customerMailField = document.getElementById('customer_mail_id');
+    if (!validateEmails(customerMailField.value)) {
+      alert('Invalid email format. Please use semicolon-separated emails (e.g., email1@example.com;email2@example.com)');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    const ct = document.getElementById('id_call_type'), ctOther = document.getElementById('call_type_other');
+    if (ct && ctOther && ct.value === 'others' && ctOther.value.trim()) ct.value = ctOther.value.trim();
+
+    fetch(form.action, {method: 'POST', body: new FormData(form), headers: {'X-Requested-With': 'XMLHttpRequest'}})
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          popup.style.display = 'block';
+          setTimeout(() => {popup.style.display = 'none'; location.reload();}, 3000);
+        } else alert('Error: ' + (data.message || 'Please check the form.'));
+      })
+      .catch(() => alert('Unexpected error.'))
+      .finally(() => submitBtn.disabled = false);
+  });
+});
 </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const fieldsWithOthers = [
-            { dropdown: 'complaint_raised', otherInput: 'complaint_raised_other' },
-            { dropdown: 'complaint_raised_through', otherInput: 'complaint_raised_through_other' },
-            { dropdown: 'complaint_assigned_to', otherInput: 'complaint_assigned_to_other' },
-            { dropdown: 'call_type', otherInput: 'call_type_other' },
-        ];
-
-        fieldsWithOthers.forEach(field => {
-            const dropdown = document.getElementById(field.dropdown);
-            const otherInput = document.getElementById(field.otherInput);
-
-            // Function to toggle the "Others" input field
-            function toggleOtherInput() {
-                if (dropdown.value === 'others') {
-                    otherInput.style.display = 'block'; // Show the input field
-                    otherInput.required = true; // Make it required
-                    otherInput.removeAttribute('disabled'); // Ensure it's editable
-                } else {
-                    otherInput.style.display = 'none'; // Hide the input field
-                    otherInput.required = false; // Remove the required attribute
-                    otherInput.value = ''; // Clear the value
-                    otherInput.setAttribute('disabled', 'true'); // Disable the field
-                }
-            }
-
-            // Add event listener to the dropdown
-            dropdown.addEventListener('change', toggleOtherInput);
-
-            // Initialize the visibility of the "Others" input field on page load
-            toggleOtherInput();
-        });
-    });
-</script>
-</body>
-</html>
 {% endblock %}

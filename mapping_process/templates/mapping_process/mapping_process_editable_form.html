@@ -37,6 +37,18 @@
         .btn-submit:hover {
             background: linear-gradient(to right, #218838, #1e7e34);
         }
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
         .read-only-message {
             margin-bottom: 20px;
             padding: 10px;
@@ -197,15 +209,18 @@
                         <!-- New PSN -->
                         <div class="col-md-3 mb-3">
                             <label for="id_new_psn" class="form-label">New PSN</label>
-                            <input type="text" name="new_psn" id="id_new_psn" class="form-control" maxlength="20" value="{{ instance.new_psn }}" {% if read_only %}readonly{% endif %}>
+                            <input type="text" name="new_psn" id="id_new_psn" class="form-control" maxlength="20" 
+                                   value="{{ instance.new_psn|default:'' }}" {% if read_only %}readonly{% endif %}>
                         </div>
+                        
                     </div>
 
                     <div class="row">
                         <!-- Submitted By -->
                         <div class="col-md-3 mb-3">
                             <label for="id_submitted_by" class="form-label">Submitted By</label>
-                            <input type="email" name="submitted_by" id="id_submitted_by" class="form-control" value="{{ instance.submitted_by }}" {% if read_only %}readonly{% endif %}>
+                            <input type="email" name="submitted_by" id="id_submitted_by" class="form-control" 
+                                   value="{{ instance.submitted_by|default:'' }}" {% if read_only %}readonly{% endif %}>
                         </div>
 
                         <!-- HOD Remarks -->
@@ -217,7 +232,8 @@
                         <!-- Mapping Done By -->
                         <div class="col-md-3 mb-3">
                             <label for="id_mapping_done_by" class="form-label">Mapping Done By</label>
-                            <input type="text" name="mapping_done_by" id="id_mapping_done_by" class="form-control" value="{{ instance.mapping_done_by }}" {% if read_only %}readonly{% endif %}>
+                            <input type="text" name="mapping_done_by" id="id_mapping_done_by" class="form-control" 
+                                   value="{{ instance.mapping_done_by|default:'' }}" {% if read_only %}readonly{% endif %}>
                         </div>
 
                         <!-- Mapping Completion Date -->
@@ -233,24 +249,6 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <!-- Call Type -->
-                        <div class="col-md-3 mb-3">
-                            <label for="id_call_type" class="form-label">Call Type</label>
-                            <select name="call_type" id="id_call_type" class="form-control" {% if read_only %}disabled{% endif %}>
-                                <option value="">-- Select Call Type --</option>
-                                <option value="Direct Call" {% if instance.call_type == "Direct Call" %}selected{% endif %}>Direct Call</option>
-                                <option value="I Alert Call" {% if instance.call_type == "I Alert Call" %}selected{% endif %}>I Alert Call</option>
-                            </select>
-                        </div>
-
-                        <!-- Ticket No (conditionally displayed) -->
-                        <div class="col-md-3 mb-3" id="ticket_no_container" style="display: none;">
-                            <label for="id_ticket_no" class="form-label">Ticket No</label>
-                            <input type="text" name="ticket_no" id="id_ticket_no" class="form-control" value="{{ instance.ticket_no }}" placeholder="Enter Ticket No" {% if read_only %}readonly{% endif %}>
-                        </div>
-                    </div>
-
                     <!-- Submit Button -->
                     <div class="text-center mt-4">
                         {% if not read_only %}
@@ -262,29 +260,53 @@
         </div>
     </div>
 
+    <!-- Popup Message -->
+    <div id="popup-message" class="popup-message">Form is successfully updated!</div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const callTypeField = document.getElementById('id_call_type');
-            const ticketNoContainer = document.getElementById('ticket_no_container');
-            const ticketNoField = document.getElementById('id_ticket_no');
+            const form = document.getElementById('mapping-process-form');
 
-            // Function to toggle the Ticket No field
-            function toggleTicketNoField() {
-                if (callTypeField.value === 'Direct Call') {
-                    ticketNoContainer.style.display = 'block';
-                    ticketNoField.required = true; // Make Ticket No required
-                } else {
-                    ticketNoContainer.style.display = 'none';
-                    ticketNoField.required = false; // Remove required attribute
-                    ticketNoField.value = ''; // Clear the value
-                }
-            }
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
 
-            // Add event listener to Call Type field
-            callTypeField.addEventListener('change', toggleTicketNoField);
+                const formData = new FormData(form);
 
-            // Initialize the visibility of the Ticket No field on page load
-            toggleTicketNoField();
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error("Server error response:", text);
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Show the popup message
+                        const popup = document.getElementById('popup-message');
+                        popup.style.display = 'block';
+
+                        // Hide the popup after 3 seconds
+                        setTimeout(() => {
+                            popup.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        alert('Error: ' + JSON.stringify(data.errors));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An unexpected error occurred. Please try again.");
+                });
+            });
         });
     </script>
 </body>

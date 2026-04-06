@@ -89,15 +89,6 @@
             </div>
             </div>
             <div class="card-body">
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <ul>
-                            {% for field, errors in form.errors.items %}
-                                <li>{{ field }}: {{ errors|join:", " }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
                 <form id="mapping-process-form" method="post" action="{% url 'mapping_process_form' %}">
                     {% csrf_token %}
 
@@ -229,8 +220,8 @@
                             <input type="date" name="current_validity_status_of_new_device" id="id_current_validity_status_of_new_device" class="form-control">
                         </div>
 
-                         <!-- Added Validity for New Device -->
-                         <div class="col-md-3 mb-3">
+                        <!-- Added Validity for New Device -->
+                        <div class="col-md-3 mb-3">
                             <label for="id_added_validity_for_new_device" class="form-label">Added Validity for New Device</label>
                             <textarea name="added_validity_for_new_device" id="id_added_validity_for_new_device" class="form-control" rows="1" placeholder="Enter additional validity details"></textarea>
                         </div>
@@ -363,34 +354,28 @@
                         'X-Requested-With': 'XMLHttpRequest',
                     },
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            console.error("Server error response:", text); // Log the server's response
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        });
-                    }
-                    return response.json(); // Parse JSON response
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Show the popup message
-                        const popup = document.getElementById('popup-message');
-                        popup.style.display = 'block';
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Show the popup message
+                            const popup = document.getElementById('popup-message');
+                            popup.style.display = 'block';
 
-                        // Hide the popup after 3 seconds
-                        setTimeout(() => {
-                            popup.style.display = 'none';
-                            form.reset(); // Reset the form
-                        }, 3000);
-                    } else {
-                        alert('Error: ' + JSON.stringify(data.errors));
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("An unexpected error occurred. Please try again.");
-                });
+                            // Hide the popup after 3 seconds
+                            setTimeout(() => {
+                                popup.style.display = 'none';
+                                form.reset(); // Reset the form
+                            }, 3000);
+                        } else {
+                            alert('Error: ' + JSON.stringify(data.errors));
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
             });
 
             const fieldsWithOthers = [

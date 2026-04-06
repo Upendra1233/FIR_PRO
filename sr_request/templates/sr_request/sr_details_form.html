@@ -5,41 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscription Approval Request Form (SARF)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        .form-container {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        body {
+            background-color: #f4f6f9; /* Light gray background */
         }
-        .form-header {
-            background-color: #007bff;
+
+        .form-container {
+            max-width: 95%;
+            margin: 30px auto;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+
+        .card-header {
+            background: linear-gradient(to right, #007bff, #00c6ff); /* Blue gradient */
             color: white;
-            padding: 10px;
-            border-radius: 8px 8px 0 0;
             text-align: center;
             font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 12px 12px 0 0;
+            padding: 15px;
+            position: relative;
         }
-        .form-footer {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .btn-submit {
-            background-color: #28a745;
+
+        .download-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem; /* Adjust icon size */
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
+
+        .download-icon:hover {
+            color: #f8f9fa; /* Slightly lighter white on hover */
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff; /* Blue border on focus */
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2); /* Blue glow on focus */
+        }
+
+        .form-label {
+            font-weight: bold;
+            font-size: 1rem; /* Slightly larger font size */
+            color: #000108; /* Dark blue for labels */
+        }
+
+        .btn-submit {
+            background: linear-gradient(to right, #28a745, #218838); /* Green gradient */
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+
         .btn-submit:hover {
-            background-color: #218838;
+            background: linear-gradient(to right, #218838, #1e7e34); /* Darker green on hover */
         }
+
         .popup-message {
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #dc3545; /* Red background for error */
+            background-color: #28a745; /* Green background for success */
             color: white;
             padding: 15px;
             border-radius: 8px;
@@ -47,7 +89,34 @@
             display: none;
             z-index: 1000;
         }
-        .read-only-message {
+
+        .btn-primary {
+            background: linear-gradient(to right, #007bff, #00c6ff); /* Blue gradient */
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #0056b3, #007bff); /* Darker blue on hover */
+            color: white;
+        }
+
+        .btn-primary i {
+            margin-right: 5px;
+        }
+
+        .custom-icon {
+            font-size: 2rem; /* Adjust the size as needed */
+        }
+
+        .btn-primary {
+            padding: 10px 15px; /* Increase padding */
+        }
+        .alert_alert-warning{
             margin-bottom: 20px;
             padding: 10px;
             background-color: #ffc107;
@@ -60,161 +129,202 @@
 </head>
 <body>
     <div class="container mt-5">
-        <div class="form-container">
-            <div class="form-header">
+        <div class="card">
+            <div class="card-header">
                 Subscription Approval Request Form (SARF)
             </div>
-            {% if read_only %}
-                <div class="read-only-message">
-                    This form is read-only because the request has been approved.
-                </div>
-            {% endif %}
-            <form id="sr-details-form" method="post">
-                {% csrf_token %}
-                <div class="row">
-                    <!-- Engineer -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_engineer" class="form-label">Engineer</label>
-                        <select name="engineer" id="id_engineer" class="form-control" {% if read_only %}disabled{% endif %}>
-                            <option value="">-- Select Engineer --</option>
-                            <option value="Dilip" {% if sr_request.engineer == "Dilip" %}selected{% endif %}>Dilip</option>
-                            <option value="Siva" {% if sr_request.engineer == "Siva" %}selected{% endif %}>Siva</option>
-                            <option value="Kunal" {% if sr_request.engineer == "Kunal" %}selected{% endif %}>Kunal</option>
-                            <option value="Narendra" {% if sr_request.engineer == "Narendra" %}selected{% endif %}>Narendra</option>
-                            <option value="Arun" {% if sr_request.engineer == "Arun" %}selected{% endif %}>Arun</option>
-                            <option value="Others" {% if sr_request.engineer == "Others" %}selected{% endif %}>Others</option>
-                        </select>
-                        <input type="text" id="id_engineer_other" name="engineer_other" class="form-control mt-2" style="display: none;" placeholder="Please specify..." {% if read_only %}readonly{% endif %}>
+            <div class="card-body">
+                {% if read_only %}
+                    <div class="alert_alert-warning" role="alert">
+                        This form is read-only because the request has been approved.
+                    </div>
+                {% endif %}
+
+                    <div class="alert_alert-warning" role="alert">
+                        This form is read-only because the request has already been {{ sr_request.manager_approval_status }}.
+                    </div>
+           
+                <form id="sr-details-form" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <!-- Engineer -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_engineer" class="form-label">Engineer</label>
+                            <select name="engineer" id="id_engineer" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Engineer --</option>
+                                <option value="Dilip" {% if sr_request.engineer == "Dilip" %}selected{% endif %}>Dilip</option>
+                                <option value="Siva" {% if sr_request.engineer == "Siva" %}selected{% endif %}>Siva</option>
+                                <option value="Kunal" {% if sr_request.engineer == "Kunal" %}selected{% endif %}>Kunal</option>
+                                <option value="Narendra" {% if sr_request.engineer == "Narendra" %}selected{% endif %}>Narendra</option>
+                                <option value="Arun" {% if sr_request.engineer == "Arun" %}selected{% endif %}>Arun</option>
+                                <option value="Others" {% if sr_request.engineer == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="id_engineer_other" name="engineer_other" class="form-control mt-2" style="display: none;" placeholder="Please specify..." {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Request Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_date" class="form-label">Request Date</label>
+                            <input type="datetime-local" name="date" id="id_date" class="form-control" value="{{ sr_request.date|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Old Software -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_software" class="form-label">Old Software</label>
+                            <input type="text" name="old_software" id="id_old_software" class="form-control" value="{{ sr_request.old_software }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <!-- Category -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_category" class="form-label">Category</label>
+                            <select name="category" id="id_category" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Category --</option>
+                                <option value="AIS 140" {% if sr_request.category == "AIS 140" %}selected{% endif %}>AIS 140</option>
+                                <option value="BS Extension" {% if sr_request.category == "BS Extension" %}selected{% endif %}>BS Extension</option>
+                                <option value="Commercial Activation" {% if sr_request.category == "Commercial Activation" %}selected{% endif %}>Commercial Activation</option>
+                                <option value="Validity Transfer" {% if sr_request.category == "Validity Transfer" %}selected{% endif %}>Validity Transfer</option>
+                                <option value="OTC RSU" {% if sr_request.category == "OTC RSU" %}selected{% endif %}>OTC RSU</option>
+                                <option value="Resumption SR" {% if sr_request.category == "Resumption SR" %}selected{% endif %}>Resumption SR</option>
+                                <option value="Others" {% if sr_request.category == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+                    
+                        <!-- Old Software -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_software" class="form-label">Old Software</label>
+                            <input type="text" name="old_software" id="id_old_software" class="form-control" maxlength="10" value="{{ sr_request.old_software }}" placeholder="Enter Old Software" {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <!-- New Software -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_new_software" class="form-label">New Software</label>
+                            <input type="text" name="new_software" id="id_new_software" class="form-control" value="{{ sr_request.new_software }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <!-- Old ICCID -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_New_sw_sch_date" class="form-label">Old ICCID</label>
+                            <input type="text" name="New_sw_sch_date" id="id_New_sw_sch_date" class="form-control" maxlength="20" value="{{ sr_request.New_sw_sch_date }}" placeholder="Enter Old ICCID" {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <!-- Approved By HOD -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_New_sw_success_date" class="form-label">Old ICCID</label>
+                            <input type="text" name="New_sw_success_date" id="id_New_sw_success_date" class="form-control" maxlength="20" value="{{ sr_request.New_sw_success_date }}" placeholder="Enter Old ICCID" {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <!-- Old Sim Status -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_approved_by_HOD" class="form-label">Approved By HOD</label>
+                            <textarea name="approved_by_HOD" id="id_approved_by_HOD" class="form-control" rows="1" placeholder="Enter Old Sim Status" {% if read_only %}readonly{% endif %}>{{ sr_request.approved_by_HOD }}</textarea>
+                        </div>
+
+                        <!-- Old Validity -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_validity" class="form-label">Old Validity</label>
+                            <input type="datetime-local" name="old_validity" id="id_old_validity" class="form-control" value="{{ sr_request.old_validity|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- PSN -->
+                        <div class="col-md-3 mb-3">
+                                <label for="id_psn" class="form-label">PSN</label>
+                            <input type="text" name="psn" id="id_psn" class="form-control" 
+                                   value="{{ sr_request.psn }}"  {% if read_only %}readonly{% endif %}>
+                                
+
+                        </div>
+
+                        <!-- ICICID -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_icicid" class="form-label">ICICID</label>
+                            <input type="text" name="icicid" id="id_icicid" class="form-control" maxlength="20" value="{{ sr_request.icicid }}" placeholder="Enter 20-digit ICICID" {% if read_only %}readonly{% endif %}>
+                        </div>
+
+                        <!-- Plan -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_plan" class="form-label">Plan</label>
+                            <select name="plan" id="id_plan" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Plan --</option>
+                                <option value="Top-Up" {% if sr_request.plan == "Top-Up" %}selected{% endif %}>Top-Up</option>
+                                <option value="Single Airtel" {% if sr_request.plan == "Single Airtel" %}selected{% endif %}>Single Airtel</option>
+                                <option value="Dual 12 Months" {% if sr_request.plan == "Dual 12 Months" %}selected{% endif %}>Dual 12 Months</option>
+                                <option value="Dual AIS140" {% if sr_request.plan == "Dual AIS140" %}selected{% endif %}>Dual AIS140</option>
+                                <option value="Single BSNL" {% if sr_request.plan == "Single BSNL" %}selected{% endif %}>Single BSNL</option>
+                                <option value="Others" {% if sr_request.plan == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+                       
+                            <!-- SIM Status During Request -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_sim_status_during_request" class="form-label">SIM Status During Request</label>
+                                <textarea name="sim_status_during_request" id="id_sim_status_during_request" class="form-control" rows="1" placeholder="Enter SIM Status During Request" {% if read_only %}readonly{% endif %}>{{ sr_request.sim_status_during_request }}</textarea>
+                            </div>
+    
+                            <!-- Existing Validity -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_existing_validity" class="form-label">Existing Validity</label>
+                                <input type="datetime-local" name="existing_validity" id="id_existing_validity" class="form-control" value="{{ sr_request.existing_validity|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                            </div>
+    
+                            <!-- Requestor Validity Start Date -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_requestor_validity_start_date" class="form-label">Requestor Validity Start Date</label>
+                                <input type="datetime-local" name="requestor_validity_start_date" id="id_requestor_validity_start_date" class="form-control" value="{{ sr_request.requestor_validity_start_date|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                            </div>
+    
+                            <!-- Requestor Validity End Date -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_requestor_validity_end_date" class="form-label">Requestor Validity End Date</label>
+                                <input type="datetime-local" name="requestor_validity_end_date" id="id_requestor_validity_end_date" class="form-control" value="{{ sr_request.requestor_validity_end_date|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                            </div>
+                        
+                        <!-- Billing To -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_billing_to" class="form-label">Billing To</label>
+                            <select name="billing_to" id="id_billing_to" class="form-control" {% if read_only %}disabled{% endif %}>
+                                <option value="">-- Select Billing To --</option>
+                                <option value="Good well" {% if sr_request.billing_to == "Good well" %}selected{% endif %}>Good well</option>
+                                <option value="Customer" {% if sr_request.billing_to == "Customer" %}selected{% endif %}>Customer</option>
+                                <option value="Engineering" {% if sr_request.billing_to == "Engineering" %}selected{% endif %}>Engineering</option>
+                                <option value="Service" {% if sr_request.billing_to == "Service" %}selected{% endif %}>Service</option>
+                                <option value="Others" {% if sr_request.billing_to == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_remarks" class="form-label">Remarks</label>
+                            <textarea name="remarks" id="id_remarks" class="form-control" rows="1" placeholder="Enter remarks" {% if read_only %}readonly{% endif %}>{{ sr_request.remarks }}</textarea>
+                        </div>
+                    
+
+                 
+                        <!-- HOD Remarks -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_hod_remarks" class="form-label">HOD Remarks</label>
+                            <textarea name="hod_remarks" id="id_hod_remarks" class="form-control" rows="1" placeholder="Enter HOD remarks" {% if read_only %}readonly{% endif %}>{{ sr_request.hod_remarks }}</textarea>
+                        </div>
+
+                        <!-- Engineer Email -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_engineer_email" class="form-label">Engineer Email</label>
+                            <input type="email" name="engineer_email" id="id_engineer_email" class="form-control" value="{{ sr_request.engineer_email }}" placeholder="Enter Engineer Email" {% if read_only %}readonly{% endif %}>
+                        </div>
                     </div>
 
-                    <!-- Request Date -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_date" class="form-label">Request Date</label>
-                        <input type="datetime-local" name="date" id="id_date" class="form-control" value="{{ sr_request.date|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
+                    <div class="form-footer mt-3">
+                        {% if sr_request.manager_approval_status != 'Approved' and sr_request.manager_approval_status != 'Rejected' %}
+                            <button type="submit" class="btn btn-submit">Submit</button>
+                        {% endif %}
                     </div>
-
-                    <!-- Category -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_category" class="form-label">Category</label>
-                        <select name="category" id="id_category" class="form-control" {% if read_only %}disabled{% endif %}>
-                            <option value="">-- Select Category --</option>
-                            <option value="AIS 140" {% if sr_request.category == "AIS 140" %}selected{% endif %}>AIS 140</option>
-                            <option value="BS Extension" {% if sr_request.category == "BS Extension" %}selected{% endif %}>BS Extension</option>
-                            <option value="Commercial Activation" {% if sr_request.category == "Commercial Activation" %}selected{% endif %}>Commercial Activation</option>
-                            <option value="Validity Transfer" {% if sr_request.category == "Validity Transfer" %}selected{% endif %}>Validity Transfer</option>
-                            <option value="OTC RSU" {% if sr_request.category == "OTC RSU" %}selected{% endif %}>OTC RSU</option>
-                            <option value="Resumption SR" {% if sr_request.category == "Resumption SR" %}selected{% endif %}>Resumption SR</option>
-                            <option value="Others" {% if sr_request.category == "Others" %}selected{% endif %}>Others</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Old PSN -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_old_psn" class="form-label">Old PSN</label>
-                        <input type="text" name="old_psn" id="id_old_psn" class="form-control" maxlength="10" value="{{ sr_request.old_psn }}" placeholder="Enter Old PSN" {% if read_only %}readonly{% endif %}>
-                    </div>
-
-                    <!-- Old ICCID -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_old_iccid" class="form-label">Old ICCID</label>
-                        <input type="text" name="old_iccid" id="id_old_iccid" class="form-control" maxlength="20" value="{{ sr_request.old_iccid }}" placeholder="Enter Old ICCID" {% if read_only %}readonly{% endif %}>
-                    </div>
-
-                    <!-- Old Sim Status -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_old_sim_status" class="form-label">Old Sim Status</label>
-                        <textarea name="old_sim_status" id="id_old_sim_status" class="form-control" rows="1" placeholder="Enter Old Sim Status" {% if read_only %}readonly{% endif %}>{{ sr_request.old_sim_status }}</textarea>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Old Validity -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_old_validity" class="form-label">Old Validity</label>
-                        <input type="datetime-local" name="old_validity" id="id_old_validity" class="form-control" value="{{ sr_request.old_validity|date:'Y-m-d\TH:i' }}" {% if read_only %}readonly{% endif %}>
-                    </div>
-
-                    <!-- PSN -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_psn" class="form-label">PSN</label>
-                        <input type="text" name="psn" id="id_psn" class="form-control" maxlength="10" value="{{ sr_request.psn }}" placeholder="Enter 10-digit PSN" {% if read_only %}readonly{% endif %}>
-                    </div>
-
-                    <!-- ICICID -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_icicid" class="form-label">ICICID</label>
-                        <input type="text" name="icicid" id="id_icicid" class="form-control" maxlength="20" value="{{ sr_request.icicid }}" placeholder="Enter 20-digit ICICID" {% if read_only %}readonly{% endif %}>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Plan -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_plan" class="form-label">Plan</label>
-                        <select name="plan" id="id_plan" class="form-control" {% if read_only %}disabled{% endif %}>
-                            <option value="">-- Select Plan --</option>
-                            <option value="Top-Up" {% if sr_request.plan == "Top-Up" %}selected{% endif %}>Top-Up</option>
-                            <option value="Single Airtel" {% if sr_request.plan == "Single Airtel" %}selected{% endif %}>Single Airtel</option>
-                            <option value="Dual 12 Months" {% if sr_request.plan == "Dual 12 Months" %}selected{% endif %}>Dual 12 Months</option>
-                            <option value="Dual AIS140" {% if sr_request.plan == "Dual AIS140" %}selected{% endif %}>Dual AIS140</option>
-                            <option value="Single BSNL" {% if sr_request.plan == "Single BSNL" %}selected{% endif %}>Single BSNL</option>
-                            <option value="Others" {% if sr_request.plan == "Others" %}selected{% endif %}>Others</option>
-                        </select>
-                    </div>
-
-                    <!-- Billing To -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_billing_to" class="form-label">Billing To</label>
-                        <select name="billing_to" id="id_billing_to" class="form-control" {% if read_only %}disabled{% endif %}>
-                            <option value="">-- Select Billing To --</option>
-                            <option value="Good well" {% if sr_request.billing_to == "Good well" %}selected{% endif %}>Good well</option>
-                            <option value="Customer" {% if sr_request.billing_to == "Customer" %}selected{% endif %}>Customer</option>
-                            <option value="Engineering" {% if sr_request.billing_to == "Engineering" %}selected{% endif %}>Engineering</option>
-                            <option value="Service" {% if sr_request.billing_to == "Service" %}selected{% endif %}>Service</option>
-                            <option value="Others" {% if sr_request.billing_to == "Others" %}selected{% endif %}>Others</option>
-                        </select>
-                    </div>
-
-                    <!-- Remarks -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_remarks" class="form-label">Remarks</label>
-                        <textarea name="remarks" id="id_remarks" class="form-control" rows="1" placeholder="Enter remarks" {% if read_only %}readonly{% endif %}>{{ sr_request.remarks }}</textarea>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- HOD Remarks -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_hod_remarks" class="form-label">HOD Remarks</label>
-                        <textarea name="hod_remarks" id="id_hod_remarks" class="form-control" rows="1" placeholder="Enter HOD remarks" {% if read_only %}readonly{% endif %}>{{ sr_request.hod_remarks }}</textarea>
-                    </div>
-
-                    <!-- Engineer Email -->
-                    <div class="col-md-4 mb-3">
-                        <label for="id_engineer_email" class="form-label">Engineer Email</label>
-                        <input type="email" name="engineer_email" id="id_engineer_email" class="form-control" value="{{ sr_request.engineer_email }}" placeholder="Enter Engineer Email" {% if read_only %}readonly{% endif %}>
-                    </div>
-                </div>
-
-                <div class="form-footer">
-                    {% if not read_only %}
-                        <button type="submit" class="btn-submit">Submit</button>
-                    {% endif %}
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- Popup Message -->
-    <div id="popup-message" class="popup-message"></div>
+    <div id="popup-message" class="popup-message">Details submitted successfully!</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('sr-details-form');
-            const popup = document.getElementById('popup-message');
+            const popupMessage = document.getElementById('popup-message');
 
             form.addEventListener('submit', function (event) {
                 event.preventDefault(); // Prevent default form submission
@@ -231,37 +341,20 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Show success message
-                        popup.textContent = data.message;
-                        popup.style.backgroundColor = '#28a745'; // Green background for success
-                        popup.style.display = 'block';
+                        popupMessage.textContent = data.message;
+                        popupMessage.style.display = 'block';
 
-                        // Hide the popup after 3 seconds
                         setTimeout(() => {
-                            popup.style.display = 'none';
+                            popupMessage.style.display = 'none';
+                            location.reload(); // Reload the page
                         }, 3000);
                     } else {
-                        // Show error message
-                        popup.textContent = data.message;
-                        popup.style.backgroundColor = '#dc3545'; // Red background for error
-                        popup.style.display = 'block';
-
-                        // Hide the popup after 3 seconds
-                        setTimeout(() => {
-                            popup.style.display = 'none';
-                        }, 3000);
+                        alert(data.message || 'This request has already been processed.');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    popup.textContent = 'An error occurred. Please try again.';
-                    popup.style.backgroundColor = '#dc3545'; // Red background for error
-                    popup.style.display = 'block';
-
-                    // Hide the popup after 3 seconds
-                    setTimeout(() => {
-                        popup.style.display = 'none';
-                    }, 3000);
+                    alert('An unexpected error occurred. Please try again.');
                 });
             });
         });

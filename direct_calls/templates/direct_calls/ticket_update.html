@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Call Closed Notification</title>
+    <style>
+        th {
+            text-align: left; /* Align table headers to the left */
+            background-color: rgb(240,240,240); /* Optional: Light gray background for headers */
+            padding: 5px; /* Add padding for better readability */
+        }
+        td {
+            padding: 5px; /* Add padding for table cells */
+            width: 60%; /* Set a fixed width for the data column */
+            word-wrap: break-word; /* Allow long text to wrap to the next line */
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Ticket {{ direct_call.unique_id }} Update Notification</h2>
+        <p>The following call has been updated with the remarks:</p>
+        <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>Ticket Number</th>
+                    <td>{{direct_call.unique_id }}</td>
+                </tr>
+    
+                <tr>
+                    <th>VIN</th>
+                    <td>{{ direct_call.vin }}</td>
+                </tr>
+                
+                <tr>
+                    <th>PSN</th>
+                    <td>{{ direct_call.psn }}</td>
+                </tr>
+                <tr>
+                    <th>Device Model</th>
+                    <td>{{ direct_call.device_model }}</td>
+                </tr>
+               
+                <tr>
+                    <th>Last Communication of Device</th>
+                    <td>{{ direct_call.last_communication_in_darby }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Type</th>
+                    <td>{{ direct_call.vehicle_type }}</td>
+                </tr>
+                
+                <tr>
+                    <th>Kilometers/Hours</th>
+                    <td>{{ direct_call.kilometers_hours }}</td>
+                </tr>
+                <tr>
+                    <th>Main Battery Voltage</th>
+                    <td>{{ direct_call.main_battery_voltage }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Running Location</th>
+                    <td>{{ direct_call.vehicle_running_location }}</td>
+                </tr>
+                <tr>
+                    <th>State</th>
+                    <td>{{ direct_call.state }}</td>
+                </tr>
+                <tr>
+                    <th>Region</th>
+                    <td>{{ direct_call.region }}</td>
+                </tr>
+               
+                <tr>
+                    <th>Issue Identified</th>
+                    <td>{{ direct_call.issue_identified }}</td>
+                </tr>
+                <tr>
+                    <th>Issue Analysis</th>
+                    <td>{{ direct_call.issue_analysis }}</td>
+                </tr>
+                <tr>
+                    <th>Latest Remarks</th>
+                    <td>{{ direct_call.d1_d2_d3_ialert }}</td>
+                </tr>
+                <tr>
+                    <th>Latest Comments</th>
+                    <td>{{ direct_call.ialert_comments }}</td>
+                </tr>
+                <tr>
+                    <th>Call Status</th>
+                    <td>{{ direct_call.call_status }}</td>
+                </tr>
+
+                <tr>
+                    <th>Date of Closure</th>
+                    <td>{{ direct_call.date_of_closure }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    <p>Thank you,<br>Support Team</p>
+    </div>
+</body>
+</html>

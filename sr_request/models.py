@@ -3,11 +3,17 @@ from django.utils import timezone
 from django.utils.timezone import now
 import pytz
 
+from django.db import IntegrityError, transaction
 class SRRequest(models.Model):
     unique_id = models.CharField(max_length=20, unique=True, blank=True)  # Field for the unique ID
+    new_software=models.CharField(max_length=100, blank=True, null=True)  # New Software
+    New_sw_sch_date=models.DateTimeField(blank=True, null=True)  # New Software Scheduled Date
+    New_sw_success_date=models.DateTimeField(blank=True, null=True)  # New Software Success Date
+    approved_by_HOD=models.CharField(max_length=100, blank=True, null=True)  # Approved by HOD
     date = models.DateTimeField(default=timezone.now, blank=True, null=True)  # Request Date
     category = models.CharField(max_length=50, blank=True, null=True)  # Category
     psn = models.CharField(max_length=10, blank=True, null=True)  # PSN
+    old_software = models.CharField(max_length=100, blank=True, null=True)  # Old Software
     icicid = models.CharField(max_length=20, blank=True, null=True)  # ICICID
     plan = models.CharField(max_length=50, blank=True, null=True)  # Plan
     engineer = models.CharField(max_length=50, blank=True, null=True)  # Engineer
@@ -44,34 +50,37 @@ class SRRequest(models.Model):
     old_sim_status = models.TextField(blank=True, null=True)  # Old Sim Status
     old_validity = models.DateTimeField(blank=True, null=True)  # Old Validity
 
+
     def save(self, *args, **kwargs):
-        if not self.unique_id:  # Generate unique ID only if it doesn't exist
+        if not self.unique_id:
             current_date = now()
             year = current_date.strftime('%y')  # Last two digits of the year
             month = current_date.strftime('%m')  # Two-digit month
+            base_id = f"SW-{year}{month}"
 
-            # Find the last entry in the database for the current year and month
-            last_entry = SRRequest.objects.filter(unique_id__startswith=f"SR-{year}{month}").order_by('-unique_id').first()
-
-            if last_entry:
-                # Extract the last four digits (sequence number) from the last unique ID
-                last_sequence_number = int(last_entry.unique_id[-4:])
-                sequence_number = last_sequence_number + 1
+            # Loop to find an unused unique_id
+            for i in range(10000):  # Allows up to 9999 entries per month
+                candidate_id = f"{base_id}{i:04d}"
+                if not SRRequest.objects.filter(unique_id=candidate_id).exists():
+                    self.unique_id = candidate_id
+                    break
             else:
-                # Start from 0000 if no entries exist for the current year and month
-                sequence_number = 0
+                raise Exception("Unable to generate a unique_id after 9999 attempts.")
 
-            # Generate the unique ID in the format SR-YYMMNNNN
-            self.unique_id = f"SR-{year}{month}{sequence_number:04d}"
-
-        # Automatically set IST timezone for manager_approval_datetime
+        # Convert manager_approval_datetime to IST if present
         if self.manager_approval_datetime:
             ist = pytz.timezone('Asia/Kolkata')
             self.manager_approval_datetime = self.manager_approval_datetime.astimezone(ist)
-        super(SRRequest, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return f"SR Request {self.id} - {self.psn}"
+        # Save inside an atomic transaction
+        try:
+            with transaction.atomic():
+                super(SRRequest, self).save(*args, **kwargs)
+        except IntegrityError:
+            raise IntegrityError("Duplicate unique_id detected. Please try again.")
+
+        def __str__(self):
+            return f"SR Request {self.id} - {self.psn}"
 
 class SRDetails(models.Model):
     sr_request = models.OneToOneField('SRRequest', on_delete=models.CASCADE, related_name='details')

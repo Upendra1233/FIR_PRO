@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Tracking - Real-Time</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            font-size: 14px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 95%;
+            padding: 0;
+        }
+        .header-card {
+            background-color: #343a40;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header-card h1, .header-card h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+        .filter-card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background-color: white;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        table {
+            font-size: 12px;
+            width: 100%;
+            background-color: navy;
+            color: white;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            vertical-align: middle;
+            padding: 6px;
+        }
+        th {
+            background-color: #1a1a80;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        tr:nth-child(even) {
+            background-color: #2a2a94;
+        }
+        tr:hover {
+            background-color: #3a3aa8;
+        }
+        .pagination-controls {
+            margin-top: 5px;
+            display: none; /* Hidden since all data is displayed */
+        }
+        .popup-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <!-- Header -->
+        <div class="header-card d-flex justify-content-center align-items-center" style="height: 60px;">
+            <h2 class="mb-0 text-center">Device Tracking - Real-Time</h2>
+            <button id="downloadSelectedFields" class="btn btn-primary ms-3" title="Download Selected Fields">
+                <i class="bi bi-download"></i>
+            </button>
+        </div>
+        <!-- Filter Form -->
+        <div class="filter-card">
+            <form id="filterForm" class="row g-2 align-items-center">
+                <div class="col-md-2">
+                    <label for="from_date" class="form-label">From Date</label>
+                    <input type="datetime-local" id="from_date" name="from_date" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label for="to_date" class="form-label">To Date</label>
+                    <input type="datetime-local" id="to_date" name="to_date" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label for="call_status" class="form-label">Call Status</label>
+                    <select id="call_status" name="call_status" class="form-control">
+                        <option value="All">All</option>
+                        <!-- Options dynamically added -->
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="call_type" class="form-label">Call Type</label>
+                    <select id="call_type" name="call_type" class="form-control">
+                        <option value="All">All</option>
+                        <!-- Options dynamically added -->
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="assigned_to" class="form-label">Responsible Engineer</label>
+                    <select id="assigned_to" name="assigned_to" class="form-control">
+                        <option value="All">All</option>
+                        <!-- Options dynamically added -->
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="unique_id" class="form-label">FIR ID</label>
+                    <input type="text" id="unique_id" name="unique_id" class="form-control" placeholder="Search Unique ID">
+                </div>
+                <div class="col-md-2">
+                    <label for="vin" class="form-label">VIN</label>
+                    <input type="text" id="vin" name="vin" class="form-control" maxlength="17" placeholder="Search VIN">
+                </div>
+                <div class="col-md-2">
+                    <label for="psn" class="form-label">PSN</label>
+                    <input type="text" id="psn" name="psn" class="form-control" placeholder="Search PSN">
+                </div>
+            </form>
+        </div>
+        <!-- Data Table (Complete database data below the filters) -->
+        <div class="table-container">
+            <div style="overflow-x: auto; max-width: 100%;">
+                <table id="realTimeTable" class="table table-bordered">
+                    <thead>
+                        <tr id="tableHeaders">
+                            <!-- Table headers will be dynamically added -->
+                        </tr>
+                    </thead>
+                    <tbody id="realTimeTableBody">
+                        <!-- Table rows will be dynamically added -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Pagination Controls (Hidden since all data is displayed) -->
+        <div class="pagination-controls d-flex justify-content-center align-items-center" style="margin-top: 5px; display: none;">
+            <button id="prevPage" class="btn btn-secondary" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span id="pageInfo" class="mx-3">Page 1 of 1</span>
+            <button id="nextPage" class="btn btn-secondary" disabled>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script>
+    // Pagination variables
+    let allTableData = [];
+
+    // After fetching all data, filter for FIR-Repair and FIR-Replace only:
+    allTableData = allTableData.filter(record =>
+        record.call_status === "FIR-Repair" || record.call_status === "FIR-Replace" || record.call_status === "FIR-Replace_Repair"
+    );
+
+    let currentPage = 1;
+    const recordsPerPage = 25;
+    function fetchFilteredRecords() {
+        const fromDate = $('#from_date').val() ? $('#from_date').val().split('T')[0] : '';
+        const toDate = $('#to_date').val() ? $('#to_date').val().split('T')[0] : '';
+        const callStatus = $('#call_status').val();
+        const assignedTo = $('#assigned_to').val();
+        const callType = $('#call_type').val();
+        const vin = $('#vin').val();
+        const psn = $('#psn').val();
+        const uniqueId = $('#unique_id').val();
+        const hodComment = $('#hod_comment').val();
+        const engineerRecommendation = $('#engineer_recommendation').val();
+        $.ajax({
+            url: "{% url 'fetch_device_tracking_records' %}",
+            method: "GET",
+            data: {
+                from_date: fromDate,
+                to_date: toDate,
+                call_status: callStatus,
+                complaint_assigned_to: assignedTo,
+                call_type: callType,
+                vin: vin,
+                psn: psn,
+                unique_id: uniqueId,
+                hod_comment: hodComment,
+                engineer_recommendation: engineerRecommendation,
+                page: 'all'
+            },
+
+            success: function (response) {
+                allTableData = response.data || [];
+                allTableData = allTableData.filter(record =>
+                    record.call_status === "FIR-Repair" || record.call_status === "FIR-Replace" || record.call_status === "FIR-Replace_Repair"
+                );
+                currentPage = 1;
+                updateTableHeaders();
+                renderPaginatedTable();
+                updateCallCounts(response.call_counts);
+                updateCharts(response.charts);
+            },
+
+            error: function (error) {
+                console.error("Error fetching records:", error);
+            }
+        });
+    }
+
+    // Render paginated table (no selectedFields)
+    function renderPaginatedTable() {
+        const totalRecords = allTableData.length;
+        const totalPages = Math.ceil(totalRecords / recordsPerPage) || 1;
+        const startIdx = (currentPage - 1) * recordsPerPage;
+        const endIdx = startIdx + recordsPerPage;
+        const pageData = allTableData.slice(startIdx, endIdx);
+        updateTable(pageData);
+        // Pagination controls
+        $("#pageInfo").text(`Page ${currentPage} of ${totalPages}`);
+        $("#prevPage").prop("disabled", currentPage === 1);
+        $("#nextPage").prop("disabled", currentPage === totalPages);
+        if (totalRecords > recordsPerPage) {
+            $(".pagination-controls").show();
+        } else {
+            $(".pagination-controls").hide();
+        }
+    }
+
+    function updateTableHeaders() {
+        const baseHeaders = [
+            "Unique ID", "Date of Complaint", "Call Type",
+            "Assigned To", "VIN", "PSN", "Call Status", "Closure Date",
+             "HOD Comments",
+        ];
+        let headersHtml = "";
+        baseHeaders.forEach(header => {
+            headersHtml += `<th>${header}</th>`;
+        });
+        $('#tableHeaders').html(headersHtml);
+    }
+
+    function updateTable(data) {
+        const tableBody = $("#realTimeTableBody");
+        tableBody.empty();
+
+        // List of datetime fields to format
+        const datetimeFields = [
+            "date_of_complaint", "date_of_closure", "faulty_device_shipped_date",
+            "device_shipped_date", "date_of_alt_device_delivered_to_customer",
+            "alt_device_fitted_date", "device_reached_date", "device_reached_for_repair",
+            "device_reached_after_repair", "acknowledge_date"
+            // Add more if needed
+        ];
+
+        let filteredData = data;
+
+        const selectedEngineerRec = ($('#engineer_recommendation').val() || '').toLowerCase();
+
+        const columnsMap = {
+            repair: [
+                "unique_id", "date_of_complaint", "psn", "vin", "date_of_closure", "complaint_assigned_to", "engineer_recommendation", "device_to_be_sent", "issue_identified",
+                "faulty_device_shipped_date", "faulty_device_shipped_thru", "faulty_device_shipped_lr_details",
+                "device_taken_for_repair", "device_delivered_to_customer", "device_repaired", "device_shipped_date",
+                "device_fitted_by", "device_working_status"
+            ],
+            replace_repair: [
+                "unique_id","date_of_complaint", "psn", "vin", "date_of_closure", "complaint_assigned_to", "engineer_recommendation", "device_to_be_sent", "issue_identified",
+                "alt_device_sent_by", "alt_device_psn", "al_dev_sim_status", "alt_device_shipped_through",
+                "alt_device_shipped_lr_no", "date_of_alt_device_delivered_to_customer", "validity_from_old_to_new_yes_done_by",
+                "updated_validity_of_alt_device", "alt_device_fitted_by", "alt_device_working_status",
+                "faulty_device_confirmation_from_destination",
+                "device_repaired", "device_shipped_to_location"
+            ],
+            replace: [
+                "unique_id","date_of_complaint","psn", "vin", "date_of_closure", "complaint_assigned_to", "engineer_recommendation", "device_to_be_sent", "issue_identified",
+                "alt_device_sent_by", "alt_device_psn", "al_dev_sim_status", "alt_device_shipped_through",
+                "alt_device_shipped_lr_no", "date_of_alt_device_delivered_to_customer", "validity_from_old_to_new_yes_done_by",
+                "updated_validity_of_alt_device", "alt_device_fitted_by", "alt_device_working_status",
+                "faulty_device_confirmation_from_destination",
+                "device_repaired", "device_shipped_to_location"
+            ]
+        };
+
+        const partCFields = [
+            "faulty_device_shipped_date", "faulty_device_shipped_thru", "faulty_device_shipped_lr_details",
+            "alt_device_sent_by", "alt_device_psn", "al_dev_sim_status", "alt_device_shipped_through",
+            "alt_device_shipped_lr_no", "date_of_alt_device_delivered_to_customer", "validity_from_old_to_new_yes_done_by",
+            "updated_validity_of_alt_device", "alt_device_fitted_by", "alt_device_working_status",
+            "faulty_device_confirmation_from_destination"
+        ];
+        const partDFields = [
+            "device_taken_for_repair", "device_delivered_to_customer", "device_repaired", "device_shipped_date", "device_shipped_to_location"
+        ];
+        const partFFields = [
+            "device_fitted_by", "device_working_status"
+        ];
+
+        // Determine which columns to use
+        let columns = [];
+        if (selectedEngineerRec.includes("replace_repair")) {
+            columns = columnsMap.replace_repair;
+        } else if (selectedEngineerRec.includes("replace")) {
+            columns = columnsMap.replace;
+        } else if (selectedEngineerRec.includes("repair")) {
+            columns = columnsMap.repair;
+        } else {
+            // Default: show all base fields
+            columns = [
+                "unique_id", "call_type", "date_of_complaint",
+                "complaint_assigned_to", "vin", "psn", "call_status", "date_of_closure",
+                "device_to_be_sent",'issue_identified',"dealer_address","device_shipped_lr_no","faulty_device_reached_date",
+
+                "device_taken_for_repair",
+                "device_repaired",
+                "copq_labour",
+                "copq_matl",
+                "matls_used",
+                'plant_analysis',
+                'plant_conclusion',
+                "device_shipped_to_location",
+                "device_shipped_to_engineer",
+            ];
+        }
+
+        // Update table headers with color
+        let headersHtml = "";
+        columns.forEach(col => {
+            let bgColor = "";
+            if (partCFields.includes(col)) {
+                bgColor = "background-color: #cce5ff; color: #000;"; // Light blue
+            } else if (partDFields.includes(col)) {
+                bgColor = "background-color: #fff3cd; color: #000;"; // Light yellow
+            } else if (partFFields.includes(col)) {
+                bgColor = "background-color: #e9ecef; color: #000;"; // Light silver
+            }
+            headersHtml += `<th style="${bgColor}">${col.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>`;
+        });
+        $('#tableHeaders').html(headersHtml);
+        filteredData.forEach(record => {
+            let rowHtml = "<tr>";
+            columns.forEach(col => {
+                let value = record[col] || '';
+                if (datetimeFields.includes(col)) {
+                    value = formatDateTime(value);
+                }
+                if (col === "unique_id") {
+                    rowHtml += `<td><a href="/direct_calls/device-repair-form/${record.id}/" style="color: blue;">${value || 'Fill Details'}</a></td>`;
+
+                } else if (col === "vin") {
+                    rowHtml += `<td><a href="/direct_calls/part-f-form/${record.id}/" style="color: orange;">${value}</a></td>`;
+                } else {
+                    rowHtml += `<td>${value}</td>`;
+                }
+            });
+            rowHtml += "</tr>";
+            tableBody.append(rowHtml);
+        });
+    }
+
+    // Pagination button handlers
+    $(document).on('click', '#prevPage', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPaginatedTable();
+        }
+    });
+    $(document).on('click', '#nextPage', function() {
+        const totalPages = Math.ceil(allTableData.length / recordsPerPage) || 1;
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPaginatedTable();
+        }
+    });
+
+    $(document).ready(function () {
+        // Remove Select2 initialization for fields
+        // Bind change event on all filter fields except fields
+        $('#from_date, #to_date, #call_status, #call_type, #assigned_to, #unique_id, #vin, #hod_comment, #engineer_recommendation').on('change', function () {
+            fetchFilteredRecords();
+        });
+        // also trigger on PSN changes
+        $('#psn').on('input change', function () { fetchFilteredRecords(); });
+        // Load all database records on page load
+        fetchFilteredRecords();
+    });
+</script>
+    <script>
+        function populateFilterFields() {
+    $.ajax({
+        url: "{% url 'fetch_filter_field_values' %}",
+        method: "GET",
+        success: function(response) {
+            // Example for call status dropdown
+            const csEl = $('#call_status');
+            csEl.empty();
+            csEl.append($('<option>', { value: 'All', text: 'All' }));
+            response.call_statuses.forEach(function(status) {
+                csEl.append($('<option>', { value: status, text: status }));
+            });
+            // Similarly for call type
+            const ctEl = $('#call_type');
+            ctEl.empty();
+            ctEl.append($('<option>', { value: 'All', text: 'All' }));
+            response.call_types.forEach(function(type) {
+                ctEl.append($('<option>', { value: type, text: type }));
+            });
+            // And for Assigned To
+            const atEl = $('#assigned_to');
+            atEl.empty();
+            atEl.append($('<option>', { value: 'All', text: 'All' }));
+            response.assigned_to.forEach(function(assignee) {
+                atEl.append($('<option>', { value: assignee, text: assignee }));
+            });
+            const hcEl = $('#hod_comment');
+            hcEl.empty();
+            hcEl.append($('<option>', { value: 'All', text: 'All' }));
+            response.hod_comments.forEach(function(comment) {
+                hcEl.append($('<option>', { value: comment, text: comment }));
+            });
+            const erEl = $('#engineer_recommendation');
+    erEl.empty();
+    erEl.append($('<option>', { value: 'All', text: 'All' }));
+    response.engineer_recommendations.forEach(function(rec) {
+        erEl.append($('<option>', { value: rec, text: rec }));
+    });
+        },
+
+        error: function(err) {
+            console.error("Error fetching filter field values:", err);
+        }
+    });
+}
+$(document).ready(function() {
+    populateFilterFields();
+    // your other initializations like fetchFilteredRecords() here
+});
+    </script>
+    <script>
+function downloadTableAsCSV() {
+    let csv = '';
+    // Get headers
+    $('#tableHeaders th').each(function() {
+        csv += '"' + ($(this).text().replace(/"/g, '""')) + '",';
+    });
+    csv = csv.slice(0, -1) + '\n';
+    // Get rows
+    $('#realTimeTableBody tr').each(function() {
+        $(this).find('td').each(function() {
+            csv += '"' + ($(this).text().replace(/"/g, '""')) + '",';
+        });
+        csv = csv.slice(0, -1) + '\n';
+    });
+    // Download
+    let blob = new Blob([csv], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'device_tracking.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+$('#downloadSelectedFields').on('click', function(e) {
+    e.preventDefault();
+    downloadAllFieldsAsCSV();
+});
+    </script>
+    <script>
+function downloadAllFieldsAsCSV() {
+    const filteredData = getFilteredDataForDownload();
+    if (!filteredData.length) {
+        alert("No data to download!");
+        return;
+    }
+    const fields = [
+                "unique_id", "call_type", "date_of_complaint",
+                "complaint_assigned_to", "vin", "psn", "call_status", "date_of_closure",
+                "device_to_be_sent",'issue_identified',"dealer_address","device_shipped_lr_no","faulty_device_reached_date",
+                "device_taken_for_repair",
+                "device_repaired",
+                "copq_labour",
+                "copq_matl",
+                "matls_used",
+                'plant_analysis',
+                'plant_conclusion',
+                "device_shipped_to_location",
+                "device_shipped_to_engineer",
+
+    ];
+    // List of datetime fields to format
+    const datetimeFields = [
+        "date_of_complaint", "date_of_closure", "faulty_device_shipped_date",
+        "device_shipped_date", "date_of_alt_device_delivered_to_customer",
+        "alt_device_fitted_date", "device_reached_date", "device_reached_for_repair",
+        "device_reached_after_repair", "acknowledge_date"
+        // Add more if needed
+    ];
+    let csv = '';
+    csv += fields.map(f => `"${f.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}"`).join(',') + '\n';
+    filteredData.forEach(row => {
+        csv += fields.map(f => {
+            let value = row[f] !== undefined && row[f] !== null ? row[f] : '';
+            if (datetimeFields.includes(f)) {
+                value = formatDateTime(value);
+            }
+            return `"${value.toString().replace(/"/g, '""')}"`;
+        }).join(',') + '\n';
+    });
+    let blob = new Blob([csv], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'device_tracking_all_fields.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+    </script>
+    <script>
+function getFilteredDataForDownload() {
+    // Start with allTableData
+    let filtered = allTableData;
+
+    // Apply filters based on current selections
+    const callStatus = $('#call_status').val();
+    const assignedTo = $('#assigned_to').val();
+    const callType = $('#call_type').val();
+    const vin = $('#vin').val().trim();
+    const psn = $('#psn').val().trim();
+    const uniqueId = $('#unique_id').val().trim();
+    const hodComment = $('#hod_comment').val();
+    const engineerRecommendation = $('#engineer_recommendation').val();
+
+    if (callStatus && callStatus !== 'All') {
+        filtered = filtered.filter(r => r.call_status === callStatus);
+    }
+    if (assignedTo && assignedTo !== 'All') {
+        filtered = filtered.filter(r => r.complaint_assigned_to === assignedTo);
+    }
+    if (callType && callType !== 'All') {
+        filtered = filtered.filter(r => r.call_type === callType);
+    }
+    if (vin) {
+        filtered = filtered.filter(r => (r.vin || '').toLowerCase().includes(vin.toLowerCase()));
+    }
+    if (psn) {
+        filtered = filtered.filter(r => (r.psn || '').toLowerCase().includes(psn.toLowerCase()));
+    }
+    if (uniqueId) {
+        filtered = filtered.filter(r => (r.unique_id || '').toLowerCase().includes(uniqueId.toLowerCase()));
+    }
+    if (hodComment && hodComment !== 'All') {
+        filtered = filtered.filter(r => r.hod_comment === hodComment);
+    }
+    if (engineerRecommendation && engineerRecommendation !== 'All') {
+        filtered = filtered.filter(r => r.engineer_recommendation === engineerRecommendation);
+    }
+
+    return filtered;
+}
+    </script>
+    <script>
+function formatDateTime(dtStr) {
+    if (!dtStr) return '';
+    // Try to parse ISO or 'YYYY-MM-DD HH:MM:SS'
+    let dt = new Date(dtStr.replace(' ', 'T'));
+    if (isNaN(dt.getTime())) return dtStr;
+    let day = String(dt.getDate()).padStart(2, '0');
+    let month = String(dt.getMonth() + 1).padStart(2, '0');
+    let year = dt.getFullYear();
+    let hours = String(dt.getHours()).padStart(2, '0');
+    let minutes = String(dt.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+}
+    </script>
+</body>
+</html>

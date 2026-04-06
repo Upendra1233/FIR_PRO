@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Upload CSV — Trip Summary</title>
+</head>
+<body>
+  <h2>Upload CSV to generate Trip Summary Excel</h2>
+
+  {% if error %}
+    <div style="color: red;">Error: {{ error }}</div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="csv_file">Choose CSV file</label>
+    <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+    <button type="submit">Upload & Generate</button>
+  </form>
+
+  {% if download_url %}
+    <p>Report ready: <a href="{{ download_url }}" target="_blank">Download Excel</a></p>
+    <p>Tip: In development, ensure MEDIA_URL/MEDIA_ROOT are served by Django (urlpatterns += static(...)).</p>
+  {% endif %}
+</body>
+</html>

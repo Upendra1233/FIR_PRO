@@ -29,50 +29,35 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2>New SR Request Submitted - Request No: {{ sr_request.unique_id }}</h2>
-        <p>New SR request has been submitted. Here are the details:</p>
+        <h2>Dear Sir,</h2>
+        <p>Please find the attached request for approval to update the software reason for the same is appended in the table below:</p>
         <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
             <tbody>
                 <tr>
-                    <th>PSN</th>
-                    <td>{{ sr_request.psn }}</td>
+                    <th>Requested Date</th>
+                    <td>{{ sr_request.date }}</td>
                 </tr>
                 <tr>
                     <th>Engineer</th>
                     <td>{{ sr_request.engineer }}</td>
                 </tr>
                 <tr>
-                    <th>ICICID</th>
-                    <td>{{ sr_request.icicid }}</td>
+                    <th>Old Software</th>
+                    <td>{{ sr_request.old_software }}</td>
                 </tr>
                 <tr>
-                    <th>Category</th>
-                    <td>{{ sr_request.category }}</td>
+                    <th>New Software</th>
+                    <td>{{ sr_request.new_software }}</td>
                 </tr>
                 <tr>
-                    <th>Plan</th>
-                    <td>{{ sr_request.plan }}</td>
+                    <th>Old PSN</th>
+                    <td>{{ sr_request.old_psn }}</td>
                 </tr>
                 <tr>
-                    <th>Requestor Comments</th>
-                    <td>{{ sr_request.requestor_comments }}</td>
+                    <th>Remarks</th>
+                    <td>{{ sr_request.remarks }}</td>
                 </tr>
-                <tr>
-                    <th>SIM Status During Request</th>
-                    <td>{{ sr_request.sim_status_during_request }}</td>
-                </tr>
-                <tr>
-                    <th>Requestor Validity Start Date</th>
-                    <td>{{ sr_request.requestor_validity_start_date }}</td>
-                </tr>
-                <tr>
-                    <th>Requestor Validity End Date</th>
-                    <td>{{ sr_request.requestor_validity_end_date }}</td>
-                </tr>
-                <tr>
-                    <th>Billing To</th>
-                    <td>{{ sr_request.billing_to }}</td>
-                </tr>
+
             </tbody>
         </table>
 
@@ -80,12 +65,12 @@
         <div class="btn-container">
 
 
-            <!-- Edit Request Button -->
+            <!-- Edit Request Button 
             <a href="{{ edit_url }}" class="btn btn-warning btn-custom" style="background-color: orange; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px;">
                 <i class="fas fa-edit"></i> Edit Request
             </a>
         </div>
-
+-->
         <div class="button-group">
             <!-- Approve Button -->
             <a href="{{ approve_url }}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px;" class="btn btn-success btn-custom">

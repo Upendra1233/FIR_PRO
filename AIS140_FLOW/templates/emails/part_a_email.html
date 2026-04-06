@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Part-B Form Closed</title>
+    <style>
+        th {
+            text-align: left;
+            background-color: rgb(240,240,240);
+            padding: 5px;
+        }
+        td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <p>Dear Customer,</p>
+    <p>The form for the following request {{ entry.unique_id }} has been closed. Below are the details:</p>
+
+    <table  border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+        <tr>
+            <th>Field</th>
+            <th>Value</th>
+        </tr>
+        <tr><td>Ticket ID</td><td>{{ entry.unique_id }}</td></tr>
+        <tr><td>Date of Request</td><td>{{ entry.date_of_request }}</td></tr>
+        <tr><td>Requested By</td><td>{{ entry.requested_by }}</td></tr>
+        <tr><td>Requestor Name</td><td>{{ entry.requested_name }}</td></tr>
+        <tr><td>State</td><td>{{ entry.state }}</td></tr>
+        <tr><td>Chassis No</td><td>{{ entry.vin_no }}</td></tr>
+        <tr><td>Engine No</td><td>{{ entry.engine }}</td></tr>
+        <tr><td>PSN No</td><td>{{ entry.psn }}</td></tr>
+        <tr><td>Request Type</td><td>{{ entry.request_type }}</td></tr>
+        <tr><td>Vehicle Regn No</td><td>{{ entry.vehicle_no }}</td></tr>
+        <tr><td>Customer Name</td><td>{{ entry.customer_name }}</td></tr>
+        <tr><td>Customer Phone No</td><td>{{ entry.customer_phone }}</td></tr>
+        <tr><td>RTO Name</td><td>{{ entry.rto_name }}</td></tr>
+        <tr><td>Dealer Name</td><td>{{ entry.dealer_name }}</td></tr>
+        <tr><td>Remarks</td><td>{{ entry.remarks }}</td></tr>
+        <tr><td>SR Request Date</td><td>{{ entry.sr_req_date }}</td></tr>
+        <tr><td>SR Success Date</td><td>{{ entry.sr_success_date }}</td></tr>
+        <tr><td>SW Scheduled Date</td><td>{{ entry.sw_sch_date }}</td></tr>
+        <tr><td>SW Success Date</td><td>{{ entry.sw_success_date }}</td></tr>
+        <tr><td>BB Completed Date</td><td>{{ entry.bb_completed_date }}</td></tr>
+        <tr><td>SOS Fitment Date</td><td>{{ entry.sos_fitment_date }}</td></tr>
+        <tr><td>Data Verified Date</td><td>{{ entry.data_verified_date }}</td></tr>
+        <tr><td>Temporary Certificate Date</td><td>{{ entry.temp_cert_date }}</td></tr>
+        <tr><td>Permanent Certificate</td><td>{{ entry.permanent_certificate }}</td></tr>
+        <tr><td>Completion Date</td><td>{{ entry.completion_date }}</td></tr>
+        <tr><td>Total TAT</td><td>{{ entry.total_tat }}</td></tr>
+        <tr>
+            <td>Upload Certificate in iAlert</td>
+            <td>
+                {% if entry.upload_certificate_in_ialert %}
+                    <a href="{{ entry.upload_certificate_in_ialert.url }}" target="_blank">Download Certificate</a>
+                {% else %}
+                    No file uploaded
+                {% endif %}
+            </td>
+        </tr>
+        <tr><td>Mail to Customer</td><td>{{ entry.mail_to_customer }}</td></tr>
+        <tr><td>Upload Certificate in Danlaw Server</td><td>{{ entry.upload_certificate_in_danlaw_server }}</td></tr>
+    </table>
+
+    <p>Best regards,<br>The AIS140 Team</p>
+</body>
+</html>

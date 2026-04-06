@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+<div class="container form-container">
+    <div class="card">
+        <div class="card-header">
+            PART C - {{ form.instance.engineer_recommendation }}
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="altDeviceForm">
+                {% csrf_token %}
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-md-3 mb-3 field-group" data-group="{{ field.name }}">
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger">
+                                        {{ field.errors|join:", " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if forloop.counter|divisibleby:4 %}
+                            </div><div class="row">
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <!-- Center the Submit Button -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+            <!-- Success Message -->
+            <div id="successMessage" class="alert alert-success mt-4" style="display: none;">
+                Form submitted successfully!
+            </div>
+            <!-- Error Message -->
+            <div id="errorMessage" class="alert alert-danger mt-4" style="display: none;">
+                An error occurred while submitting the form. Please try again.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const recommendation = "{{ form.instance.engineer_recommendation }}";
+        const fieldGroups = document.querySelectorAll('.field-group');
+
+        // Define field groups for each recommendation type
+        const fieldVisibility = {
+            "Repair": [
+                "unique_id",
+                "vin",
+                "psn",
+                "complaint_assigned_to",
+                'device_IMEI',
+                'device_ICCID',
+                'issue_identified',
+                "device_to_be_sent",
+                "faulty_device_shipped_date",
+                "faulty_device_shipped_thru",
+                "faulty_device_shipped_lr_details",
+                "faulty_device_reached_date",
+                "faulty_device_confirmation_from_destination"
+            ],
+            "Replace_Repair": [
+                "unique_id",
+                "vin",
+                "psn",
+                "complaint_assigned_to",
+                'device_IMEI',
+                'device_ICCID',
+                'issue_identified',
+                "device_to_be_sent",
+                "alt_device_sent_by",
+                "alt_device_psn",
+                "al_dev_sim_status",
+                "alt_device_shipped_date",
+                "alt_device_shipped_through",
+                "alt_device_shipped_lr_no",
+                "date_of_alt_device_delivered_to_customer",
+                "validity_of_old_device",
+                "validity_of_alt_device",
+                "validity_transfer_from_old_device",
+                "validity_from_old_to_new_yes_done_by",
+                "updated_validity_of_alt_device",
+                "alt_device_fitted_by",
+                "alt_device_fitted_date",
+                "alt_device_mapping_completion_date",
+                "alt_device_working_status",
+                "old_device_sent_to_location",
+                "faulty_device_shipped_date",
+                "faulty_device_shipped_thru",
+                "faulty_device_shipped_lr_details",
+                "faulty_device_reached_date",
+                "faulty_device_confirmation_from_destination"
+            ],
+            "Replace": [
+                "unique_id",
+                "vin",
+                "psn",
+                "complaint_assigned_to",
+                'device_IMEI',
+                'device_ICCID',
+                'issue_identified',
+                "device_to_be_sent",
+                "alt_device_sent_by",
+                "alt_device_psn",
+                "al_dev_sim_status",
+                "alt_device_shipped_date",
+                "alt_device_shipped_through",
+                "alt_device_shipped_lr_no",
+                "date_of_alt_device_delivered_to_customer",
+                "validity_of_old_device",
+                "validity_of_alt_device",
+                "validity_transfer_from_old_device",
+                "validity_from_old_to_new_yes_done_by",
+                "updated_validity_of_alt_device",
+                "alt_device_fitted_by",
+                "alt_device_fitted_date",
+                "alt_device_mapping_completion_date",
+                "alt_device_working_status",
+                "old_device_sent_to_location",
+                "faulty_device_shipped_date",
+                "faulty_device_shipped_thru",
+                "faulty_device_shipped_lr_details",
+                "faulty_device_reached_date",
+                "faulty_device_confirmation_from_destination",
+                "grn_no_for_faulty_device"
+            ]
+        };
+
+        // Hide all fields initially
+        fieldGroups.forEach(group => {
+            group.style.display = 'none';
+        });
+
+        // Show fields based on the recommendation
+        if (fieldVisibility[recommendation]) {
+            fieldVisibility[recommendation].forEach(fieldName => {
+                const fieldGroup = document.querySelector(`.field-group[data-group="${fieldName}"]`);
+                if (fieldGroup) {
+                    fieldGroup.style.display = 'block';
+                } else {
+                    console.warn(`Field group not found for: ${fieldName}`);
+                }
+            });
+        }
+    });
+
+    document.getElementById('altDeviceForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+        const form = this;
+
+        // Submit the form using Fetch API
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show the success message
+                const successMessage = document.getElementById('successMessage');
+                successMessage.style.display = 'block';
+                successMessage.textContent = data.message;
+                form.reset(); // Reset the form after successful submission
+            } else {
+                // Show the error message
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Please correct the errors and try again.';
+                console.error('Form errors:', data.errors);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'An error occurred while submitting the form. Please try again.';
+        });
+    });
+</script>
+{% endblock %}   

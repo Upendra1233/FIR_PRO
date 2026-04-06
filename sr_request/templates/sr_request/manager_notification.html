@@ -29,12 +29,45 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2>SR Request Closed - Request No: {{ sr_request.psn }}</h2>
-        <p>The SR request has been marked as <strong>Closed</strong>. Below are the details:</p>
- 
+        <h2>Your Request has been successfully completed - Request No: {{ sr_request.unique_id }}</h2>
+        <p></p>Below are the details of the request:</p>
+        <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>Requested Date</th>
+                    <td>{{ sr_request.date }}</td>
+                </tr>
+                <tr>
+                    <th>Engineer</th>
+                    <td>{{ sr_request.engineer }}</td>
+                </tr>
+                <tr>
+                    <th>Old Software</th>
+                    <td>{{ sr_request.old_software }}</td>
+                </tr>
+                <tr>
+                    <th>New Software</th>
+                    <td>{{ sr_request.new_software }}</td>
+                </tr>
+                <tr>
+                    <th>Old PSN</th>
+                    <td>{{ sr_request.old_psn }}</td>
+                </tr>
+                <tr>
+                    <th>Remarks</th>
+                    <td>{{ sr_request.remarks }}</td>
+                </tr>
+                <tr>
+                    <th>New Software Schedule Date</th>
+                    <td>{{ sr_request.New_sw_sch_date }}</td>
+                </tr>
+                <tr>
+                    <th>New Software Success Date</th>
+                    <td>{{ sr_request.New_sw_success_date }}</td>
+                </tr>                
+            </tbody>
+        </table> 
 
-        <p>You can view the full details of the request by clicking the link below:</p>
-        <p><a href="{{ details_url }}" class="btn btn-primary" style="text-decoration: none;">View Request Details</a></p>
         <p>Thank you.</p>
     </div>
     <!-- Bootstrap JS -->

@@ -1,0 +1,69 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Sign in — FIR_PRO</title>
+    <style>
+      :root{
+        --bg:#f4f7fb; --card:#ffffff; --accent:#0b5ed7; --muted:#6b7280;
+        --radius:12px; --shadow:0 6px 24px rgba(11,78,163,0.08);
+        font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      }
+      html,body{height:100%;margin:0;background:linear-gradient(180deg,#f7fafc,white);}
+      .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;}
+      .card{width:100%;max-width:420px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;box-sizing:border-box;}
+      .brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+      .brand img{height:44px;width:44px;object-fit:contain;border-radius:8px}
+      h1{font-size:20px;margin:0 0 4px;color:#0f172a}
+      p.lead{margin:0;color:var(--muted);font-size:13px}
+      form{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+      label{display:block;font-size:13px;color:#374151}
+      input[type="text"],input[type="password"]{
+        width:100%;padding:10px 12px;border:1px solid #e6eef8;border-radius:8px;font-size:14px;background:#fbfdff;
+        box-sizing:border-box;outline:none
+      }
+      input:focus{box-shadow:0 0 0 4px rgba(11,78,163,0.06);border-color:var(--accent)}
+      .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+      .btn{
+        display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;background:var(--accent);color:#fff;border-radius:8px;border:0;font-weight:600;cursor:pointer;
+      }
+      .small{font-size:12px;color:var(--muted)}
+      .error{background:#fff5f5;border:1px solid #ffd3d3;color:#9b1c1c;padding:8px;border-radius:8px;font-size:13px}
+      footer{margin-top:18px;text-align:center;color:var(--muted);font-size:12px}
+      @media (max-width:420px){.card{padding:18px}}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card" role="main" aria-labelledby="signin">
+        <div class="brand">
+          <img src="{% static 'images/logo.png' %}" alt="FIR_PRO logo" onerror="this.style.display='none'">
+          <div>
+            <h1 id="signin">FIR_PRO — Engineer Access</h1>
+            <p class="lead">Enter the site credentials to continue.</p>
+          </div>
+        </div>
+
+        {% if error %}
+          <div class="error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{% url 'site_login' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next|default:'/' }}">
+          <label for="id_username">Username</label>
+          <input id="id_username" name="username" type="text" required>
+          <label for="id_password">Password</label>
+          <input id="id_password" name="password" type="password" required>
+          {% if error %}<div class="text-danger">{{ error }}</div>{% endif %}
+          <button type="submit">Sign in</button>
+        </form>
+        <footer>
+          <div class="small">Danlaw Service Team</div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

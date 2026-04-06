@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Real-Time Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body { font-size: 14px; background-color: #f8f9fa; }
+        .container { max-width: 95%; }
+        .header-card { background-color: #343a40; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .filter-card { background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 15px; }
+        .table-container { max-height: 70vh; overflow-y: auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; }
+        th { background-color: #343a40; color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:hover { background-color: #ddd; }
+        .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 10px 0; }
+        .chart-container { width: 100%; max-width: 350px; height: 350px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        canvas { max-width: 100% !important; max-height: 100% !important; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <!-- Header -->
+        <div class="header-card position-relative">
+            <h2>SIM - Billing Data</h2>
+            <a href="#" id="downloadCsvBtn" class="btn btn-primary position-absolute top-0 end-0 mt-2 me-2" style="padding: 4px 8px; font-size: 18px;" title="Download CSV">
+                <i class="fa fa-download"></i>
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-card">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-1">
+                    <label for="from_date" class="form-label">Invoice Date From</label>
+                    <input type="date" id="from_date" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label for="to_date" class="form-label">Invoice Date To</label>
+                    <input type="date" id="to_date" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label for="unique_id" class="form-label">Unique ID</label>
+                    <input type="text" id="unique_id" class="form-control" placeholder="Search Unique ID">
+                </div>
+                <div class="col-md-2">
+                     <label for="customer_name" class="form-label">Customer Name</label>
+                    <select id="customer_name" class="form-control select2">
+                        <option value="">All</option>
+                    </select>
+                </div>
+               <div class="col-md-1">
+                    <label for="service_line" class="form-label">Service Line</label>
+                    <input type="text" id="service_line" class="form-control" placeholder="Search Service Line (leave empty for All)">
+                 </div>
+                <div class="col-md-1">
+                    <label for="bill_year" class="form-label">Bill Year</label>
+                    <select id="bill_year" class="form-control select2">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="invoice_no" class="form-label">Invoice No</label>
+                    <input type="text" id="invoice_no" class="form-control" placeholder="Search Invoice No">
+                </div>
+                <div class="col-md-2">
+                    <label for="final_po" class="form-label">Final PO</label>
+                    <input type="text" id="final_po" class="form-control" placeholder="Search Final PO">
+                </div>
+                <div class="col-md-1">
+                    <label for="po_no" class="form-label">PO No</label>
+                    <input type="text" id="po_no" class="form-control" placeholder="Search PO No">
+                </div>
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table class="table table-bordered">
+                <thead>
+                    <tr id="tableHeaders">
+                        <th>Unique ID</th>
+                        <th>Customer Name</th>
+                        <th>Master PO</th>
+                        <th>PO No</th>
+                        <th>Service Line</th>
+                        <th>Profile Type</th>
+                        <th>Tenure</th>
+                        <th>Bill Year</th>
+                        <th>Start Month</th>
+                        <th>End Month</th>
+                        <th>Invoice Number</th>
+                        <th>Invoice Date</th>
+                        <th>Invoice Qty</th>
+                        <th>Customer Price</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+            <button id="prevPage" class="btn btn-secondary btn-sm" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button id="nextPage" class="btn btn-secondary btn-sm">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <!-- Charts (optional, add your own logic/data) -->
+        <div class="row mt-4">
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <h5 class="text-center">Customer-wise Invoice Qty</h5>
+                <div class="chart-container">
+                    <canvas id="customerQtyPieChart" width="350" height="350"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <h5 class="text-center">Customer-wise Invoice Value</h5>
+                <div class="chart-container">
+                    <canvas id="customerValuePieChart" width="350" height="350"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: function(){
+                    $(this).data('placeholder');
+                },
+                allowClear: true,
+                width: 'resolve'
+            });
+            // service_line is a plain text input (search-like) — no select2 initialization
+
+            let currentPage = 1;
+            let totalPages = 1;
+
+            // Fetch unique values for dropdowns
+            fetch('/bill_verify/get_unique_field_values/')
+                .then(response => response.json())
+                .then(data => {
+                    $('#customer_name').empty().append('<option value="">All</option>');
+                    data.customer_names.forEach(name => {
+                        $('#customer_name').append(`<option value="${name}">${name}</option>`);
+                    });
+                   // (service_line is a free-text input now; we still return service_lines from backend if needed elsewhere)
+                    $('#bill_year').empty().append('<option value="">All</option>');
+                    data.bill_years.forEach(year => {
+                        $('#bill_year').append(`<option value="${year}">${year}</option>`);
+                    });
+                });
+
+            // Fetch and update table and charts
+            function fetchTableData(page = 1) {
+                currentPage = page;
+                const uniqueId = $('#unique_id').val();
+                const customerName = $('#customer_name').val();
+                const billYear = $('#bill_year').val();
+                const invoiceNo = $('#invoice_no').val();
+                const fromDate = $('#from_date').val();
+                const toDate = $('#to_date').val();
+                const finalPo = $('#final_po').val();
+                const serviceLine = $('#service_line').val();
+                const poNo = $('#po_no').val();
+                $.ajax({
+                    url: '/bill_verify/fetch/',
+                    method: 'GET',
+                    data: {
+                        unique_id: uniqueId,
+                        customer_name: customerName,
+                        bill_year: billYear,
+                        invoice_no: invoiceNo,
+                        from_date: fromDate,
+                        to_date: toDate,
+                        final_po: finalPo,
+                        service_line: serviceLine,
+                        po_no: poNo,
+                        page: currentPage
+                    },
+                    success: function (response) {
+                        updateTable(response.data);
+                        currentPage = response.current_page;
+                        totalPages = response.total_pages;
+                        renderPagination(currentPage, totalPages, response.has_previous, response.has_next);
+                    },
+                    error: function (error) {
+                        console.error('Error fetching table data:', error);
+                    }
+                });
+            }
+
+            // Update table rows
+            function updateTable(data) {
+                const tableBody = $('#tableBody');
+                tableBody.empty();
+                if (data.length === 0) {
+                    tableBody.append('<tr><td colspan="13" class="text-center">No records found.</td></tr>');
+                } else {
+                    data.forEach(row => {
+                        let tableRow = `
+                            <tr>
+                                <td>${row.unique_id || ''}</td>
+                                <td>
+                <a href="/bill_verify/form/${row.id}/?edit=1" target="_blank">${row.customer_name || ''}</a>
+            </td>
+                                <td>${row.final_po || ''}</td>
+                                <td>${row.po_no || ''}</td>
+                                <td>${row.service_line || ''}</td>
+                                <td>${row.profile_type || ''}</td>
+                                <td>${row.tenure || ''}</td>
+                                <td>${row.bill_year || ''}</td>
+                                <td>${row.start_month || ''}</td>
+                                <td>${row.end_month || ''}</td>
+                                <td>${Array.isArray(row.invoice_number) ? row.invoice_number.join(', ') : row.invoice_number || ''}</td>
+                                <td>${Array.isArray(row.invoice_date) ? row.invoice_date.join(', ') : row.invoice_date || ''}</td>
+                                <td>${Array.isArray(row.invoice_qty) ? row.invoice_qty.join(', ') : row.invoice_qty || ''}</td>
+                                <td>${row.customer_price || ''}</td>
+                            </tr>
+                        `;
+                        tableBody.append(tableRow);
+                    });
+                }
+            }
+
+            // Render pagination bar
+            function renderPagination(current, total, hasPrev, hasNext) {
+                $('#pageInfo').text(`Page ${current} of ${total}`);
+                $('#prevPage').prop('disabled', !hasPrev);
+                $('#nextPage').prop('disabled', !hasNext);
+            }
+
+            // Pagination button handlers
+            $(document).on('click', '#prevPage', function() {
+                if (currentPage > 1) {
+                    fetchTableData(currentPage - 1);
+                }
+            });
+            $(document).on('click', '#nextPage', function() {
+                if (currentPage < totalPages) {
+                    fetchTableData(currentPage + 1);
+                }
+            });
+
+            $('#filterForm input, #filterForm select').on('change', function () {
+                fetchTableData(1);
+            });
+
+            $('#downloadCsvBtn').on('click', function (e) {
+                e.preventDefault();
+                // Collect current filters (include final_po, po_no and service_line)
+                const params = {
+                    unique_id: $('#unique_id').val(),
+                    customer_name: $('#customer_name').val(),
+                    service_line: $('#service_line').val(),
+                    bill_year: $('#bill_year').val(),
+                    invoice_no: $('#invoice_no').val(),
+                    from_date: $('#from_date').val(),
+                    to_date: $('#to_date').val(),
+                    final_po: $('#final_po').val(),
+                    po_no: $('#po_no').val()
+                };
+                const query = $.param(params, true);
+                window.location.href = '/bill_verify/download_csv/?' + query;
+            });
+
+            fetchTableData();
+        });
+    </script>
+</body>
+</html>

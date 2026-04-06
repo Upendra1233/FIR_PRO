@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Real-Time Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body { font-size: 14px; background-color: #f8f9fa; }
+        .container { max-width: 95%; }
+        .header-card { background-color: #343a40; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .filter-card { background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 15px; }
+        .table-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Space below table for pagination/charts */
+}
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; }
+        th { background-color: #343a40; color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:hover { background-color: #ddd; }
+
+        .select2-container .select2-selection--single,
+        .select2-container .select2-selection--multiple {
+            height: 38px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            background-color: #fff !important;
+            box-sizing: border-box;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 24px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 10px;
+        }
+
+        #paginationBar {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    z-index: 10;
+    margin-bottom: 0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 350px;
+    height: 350px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    display: block;
+}
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <!-- Header -->
+        <div class="header-card position-relative">
+            <h2>Billing Real-Time Data</h2>
+            <a href="#" id="downloadCsvBtn" class="btn btn-primary position-absolute top-0 end-0 mt-2 me-2" style="padding: 4px 8px; font-size: 18px;" title="Download CSV">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" stroke="white" stroke-width="1.5" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10.4a.5.5 0 0 1 1 0v2.6A2 2 0 0 1 14 15H2a2 2 0 0 1-2-2V10.4a.5.5 0 0 1 .5-.5z" stroke="white" stroke-width="1.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" stroke="white" stroke-width="1.5"/>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <!-- Filters -->
+        <div class="filter-card">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-1">
+                    <label for="from_date" class="form-label">Invoice Date Fr</label>
+                    <input type="date" id="from_date" class="form-control">
+                    <label for="to_date" class="form-label">Invoice Date To</label>
+                    <input type="date" id="to_date" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label for="due_date_from" class="form-label">Pay Due Fr</label>
+                    <input type="date" id="due_date_from" class="form-control">
+                    <label for="due_date_to" class="form-label">Pay Due To</label>
+                    <input type="date" id="due_date_to" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label for="received_date_from" class="form-label">Pay Recd From</label>
+                    <input type="date" id="received_date_from" class="form-control">
+                    <label for="received_date_to" class="form-label">Pay Recd To</label>
+                    <input type="date" id="received_date_to" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label for="invoice_no" class="form-label">Invoice No</label>
+                    <input type="text" id="invoice_no" class="form-control" placeholder="Search Invoice No">
+                    <label for="customer_name" class="form-label">Customer Name</label>
+                    <select id="customer_name" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="payment_status" class="form-label">Payment Status</label>
+                    <select id="payment_status" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                    <label for="location" class="form-label">Location</label>
+                    <select id="location" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="product" class="form-label">Product</label>
+                    <select id="product" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                    <label for="part_sub_category" class="form-label">Part Sub Category</label>
+                    <select id="part_sub_category" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="item_sub_category" class="form-label">Item Sub Category</label>
+                    <select id="item_sub_category" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                    <label for="part_no" class="form-label">Part No.</label>
+                    <select id="part_no" class="form-control select2">
+                        <option value="All">Select All</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="grn_date_filter" class="form-label">GRN Date</label>
+                    <select id="grn_date_filter" class="form-control select2">
+                        <option value="All">Select All</option>
+                        <option value="blank">Blank</option>
+                        <option value="non_blank">Non-Blank</option>
+                    </select>
+                    <label for="grn_no" class="form-label">GRN No.</label>
+                    <input type="text" id="grn_no" class="form-control" placeholder="Search GRN No.">
+                </div>
+                <div class="col-md-1">
+                    <label for="gap_filter" class="form-label">GAP</label>
+                    <select id="gap_filter" class="form-control select2">
+                        <option value="All">Select All</option>
+                        <option value="gt0">&gt; 0</option>
+                        <option value="eq0">= 0</option>
+                        <option value="lt0">&lt; 0</option>
+                    </select>
+                    <label for="due_date_range" class="form-label">Due Date Range</label>
+                    <select id="due_date_range" class="form-control select2">
+                        <option value="">Select</option>
+                        <option value="overdue_7">Over Due &gt; 7 days</option>
+                        <option value="overdue_15">Over Due &gt; 15 days</option>
+                        <option value="overdue_30">Over Due &gt; 30 days</option>
+                        <option value="due_7">Due in 7 days</option>
+                        <option value="due_15">Due in 15 days</option>
+                        <option value="due_30">Due in 30 days</option>
+                        <option value="due_60">Due in 60 days</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="fields" class="form-label">Additional Fields</label>
+                    <select id="fields" name="fields" class="form-control select2" multiple>
+                        <option value="docket_no">Docket No.</option>
+                        <option value="invoice_value_without_gst">Invoice Value Without GST</option>
+                        <option value="date_of_shipment">Date of Shipment</option>
+                        <option value="transporter_name">Transporter Name</option>
+                        <option value="theoretical_payment_due_date">Theoretical Payment Due Date</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table class="table table-bordered">
+                <thead>
+                    <tr id="tableHeaders">
+                        <th>Unique ID</th>
+                        <th>Invoice No</th>
+                        <th>Invoice Date</th>
+                        <th>Part No</th>
+                        <th>Qty</th>
+                        <th>Customer Name</th>
+                        <th>Location</th>
+                        <th>Part Sub Category</th>
+                        <th>Product</th>
+                        <th>Value With GST</th>
+                        <th>TDS Val</th>
+                        <th>Credited Val</th>
+                        <th>GAP</th>
+                        <th>GRN No</th>
+    <th>GRN Date</th>
+    <th>Due Date</th>
+    <th>Payment Status</th>
+    <th>Received Date</th>
+
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="pagination-controls d-flex justify-content-center align-items-center my-2">
+            <button id="prevPage" class="btn btn-secondary btn-sm me-2" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span id="pageInfo" class="mx-2">Page 1 of 1</span>
+            <button id="nextPage" class="btn btn-secondary btn-sm ms-2">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <!-- Total Invoice Value Card -->
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-4 col-sm-8 col-12">
+                <div class="card text-center" style="background: #d1f3fa;">
+                    <div class="card-body">
+                        <div style="color: #00a0c6; font-weight: 600;">Total Invoice Value with GST</div>
+                        <div id="totalInvoiceValue" style="font-size: 2rem; font-weight: bold; color: #222;">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-8 col-12">
+                <div class="card text-center" style="background: #f7e6d1;">
+                    <div class="card-body">
+                        <div style="color: #c68600; font-weight: 600;">Total Quantity</div>
+                        <div id="totalQty" style="font-size: 2rem; font-weight: bold; color: #222;">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Charts -->
+        <div class="row mt-4">
+            <div class="col-md-4 d-flex flex-column align-items-center">
+                <h5 class="text-center">Customer-wise Invoice Value with GST</h5>
+                <div class="chart-container">
+                    <canvas id="customerPieChart" width="350" height="350"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex flex-column align-items-center">
+                <h5 class="text-center">Customer-wise Quantity</h5>
+                <div class="chart-container">
+                    <canvas id="quantityPieChart" width="350" height="350"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex flex-column align-items-center">
+                <h5 class="text-center">Product-wise Invoice Value with GST</h5>
+                <div class="chart-container">
+                    <canvas id="productPieChart" width="350" height="350"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 for dropdowns
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+            $('#fields').select2({
+                placeholder: "Select additional fields",
+                allowClear: true,
+                width: '100%'
+            });
+            let customerPieChart, quantityPieChart, productPieChart;
+            let currentPage = 1;
+            let totalPages = 1;
+            // Fetch unique values for dropdowns
+            fetch('/billing_data/get_unique_field_values/')
+                .then(response => response.json())
+                .then(data => {
+                    $('#customer_name').empty().append('<option value="All">Select All</option>');
+                    data.customer_names.forEach(name => {
+                        $('#customer_name').append(`<option value="${name}">${name}</option>`);
+                    });
+
+                    $('#location').empty().append('<option value="All">Select All</option>');
+                    data.locations.forEach(location => {
+                        $('#location').append(`<option value="${location}">${location}</option>`);
+                    });
+
+                    $('#part_sub_category').empty().append('<option value="All">Select All</option>');
+                    data.part_sub_categories.forEach(cat => {
+                        $('#part_sub_category').append(`<option value="${cat}">${cat}</option>`);
+                    });
+
+                    $('#payment_status').empty().append('<option value="All">Select All</option>');
+                    data.payment_statuses.forEach(status => {
+                        $('#payment_status').append(`<option value="${status}">${status}</option>`);
+                    });
+
+                    $('#product').empty().append('<option value="All">Select All</option>');
+                    data.products.forEach(product => {
+                        $('#product').append(`<option value="${product}">${product}</option>`);
+                    });
+
+                    $('#item_sub_category').empty().append('<option value="All">Select All</option>');
+                    data.item_sub_categories.forEach(item => {
+                        $('#item_sub_category').append(`<option value="${item}">${item}</option>`);
+                    });
+
+                    $('#part_no').empty().append('<option value="All">Select All</option>');
+                    data.part_nos.forEach(part => {
+                        $('#part_no').append(`<option value="${part}">${part}</option>`);
+                    });
+                });
+
+            // Fetch and update table and charts
+            function fetchTableData(page = 1) {
+                currentPage = page;
+                const fromDate = $('#from_date').val();
+                const toDate = $('#to_date').val();
+                const invoiceNo = $('#invoice_no').val();
+                const customerName = $('#customer_name').val();
+                const location = $('#location').val();
+                const partSubCategory = $('#part_sub_category').val();
+                const paymentStatus = $('#payment_status').val();
+                const dueDateFrom = $('#due_date_from').val();
+                const dueDateTo = $('#due_date_to').val();
+                const receivedDateFrom = $('#received_date_from').val();
+                const receivedDateTo = $('#received_date_to').val();
+                const selectedFields = $('#fields').val();
+                const product = $('#product').val();
+                const itemSubCategory = $('#item_sub_category').val();
+                const partNo = $('#part_no').val();
+                const gapFilter = $('#gap_filter').val();
+                const gapNo = $('#gap_no').val();
+                const dueDateRange = $('#due_date_range').val();
+                $.ajax({
+                    url: '/billing_data/fetch/',
+                    method: 'GET',
+                    data: {
+                        from_date: fromDate,
+                        to_date: toDate,
+                        invoice_no: invoiceNo,
+                        customer_name: customerName !== 'All' ? customerName : '',
+                        location: location !== 'All' ? location : '',
+                        part_sub_category: partSubCategory !== 'All' ? partSubCategory : '',
+                        payment_status: paymentStatus !== 'All' ? paymentStatus : '',
+                        due_date_from: dueDateFrom,
+                        due_date_to: dueDateTo,
+                        received_date_from: receivedDateFrom,
+                        received_date_to: receivedDateTo,
+                        fields: selectedFields,
+                        product: product !== 'All' ? product : '',
+                        item_sub_category: itemSubCategory !== 'All' ? itemSubCategory : '',
+                        part_no: partNo !== 'All' ? partNo : '',
+                        gap_filter: gapFilter,
+                        grn_date_filter: $('#grn_date_filter').val(),
+                        grn_no: $('#grn_no').val(), // <-- FIXED!
+                        due_date_range: dueDateRange,
+                        page: currentPage
+                    },
+                    success: function (response) {
+                        const selectedFields = $('#fields').val();
+                        updateTableHeaders(selectedFields); // <-- Add this line
+                        updateTable(response.data, selectedFields);
+                        updateCharts(response.charts);
+                        currentPage = response.current_page;
+                        totalPages = response.total_pages;
+                        renderPagination(currentPage, totalPages, response.has_previous, response.has_next);
+
+                        // Format as Indian currency with ₹ and comma separation, no decimals
+                        let totalValue = response.total_invoice_value_with_gst || 0;
+                        $('#totalInvoiceValue').text(
+                            '₹' + Number(totalValue).toLocaleString('en-IN', { maximumFractionDigits: 0 })
+                        );
+
+                        let totalQty = response.total_qty || 0;
+                        $('#totalQty').text(totalQty.toLocaleString('en-IN'));
+                    },
+                    error: function (error) {
+                        console.error('Error fetching table data:', error);
+                    }
+                });
+            }
+
+            // Update table rows
+            function updateTable(data, selectedFields) {
+                const tableBody = $('#tableBody');
+                tableBody.empty();
+
+                data.forEach(row => {
+                    let tableRow = `
+                        <tr>
+<td>
+    <a href="/billing_data/add-billing-data/${row.id}/" style="color: blue;">
+        ${row.unique_id || 'O'}
+    </a>
+</td>
+                            <td>${row.invoice_no || ''}</td>
+                            <td>${row.invoice_date || ''}</td>
+                            <td>${row.part_no || ''}</td>
+                            <td>${row.qty || ''}</td>
+                            <td>${row.customer_name || ''}</td>
+                            <td>${row.location || ''}</td>
+                            <td>${row.part_sub_category || ''}</td>
+                            <td>${row.product || ''}</td>
+                            <td>${row.invoice_value_with_gst || ''}</td>
+                            <td>${row.tds_amount || ''}</td>
+                            <td>${row.credited_amount || ''}</td>
+                            <td>${row.gap || ''}</td>
+                            <td>${row.grn_no || ''}</td>
+                            <td>${row.actual_grn_delivery_date || ''}</td>
+                            <td>${row.due_date || ''}</td>
+                            <td>${row.payment_status || ''}</td>
+                            <td>${row.received_date || ''}</td>
+
+                    `;
+
+                    // If you want to add additional fields dynamically:
+                    if (selectedFields && selectedFields.length > 0) {
+                        selectedFields.forEach(field => {
+                            tableRow += `<td>${row[field] || ''}</td>`;
+                        });
+                    }
+
+                    tableRow += '</tr>';
+                    tableBody.append(tableRow);
+                });
+            }
+
+            // Update table headers
+            function updateTableHeaders(selectedFields) {
+    let baseHeaders = `
+        <th>Unique ID</th>
+        <th>Invoice No</th>
+        <th>Invoice Date</th>
+        <th>Part No</th>
+        <th>Qty</th>
+        <th>Customer Name</th>
+        <th>Location</th>
+        <th>Part Sub Category</th>
+        <th>Product</th>
+        <th>Value With GST</th>
+        <th>TDS Val</th>
+        <th>Credited Val</th>
+        <th>GAP</th>
+        <th>GRN No</th>
+        <th>GRN Date</th>
+        <th>Due Date</th>
+        <th>Payment Status</th>
+        <th>Received Date</th>
+    `;
+    let additionalHeaders = '';
+    if (selectedFields && selectedFields.length > 0) {
+        selectedFields.forEach(field => {
+            additionalHeaders += `<th>${field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>`;
+        });
+    }
+    $('#tableHeaders').html(baseHeaders + additionalHeaders);
+}
+
+            // Update charts (same as before)
+            function updateCharts(charts) {
+                const customerLabels = charts.customer.map(item => item.customer_name || 'Unknown');
+                const customerData = charts.customer.map(item => item.total_value);
+                if (customerPieChart) customerPieChart.destroy();
+                const customerCtx = document.getElementById('customerPieChart').getContext('2d');
+                customerPieChart = new Chart(customerCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: customerLabels,
+                        datasets: [{
+                            data: customerData,
+                            backgroundColor: generateColors(customerLabels.length)
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            datalabels: {
+                                color: '#fff',
+                                font: { size: 14 },
+                                formatter: (value, context) => {
+                                    const roundedValue = Math.ceil(value / 100000);
+                                    const formattedValue = roundedValue.toLocaleString();
+                                    return `${formattedValue}L`;
+                                },
+                            },
+                        },
+                    },
+                    plugins: [ChartDataLabels]
+                });
+                const quantityLabels = charts.quantity.map(item => item.customer_name || 'Unknown');
+                const quantityData = charts.quantity.map(item => item.total_value);
+                if (quantityPieChart) quantityPieChart.destroy();
+                const quantityCtx = document.getElementById('quantityPieChart').getContext('2d');
+                quantityPieChart = new Chart(quantityCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: quantityLabels,
+                        datasets: [{
+                            data: quantityData,
+                            backgroundColor: generateColors(quantityLabels.length)
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            datalabels: {
+                                color: '#fff',
+                                font: { size: 14 },
+                                formatter: (value, context) => {
+                                    const roundedValue = Math.ceil(value );
+                                    const formattedValue = roundedValue.toLocaleString();
+                                    return `${formattedValue}`;
+                                },
+                            },
+                        },
+                    },
+                    plugins: [ChartDataLabels]
+                });
+                // Product-wise Pie Chart
+                const productLabels = charts.product.map(item => item.product || 'Unknown');
+                const productData = charts.product.map(item => item.total_value);
+                if (productPieChart) productPieChart.destroy();
+                const productCtx = document.getElementById('productPieChart').getContext('2d');
+                productPieChart = new Chart(productCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: productLabels,
+                        datasets: [{
+                            data: productData,
+                            backgroundColor: generateColors(productLabels.length)
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            datalabels: {
+                                color: '#fff',
+                                font: { size: 14 },
+                                formatter: (value, context) => {
+                                    const roundedValue = Math.ceil(value / 100000);
+                                    const formattedValue = roundedValue.toLocaleString();
+                                    return `${formattedValue}L`;
+                                },
+                            },
+                        },
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            }
+            // Generate random colors for charts
+            function generateColors(count) {
+    // Use a set of visually distinct colors (extend as needed)
+    const palette = [
+        "#3366CC", "#DC3912", "#FF9900", "#109618", "#990099", "#0099C6", "#DD4477",
+        "#66AA00", "#B82E2E", "#316395", "#994499", "#22AA99", "#AAAA11", "#6633CC",
+        "#E67300", "#8B0707", "#329262", "#5574A6", "#3B3EAC", "#B77322", "#16D620",
+        "#B91383", "#F4359E", "#9C5935", "#A9C413", "#2A778D", "#668D1C", "#BEA413",
+        "#0C5922", "#743411"
+    ];
+    // If more colors are needed, repeat palette but shift hue for each repeat
+    let colors = [];
+    for (let i = 0; i < count; i++) {
+        if (i < palette.length) {
+            colors.push(palette[i]);
+        } else {
+            // Generate a new color by shifting hue
+            let hue = (i * 137.508) % 360; // Golden angle
+            colors.push(`hsl(${hue},70%,60%)`);
+        }
+    }
+    return colors;
+}
+            // Render pagination bar
+            function renderPagination(current, total, hasPrev, hasNext) {
+                $('#pageInfo').text(`Page ${current} of ${total}`);
+                $('#prevPage').prop('disabled', !hasPrev);
+                $('#nextPage').prop('disabled', !hasNext);
+                if (total > 1) {
+                    $('.pagination-controls').show();
+                } else {
+                    $('.pagination-controls').hide();
+                }
+            }
+
+            // Pagination button handlers
+            $(document).on('click', '#prevPage', function() {
+                if (currentPage > 1) {
+                    fetchTableData(currentPage - 1);
+                }
+            });
+            $(document).on('click', '#nextPage', function() {
+                if (currentPage < totalPages) {
+                    fetchTableData(currentPage + 1);
+                }
+            });
+
+            $('#filterForm input, #filterForm select').on('change', function () {
+                fetchTableData(1);
+            });
+
+            $('#downloadCsvBtn').on('click', function (e) {
+                e.preventDefault();
+                // Collect current filters
+                const params = {
+                    from_date: $('#from_date').val(),
+                    to_date: $('#to_date').val(),
+                    invoice_no: $('#invoice_no').val(),
+                    customer_name: $('#customer_name').val() !== 'All' ? $('#customer_name').val() : '',
+                    location: $('#location').val() !== 'All' ? $('#location').val() : '',
+                    part_sub_category: $('#part_sub_category').val() !== 'All' ? $('#part_sub_category').val() : '',
+                    payment_status: $('#payment_status').val() !== 'All' ? $('#payment_status').val() : '',
+                    due_date_from: $('#due_date_from').val(),
+                    due_date_to: $('#due_date_to').val(),
+                    received_date_from: $('#received_date_from').val(),
+                    received_date_to: $('#received_date_to').val(),
+                    product: $('#product').val() !== 'All' ? $('#product').val() : '',
+                    item_sub_category: $('#item_sub_category').val() !== 'All' ? $('#item_sub_category').val() : '',
+                    part_no: $('#part_no').val() !== 'All' ? $('#part_no').val() : '',
+                    gap_filter: $('#gap_filter').val(),
+                    grn_date_filter: $('#grn_date_filter').val(),
+                    grn_no: $('#grn_no').val(),
+
+                    // Add this line to include selected fields
+                    fields: $('#fields').val()
+                };
+                const query = $.param(params, true);
+                window.location.href = '/billing_data/download_csv/?' + query; // <-- Use the Excel endpoint
+            });
+            fetchTableData();
+        });
+    </script>
+</body>
+</html>
+
+

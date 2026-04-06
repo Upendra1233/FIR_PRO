@@ -9,6 +9,10 @@ class SRRequestForm(forms.ModelForm):
         exclude = ['unique_id']  # Exclude unique_id from the form
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'new_software': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter New Software'}),  # New Software
+            'New_sw_sch_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),  # New Software Scheduled Date
+            'New_sw_success_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),  # New Software Success Date
+            'approved_by_HOD': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter HOD Name'}),  # Approved by HOD
             'existing_validity': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'requestor_validity_start_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'requestor_validity_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
@@ -31,6 +35,7 @@ class SRRequestForm(forms.ModelForm):
             'old_iccid': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Old ICCID'}),  # Old ICCID
             'old_sim_status': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter Old Sim Status', 'rows': 1}),  # Old Sim Status
             'old_validity': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),  # Old Validity
+            'old_software': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Old Software'}),  # Old Software
         }
 
     def __init__(self, *args, **kwargs):
@@ -55,10 +60,12 @@ class SRDetailsForm(forms.ModelForm):
 class NewSRDetailsForm(forms.ModelForm):
     class Meta:
         model = SRRequest
-        fields = ['new_sr_no', 'sr_date', 'sr_success_date', 'status']
+        fields = ['new_sr_no', 'sr_date', 'sr_success_date', 'status','New_sw_sch_date', 'New_sw_success_date']
         widgets = {
             'new_sr_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter New SR No'}),
             'sr_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'sr_success_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
+            'New_sw_sch_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),  # New Software Success Date
+            'New_sw_success_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),  # New Software Success Date
         }

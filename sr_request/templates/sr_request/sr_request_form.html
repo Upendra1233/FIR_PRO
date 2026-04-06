@@ -106,8 +106,7 @@
     <div class="container form-container">
         <div class="card">
             <div class="card-header">
-                Subscription Approval Request Form (SARF)
-                <a href="{% url 'download_sr_requests' %}" class="download-icon" title="Download SR Requests">
+Software Update                <a href="{% url 'download_sr_requests' %}" class="download-icon" title="Download SR Requests">
                     <i class="fas fa-download"></i>
                 </a>
             </div>
@@ -128,6 +127,11 @@
                     <div id="message-container" class="alert" style="display: none;"></div>
 
                     <div class="row">
+                        <!-- Date -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_date" class="form-label">Request Date</label>
+                            <input type="datetime-local" name="date" id="id_date" class="form-control">
+                        </div>
                         <!-- Engineer -->
                         <div class="col-md-3 mb-3">
                             <label for="id_engineer" class="form-label">Engineer</label>
@@ -143,53 +147,51 @@
                             <input type="text" id="id_engineer_other" name="engineer_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
 
-                        <!-- Date -->
+
+
+                   
                         <div class="col-md-3 mb-3">
-                            <label for="id_date" class="form-label">Request Date</label>
-                            <input type="datetime-local" name="date" id="id_date" class="form-control">
+                            <label for="id_old_software" class="form-label">Old Software</label>
+                            <input type="text" name="old_software" id="id_old_software" class="form-control" maxlength="10" value="{{ sr_request.old_software }}" placeholder="Enter Old Software" {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="id_new_software" class="form-label">New Software</label>
+                            <input type="text" name="new_software" id="id_new_software" class="form-control" value="{{ sr_request.new_software }}" {% if read_only %}readonly{% endif %}>
                         </div>
 
-                        <!-- Category -->
+
+                        
+<!--
                         <div class="col-md-3 mb-3">
-                            <label for="id_category" class="form-label">Category</label>
-                            <select name="category" id="id_category" class="form-control">
-                                <option value="">-- Select Category --</option>
-                                <option value="AIS 140">AIS 140</option>
-                                <option value="BS Extension">BS Extension</option>
-                                <option value="Commercial Activation">Commercial Activation</option>
-                                <option value="Validity Transfer">Validity Transfer</option>
-                                <option value="OTC RSU">OTC RSU</option>
-                                <option value="Resumption SR">Resumption SR</option>
-                                <option value="Others">Others</option>
-                            </select>
-                            <input type="text" id="id_category_other" name="category_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                            <label for="id_approved_by_HOD" class="form-label">Approved By HOD</label>
+                            <textarea name="approved_by_HOD" id="id_approved_by_HOD" class="form-control" rows="1" placeholder="Enter Old Sim Status" {% if read_only %}readonly{% endif %}>{{ sr_request.approved_by_HOD }}</textarea>
                         </div>
-<!-- Old PSN -->
-<div class="col-md-3 mb-3">
-    <label for="id_old_psn" class="form-label">Old PSN</label>
-    <input type="text" name="old_psn" id="id_old_psn" class="form-control" maxlength="10" 
-           pattern="\d{10}" title="Old PSN must be exactly 10 digits" placeholder="Enter Old PSN" required>
-</div>
-<!-- Old ICCID -->
-<div class="col-md-3 mb-3">
-    <label for="id_old_iccid" class="form-label">Old ICCID</label>
-    <input type="text" name="old_iccid" id="id_old_iccid" class="form-control" maxlength="20" 
-           pattern="\d{20}" title="ICCID must be exactly 20 digits" placeholder="Enter Old ICCID" required>
-</div>
+                    -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_old_psn" class="form-label">PSN</label>
+                            <input type="text" name="old_psn" id="id_old_psn" class="form-control" maxlength="10" 
+                                pattern="\d{10}" title="Old PSN must be exactly 10 digits" placeholder="Enter Old PSN" required>
+                        </div>
 
-    <!-- Old Sim Status -->
-    <div class="col-md-3 mb-3">
-        <label for="id_old_sim_status" class="form-label">Old Sim Status</label>
-        <textarea name="old_sim_status" id="id_old_sim_status" class="form-control" rows="1" placeholder="Enter Old Sim Status"></textarea>
-    </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="id_remarks" class="form-label">Remarks</label>
+                            <textarea name="remarks" id="id_remarks" class="form-control" rows="1" placeholder="Enter remarks"></textarea>
+                        </div>                        
 
-    <!-- Old Validity -->
-    <div class="col-md-3 mb-3">
-        <label for="id_old_validity" class="form-label">Old Validity</label>
-        <input type="datetime-local" name="old_validity" id="id_old_validity" class="form-control">
-    </div>
+ <!-- 
 
-                        <!-- PSN -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_old_sim_status" class="form-label">Old Sim Status</label>
+                                <textarea name="old_sim_status" id="id_old_sim_status" class="form-control" rows="1" placeholder="Enter Old Sim Status"></textarea>
+                            </div>
+
+
+                            <div class="col-md-3 mb-3">
+                                <label for="id_old_validity" class="form-label">Old Validity</label>
+                                <input type="datetime-local" name="old_validity" id="id_old_validity" class="form-control">
+                            </div>
+
+           
                         <div class="col-md-3 mb-3">
                             <label for="id_psn" class="form-label">PSN</label>
                             <input type="text" name="psn" id="id_psn" class="form-control" maxlength="10" placeholder="Enter 10-digit PSN">
@@ -197,13 +199,12 @@
                     </div>
 
                     <div class="row">
-                        <!-- ICICID -->
+              
                         <div class="col-md-3 mb-3">
                             <label for="id_icicid" class="form-label">ICICID</label>
                             <input type="text" name="icicid" id="id_icicid" class="form-control" maxlength="20" placeholder="Enter 20-digit ICICID">
                         </div>
 
-                        <!-- Plan -->
                         <div class="col-md-3 mb-3">
                             <label for="id_plan" class="form-label">Plan</label>
                             <select name="plan" id="id_plan" class="form-control">
@@ -218,13 +219,13 @@
                             <input type="text" id="id_plan_other" name="plan_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
 
-                        <!-- Requestor Comments -->
+               
                         <div class="col-md-3 mb-3">
                             <label for="id_requestor_comments" class="form-label">Requestor Comments</label>
                             <textarea name="requestor_comments" id="id_requestor_comments" class="form-control" rows="1" placeholder="Enter your comments"></textarea>
                         </div>
 
-                        <!-- SIM Status -->
+               
                         <div class="col-md-3 mb-3">
                             <label for="id_sim_status_during_request" class="form-label">SIM Status During Request</label>
                             <textarea name="sim_status_during_request" id="id_sim_status_during_request" class="form-control" rows="1" placeholder="SIM status during request"></textarea>
@@ -232,30 +233,27 @@
                     </div>
 
                     <div class="row">
-                        <!-- Existing Validity -->
+           
                         <div class="col-md-3 mb-3">
                             <label for="id_existing_validity" class="form-label">Existing Validity</label>
                             <input type="datetime-local" name="existing_validity" id="id_existing_validity" class="form-control">
                         </div>
 
-                        <!-- Requestor Validity Start Date -->
                         <div class="col-md-3 mb-3">
                             <label for="id_requestor_validity_start_date" class="form-label">Requestor Validity Start Date</label>
                             <input type="datetime-local" name="requestor_validity_start_date" id="id_requestor_validity_start_date" class="form-control">
                         </div>
 
-                        <!-- Requestor Validity End Date -->
                         <div class="col-md-3 mb-3">
                             <label for="id_requestor_validity_end_date" class="form-label">Requestor Validity End Date</label>
                             <input type="datetime-local" name="requestor_validity_end_date" id="id_requestor_validity_end_date" class="form-control">
                         </div>
 
-                        <!-- Billing To -->
                         <div class="col-md-3 mb-3">
                             <label for="id_billing_to" class="form-label">Billing To</label>
                             <select name="billing_to" id="id_billing_to" class="form-control">
                                 <option value="">-- Select Billing To --</option>
-                                <option value="Good will">Good well</option>
+                                <option value="Good wi  ll">Good will</option>
                                 <option value="Customer">Customer</option>
                                 <option value="Engineering">Engineering</option>
                                 <option value="Service">Service</option>
@@ -264,25 +262,23 @@
                             <input type="text" id="id_billing_to_other" name="billing_to_other" class="form-control mt-2" style="display: none;" placeholder="Please specify...">
                         </div>
                     </div>
-
+                    
                     <div class="row">
-                        <!-- Remarks -->
                         <div class="col-md-3 mb-3">
                             <label for="id_remarks" class="form-label">Remarks</label>
                             <textarea name="remarks" id="id_remarks" class="form-control" rows="1" placeholder="Enter remarks"></textarea>
                         </div>
 
-                        <!-- HOD Remarks -->
                         <div class="col-md-3 mb-3">
                             <label for="id_hod_remarks" class="form-label">HOD Remarks</label>
                             <textarea name="hod_remarks" id="id_hod_remarks" class="form-control" rows="1" placeholder="Enter HOD remarks"></textarea>
                         </div>
                         
-                            <!-- Engineer Email -->
                             <div class="col-md-3 mb-3">
                                 <label for="id_engineer_email" class="form-label">Engineer Email</label>
                                 <input type="email" name="engineer_email" id="id_engineer_email" class="form-control" placeholder="Enter Engineer Email">
                             </div>
+        -->
                         
                     </div>
 
@@ -484,6 +480,51 @@
                 oldIccidInput.focus();
                 return;
             }
+        });
+    });
+</script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('sr-request-form');
+        const popupMessage = document.getElementById('popup-message');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        // Handle form submission
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+            submitButton.disabled = true; // Disable the submit button to prevent multiple clicks
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show the popup message
+                    popupMessage.style.display = 'block';
+
+                    // Hide the popup after 3 seconds and refresh the page
+                    setTimeout(() => {
+                        popupMessage.style.display = 'none';
+                        location.reload(); // Refresh the page
+                    }, 3000);
+                } else {
+                    alert('There was an error: ' + (data.message || 'Please check the form.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An unexpected error occurred. Please try again.');
+            })
+            .finally(() => {
+                submitButton.disabled = false; // Re-enable the submit button in case of an error
+            });
         });
     });
 </script>

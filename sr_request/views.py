@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, get_connection
+from email.utils import make_msgid
 from django.template.loader import render_to_string
 from .forms import SRRequestForm, SRDetailsForm, NewSRDetailsForm
 from .models import SRRequest
@@ -35,20 +36,36 @@ def sr_request_form(request):
             sr_request = form.save()
 
             # Send email to manager
-            subject = f"Approval Needed for SR Request {sr_request.unique_id}"
+            subject = f"New S/W Update Request {sr_request.unique_id}"
             recipient_email = 'upendram@danlawtech.com'  # Manager's email from settings
-            cc_emails = [sr_request.engineer_email,'sales@danlawtech.com']  # Add CC email addresses
-            context = {
-                'sr_request': sr_request,
-                'view_details_url': f"http://127.0.0.1:8000/sr_request/view/{sr_request.id}/",
-                'edit_url': f"http://127.0.0.1:8000/sr_request/edit/{sr_request.id}/",
-                'approve_url': f"http://127.0.0.1:8000/sr_request/approve/{sr_request.id}/",
-                'reject_url': f"http://127.0.0.1:8000/sr_request/reject/{sr_request.id}/",
+            cc_emails = ["upendram@danlawtech.com", 'sales@danlawtech.com']  # Add CC email addresses
+            context = {   
+                'sr_request': sr_request,   
+                
+                'edit_url': f"https://danlawtechu.pythonanywhere.com/sr_request/edit/{sr_request.id}/",
+                'approve_url': f"https://danlawtechu.pythonanywhere.com/sr_request/approve/{sr_request.id}/",
+                'reject_url': f"https://danlawtechu.pythonanywhere.com/sr_request/reject/{sr_request.id}/",
             }
             email_body = render_to_string('sr_request/manager_email.html', context)
-            email = EmailMessage(subject, email_body, to=[recipient_email], cc=cc_emails)
+            email = EmailMessage(subject, email_body, settings.DEFAULT_FROM_EMAIL, [recipient_email], cc=cc_emails)
+            # Add Message-ID and debug header
+            domain = settings.DEFAULT_FROM_EMAIL.split('@')[-1]
+            mid = make_msgid(domain=domain)
+            email.extra_headers = {'X-SR-Source': 'sr_request.sr_request_form', 'Message-ID': mid}
+            logger.info(f"Email from: {email.from_email}, to: {email.to}, cc: {email.cc}, Message-ID: {mid}")
             email.content_subtype = 'html'
-            email.send()
+            try:
+                conn = get_connection()
+                conn.open()
+                result = conn.send_messages([email])
+                logger.info("Manager notification sent, send_messages returned: %s, Message-ID: %s", result, mid)
+                logger.debug("Raw manager email:\n%s", email.message().as_string())
+                if not result:
+                    logger.warning("Manager notification send returned 0 — SMTP may have rejected/dropped it.")
+                conn.close()
+            except Exception as e:
+                logger.error("Failed to send manager notification: %s", e, exc_info=True)
+                return JsonResponse({'success': False, 'message': f'Form submitted but failed to send email: {e}'}, status=500)
 
             return JsonResponse({'success': True, 'message': 'Form submitted successfully!'})
         else:
@@ -63,33 +80,108 @@ def sr_request_success(request):
 
 def approve_request(request, request_id):
     sr_request = get_object_or_404(SRRequest, id=request_id)
-    sr_request.status = 'Approved'
+
+    if sr_request.manager_approval_status in ['Approved', 'Rejected']:
+        return JsonResponse({'success': False, 'message': 'Request has already been processed.'}, status=400)
+
+    sr_request.manager_approval_status = 'Approved'
     sr_request.save()
 
-    # Generate the full URL for the new_sr_details_form
-    base_url = request.build_absolute_uri('/')[:-1]  # Get the base URL (e.g., http://127.0.0.1:8000)
-    form_url = f"{base_url}{reverse('new_sr_details_form', kwargs={'request_id': sr_request.id})}"
+    try:
+        base_url = request.build_absolute_uri('/')[:-1]
+        form_url = f"{base_url}{reverse('new_sr_details_form', kwargs={'request_id': sr_request.id})}"
 
-    # Send email to engineer with the form URL
-    subject = f"Action Required: Fill Additional Details for SR Request {sr_request.unique_id} ON {sr_request.psn}"
-    recipient_email = 'upendram@danlawtech.com'  # Engineer's email
-    cc_emails = ['upendram@danlawtech.com', sr_request.engineer_email, 'sales@danlawtech.com']
-    context = {
-        'sr_request': sr_request,
-        'form_url': form_url,  # Pass the resolved URL to the template
-    }
-    email_body = render_to_string('sr_request/engineer_email.html', context)
-    email = EmailMessage(subject, email_body, to=[recipient_email], cc=cc_emails)
-    email.content_subtype = 'html'
-    email.send()
+        subject = f"Action Required: Fill Additional Details for SW Request {sr_request.unique_id}"
+        recipient_email = ['sales@danlawtech.com']
+        cc_emails = [sr_request.engineer_email] if sr_request.engineer_email else []
+        
+        logger.info(f"Sending approval email to: {recipient_email}, CC: {cc_emails}")
+        logger.info(f"Form URL: {form_url}")
+        
+        context = {
+            'sr_request': sr_request,
+            'form_url': form_url,
+        }
+        email_body = render_to_string('sr_request/engineer_email.html', context)
+        email = EmailMessage(subject, email_body, settings.DEFAULT_FROM_EMAIL, recipient_email, cc=cc_emails)
+        # Add debug headers for tracking in mail server logs (keep X-SR headers)
+        domain = settings.DEFAULT_FROM_EMAIL.split('@')[-1]
+        mid = make_msgid(domain=domain)
+        email.extra_headers = {
+            'X-SR-Request-ID': str(sr_request.id),
+            'X-SR-Unique-ID': sr_request.unique_id,
+            'X-SR-Source': 'sr_request.approve_request',
+            'Message-ID': mid
+        }
+        logger.info(f"Email from: {email.from_email}, to: {email.to}, cc: {email.cc}, headers: {email.extra_headers}")
+        email.content_subtype = 'html'
+        try:
+            conn = get_connection()
+            conn.open()
+            result = conn.send_messages([email])
+            logger.info(f"Approval email sent. send_messages returned: {result}, Subject: {subject}, Message-ID: {mid}")
+            logger.debug("Raw approval email:\n%s", email.message().as_string())
+            if not result:
+                logger.warning("Approval email send returned 0 — SMTP server may have rejected or dropped the message.")
+            conn.close()
+        except Exception as e:
+            logger.error(f"Failed to send approval email: {str(e)}", exc_info=True)
+            return JsonResponse({'success': False, 'message': f'Request approved but failed to send email: {str(e)}'}, status=500)
+    except Exception as e:
+        logger.error(f"Failed to send approval email: {str(e)}", exc_info=True)
+        return JsonResponse({'success': False, 'message': f'Request approved but failed to send email: {str(e)}'}, status=500)
 
-    return JsonResponse({'success': True, 'message': 'Request approved and email sent to engineer.'})
+    return JsonResponse({'success': True, 'message': 'Request approved and email sent to sales.'})
 
 def reject_request(request, request_id):
     sr_request = get_object_or_404(SRRequest, id=request_id)
-    sr_request.status = 'Rejected'
+
+
+    # Check if the request has already been processed
+    if sr_request.manager_approval_status in ['Approved', 'Rejected']:
+        return JsonResponse({'success': False, 'message': 'Request has already been processed.'}, status=400)
+
+    sr_request.manager_approval_status = 'Rejected'
     sr_request.save()
-    return JsonResponse({'success': True, 'message': 'Request rejected.'})
+
+    # Send rejection email to sales
+    try:
+        base_url = request.build_absolute_uri('/')[:-1]
+        form_url = f"{base_url}{reverse('new_sr_details_form', kwargs={'request_id': sr_request.id})}"        
+        subject = f"SR Request {sr_request.unique_id} - Rejection Notification"
+        recipient_email = ['sales@danlawtech.com']
+        cc_emails = [sr_request.engineer_email] if sr_request.engineer_email else []
+        
+        logger.info(f"Sending rejection email to: {recipient_email}, CC: {cc_emails}")
+        
+        context = {
+            'sr_request': sr_request,
+            'form_url': form_url,
+        }
+        email_body = render_to_string('sr_request/engineer_email.html', context)
+        email = EmailMessage(subject, email_body, settings.DEFAULT_FROM_EMAIL, recipient_email, cc=cc_emails)
+        domain = settings.DEFAULT_FROM_EMAIL.split('@')[-1]
+        mid = make_msgid(domain=domain)
+        email.extra_headers = {'X-SR-Source': 'sr_request.reject_request', 'Message-ID': mid}
+        logger.info(f"Email from: {email.from_email}, to: {email.to}, cc: {email.cc}, Message-ID: {mid}")
+        email.content_subtype = 'html'
+        try:
+            conn = get_connection()
+            conn.open()
+            result = conn.send_messages([email])
+            logger.info("Rejection email send_messages returned: %s, Message-ID: %s", result, mid)
+            logger.debug("Raw rejection email:\n%s", email.message().as_string())
+            if not result:
+                logger.warning("Rejection email send returned 0 — SMTP may have rejected/dropped it.")
+            conn.close()
+        except Exception as e:
+            logger.error(f"Failed to send rejection email: {str(e)}", exc_info=True)
+            return JsonResponse({'success': False, 'message': f'Request rejected but failed to send email: {str(e)}'}, status=500)
+    except Exception as e:
+        logger.error(f"Failed to send rejection email: {str(e)}", exc_info=True)
+        return JsonResponse({'success': False, 'message': f'Request rejected but failed to send email: {str(e)}'}, status=500)
+
+    return JsonResponse({'success': True, 'message': 'Request rejected and notification sent to sales.'})
 
 def sr_details_form(request, request_id):
     sr_request = get_object_or_404(SRRequest, id=request_id)
@@ -106,23 +198,27 @@ def sr_details_form(request, request_id):
             # Check if the status is now set to 'Closed'
             if sr_request.status == 'Closed':
                 try:
-                    # Send email to the engineer
                     subject = f"SR Request {sr_request.unique_id} - Status Closed Notification"
-                    recipient_email = sr_request.engineer_email  # Engineer's email from the model
-                    if not recipient_email:
-                        logger.error("Recipient email is missing.")
-                        return JsonResponse({'success': False, 'message': 'Recipient email is missing.'}, status=400)
+                    # prefer engineer email from model; fallback to sales if missing
+                    engineer_email = sr_request.engineer_email or 'sales@danlawtech.com'
+                    to_emails = [engineer_email]
 
-                    context = {
-                        'sr_request': sr_request,
-                    }
+                    context = {'sr_request': sr_request}
                     email_body = render_to_string('sr_request/manager_notification.html', context)
-                    email = EmailMessage(subject, email_body, to=[recipient_email], cc=['sales@danlawtech.com'])
+                    email = EmailMessage(subject, email_body, settings.DEFAULT_FROM_EMAIL, to_emails, cc=['sales@danlawtech.com'])
+                    domain = settings.DEFAULT_FROM_EMAIL.split('@')[-1]
+                    mid = make_msgid(domain=domain)
+                    email.extra_headers = {'X-SR-Source': 'sr_request.sr_details_form.closed_notification', 'Message-ID': mid}
+                    logger.info(f"Email from: {email.from_email}, to: {email.to}, cc: {email.cc}, Message-ID: {mid}")
                     email.content_subtype = 'html'
-                    email.send()
-                    logger.info(f"Email sent successfully to {recipient_email}")
+                    conn = get_connection()
+                    conn.open()
+                    result = conn.send_messages([email])
+                    logger.info("Closed notification send_messages returned: %s, Message-ID: %s", result, mid)
+                    logger.debug("Raw closed-notification email:\n%s", email.message().as_string())
+                    conn.close()
                 except Exception as e:
-                    logger.error(f"Failed to send email: {e}")
+                    logger.error("Failed to send email: %s", e, exc_info=True)
                     return JsonResponse({'success': False, 'message': f'Failed to send email: {e}'}, status=500)
 
             return JsonResponse({'success': True, 'message': 'Details submitted successfully!'})
@@ -173,9 +269,21 @@ def send_manager_email(sr_request):
         'reject_url': f"http://127.0.0.1:8000/sr_request/reject/{sr_request.id}/",
     }
     email_body = render_to_string('sr_request/manager_email.html', context)
-    email = EmailMessage(subject, email_body, to=[recipient_email], cc=cc_emails)
+    email = EmailMessage(subject, email_body, settings.DEFAULT_FROM_EMAIL, [recipient_email], cc=cc_emails)
+    domain = settings.DEFAULT_FROM_EMAIL.split('@')[-1]
+    mid = make_msgid(domain=domain)
+    email.extra_headers = {'X-SR-Source': 'sr_request.send_manager_email', 'Message-ID': mid}
+    logger.info(f"Email from: {email.from_email}, to: {email.to}, cc: {email.cc}, Message-ID: {mid}")
     email.content_subtype = 'html'
-    email.send()
+    try:
+        conn = get_connection()
+        conn.open()
+        result = conn.send_messages([email])
+        logger.info(f"Send_manager_email send_messages returned: {result}, Message-ID: {mid}")
+        logger.debug("Raw send_manager_email message:\n%s", email.message().as_string())
+        conn.close()
+    except Exception as e:
+        logger.error("Failed to send manager email: %s", e, exc_info=True)
 
 def approve_manager_request(request, id):
     logger.info(f"approve_manager_request called for ID: {id}")
@@ -214,7 +322,7 @@ def download_sr_requests(request):
 
     # Write the header row
     writer.writerow([
-        'ID', 'Request ID','Date', 'Category', 'PSN', 'ICICID', 'Engineer', 'Requestor Comments',
+        'ID', 'Request ID','Date',  'PSN',  'Engineer', 'Requestor Comments',
         'Plan', 'Existing Validity', 'Requestor Validity Start Date', 'Requestor Validity End Date',
         'Billing To', 'SIM Status During Request', 'Remarks', 'HOD Remarks', 'Status',
         'New SR No', 'SR Date', 'SR Success Date', 'Engineer Email',
@@ -245,7 +353,7 @@ def download_sr_requests(request):
             sr_request.new_sr_no,
             sr_request.sr_date.strftime('%Y-%m-%d %H:%M:%S') if sr_request.sr_date else 'N/A',
             sr_request.sr_success_date.strftime('%Y-%m-%d %H:%M:%S') if sr_request.sr_success_date else 'N/A',
-            sr_request.engineer_email,
+            sr_request.engineer_email,        
             sr_request.manager_approval_status,
             sr_request.manager_approval_datetime.strftime('%Y-%m-%d %H:%M:%S') if sr_request.manager_approval_datetime else 'N/A',
         ])

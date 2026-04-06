@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.5rem;
+        }
+        .email-body {
+            padding: 20px;
+        }
+        .email-body table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .email-body table th, .email-body table td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .email-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn-approve {
+            background-color: #28a745;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            Leave Request Submitted
+        </div>
+        <div class="email-body">
+            <p>A new leave request has been submitted. Here are the details:</p>
+            <table>
+                <tr>
+                    <th>Engineer</th>
+                    <td>{{ leave_request.engineer }}</td>
+                </tr>
+                <tr>
+                    <th>Request Date</th>
+                    <td>{{ leave_request.request_date }}</td>
+                </tr>
+                <tr>
+                    <th>Category</th>
+                    <td>{{ leave_request.category }}</td>
+                </tr>
+                <tr>
+                    <th>Date of Leave</th>
+                    <td>{{ leave_request.date_of_leave }}</td>
+                </tr>
+                <tr>
+                    <th>Manager</th>
+                    <td>{{ leave_request.manager }}</td>
+                </tr>
+                <tr>
+                    <th>Reason for Leave</th>
+                    <td>{{ leave_request.approved_by }}</td>
+                </tr>
+            </table>
+            <div class="email-footer">
+                <p>Please take action by clicking one of the buttons below:</p>
+                <a href="{{ approve_url }}" class="btn btn-approve">Approve</a>
+                <a href="{{ reject_url }}" class="btn btn-reject">Reject</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

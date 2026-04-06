@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Part E Form Submission</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    th {
+      text-align: left;
+      background-color: rgb(240,240,240);
+      padding: 5px;
+    }
+    td {
+      padding: 5px;
+    }
+    .button {
+      display: inline-block;
+      background-color: #ff9800;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #e68a00;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-4">
+    <div class="card">
+      <div class="card-body">
+        <h4>Device shipped to be fitted in Customer Vehicle for Ticket: {{ entry.unique_id }}</h4>
+        <table border="1" class="table table-bordered">
+          <tbody>
+            <tr>
+              <th>Ticket Number</th>
+              <td>{{ entry.unique_id }}</td>
+            </tr>
+            <tr>
+              <th>VIN</th>
+              <td>{{ entry.vin }}</td>
+            </tr>
+            <tr>
+              <th>PSN</th>
+              <td>{{ entry.psn }}</td>
+            </tr>
+             <tr>
+              <th>Assigned Engineer</th>
+              <td>{{ direct_call.complaint_assigned_to }}</td>
+            </tr>
+            <tr>
+              <th>Identified Issue</th>
+              <td>{{ direct_call.issue_identified }}</td>
+            </tr>
+            <tr>
+              <th>CoPQ Labour</th>
+              <td>{{ entry.copq_labour }}</td>
+            </tr>
+            <tr>
+              <th>CoPQ Materials</th>
+              <td>{{ entry.copq_matl }}</td>
+            </tr>
+            <tr>
+              <th>Materials Used</th>
+              <td>{{ entry.matls_used }}</td>
+            </tr>
+            <tr>
+              <th>Device Shipped Date</th>
+              <td>{{ entry.device_shipped_date }}</td>
+            </tr>
+             <tr>
+              <th>Device Shipped Through</th>
+              <td>{{ entry.device_shipped_through }}</td>
+            </tr>
+            <tr>
+              <th>Device Shipped LR No</th>
+              <td>{{ entry.device_shipped_lr_no }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Please review the above details and take necessary actions.</p>
+      </div>
+      <div class="card-footer text-center">
+        <b>Danlaw Technologies Service & Support Team<br>
+          Email: crscdanlaw@danlawtechnologies.com<br>
+          Support Team - 6303908940 / 04431436579<br>
+          Online support: 09:00AM to 05:30PM, Monday to Saturday<br>
+          Thank you.
+        </b><br>
+        {% if logo_base64 %}
+        <img src="data:image/png;base64,{{ logo_base64 }}" alt="Danlaw Logo" style="width: 150px; height: auto;">
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

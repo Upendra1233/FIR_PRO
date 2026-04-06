@@ -114,14 +114,33 @@
             </a>
             <a href="{% url 'manager_form' %}" title="Direct calls">
                 <i class="fas fa-phone-alt"></i>
-                <p>Direct calls</p>
+                <p>CRSC Calls</p>
             </a>
-            <a href="{% url 'add_billing_data' %}" title="Billing data">
-                <i class="fas fa-file-alt"></i>
-                <p>Billing Data</p>
+            <a href="{% url 'part_a_form' %}" title="AIS140">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>AIS140</p>
             </a>
+    <!-- Icon for Sat-Leave Form -->
+    <a href="{% url 'leave_request' %}" title="Sat-Leave Form">
+        <i class="fas fa-calendar-alt"></i>
+        <p>Leave Form</p>
+    </a> 
+            <a href="{% url 'add_billing_data' %}" title="Billing">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <p>Billing</p>
+            </a>
+            <a href="bill_verify/bill-verify/" title="Bill Verify">
+                <i class="fas fa-check-circle"></i>   <!-- Invoice icon -->
+                <p>Bill Verify</p>
+            </a>
+            <!-- Icon for Data Search -->
+            <a href="data_search/search/" title="Data Search">
+                <i class="fas fa-search"></i>
+                <p>Darby Analysis</p>
+            </a>
+
         </div>
-        
+
         <!-- Service Logo Section -->
         {% load static %}
         <div class="logo-container">

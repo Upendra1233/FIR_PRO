@@ -1,0 +1,39 @@
+{# filepath: AIS140_FLOW/templates/AIS140_FLOW/partials/real_time_table_rows.html #}
+{% for entry in entries %}
+<tr>
+    <td><a href="/ais140/part_b_form/{{ entry.id }}" target="_blank" class="button">{{ entry.unique_id|default:"" }}</a></td>
+    <td>{{ entry.date_of_request|date:"Y-m-d H:i:s"|default:"" }}</td>
+    <td>{{ entry.Customer_assigned_date|date:"Y-m-d H:i:s"|default:"" }}</td>
+    <td>{{ entry.AL_assigned_date|date:"Y-m-d H:i:s"|default:"" }}</td>
+
+    <td>{{ entry.state|default:"" }}</td>
+    <td>{{ entry.vin_no|default:"" }}</td>
+    <td>{{ entry.psn|default:"" }}</td>
+    <td>{{ entry.request_type|default:"" }}</td>
+    <td>{{ entry.customer_name|default:"" }}</td>
+                        <td>
+                            {% if entry.assigned_engineer_email == "--" %}
+                                <a href="/ais140/part_a_form/{{ entry.id }}/" style="color: blue;">
+                                  --
+                                </a>
+                            {% else %}
+                                {{ entry.assigned_engineer_email|default:"" }}
+                            {% endif %}
+                        </td>    
+                        <td>{{ entry.ticket_through|default:"" }}</td>
+
+    <td>{{ entry.d1|default:"" }}</td>
+    <td>{{ entry.D1_comments|default:"" }}</td>
+    <td>{{ entry.d2|default:"" }}</td>
+    <td>{{ entry.D2_comments|default:"" }}</td>
+    <td>{{ entry.completion_status|default:"" }}</td>
+    <td>{{ entry.completion_date|date:"Y-m-d H:i:s"|default:"" }}</td>
+    <td>{{ entry.total_tat|default:"" }}</td>
+    <td>{{ entry.certification_start_date|date:"Y-m-d"|default:"" }}</td>
+    <td>{{ entry.certification_end_date|date:"Y-m-d"|default:"" }}</td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="21" class="text-center">No data available</td>
+</tr>
+{% endfor %}

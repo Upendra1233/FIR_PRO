@@ -30,7 +30,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2>New Mapping Process Submitted - Request No: {{ entry.id }}</h2>
+        <h2>New Mapping Process Submitted - Request No: {{ entry.ticket_id }}</h2>
         <p>A new mapping process has been submitted. Here are the details:</p>
         <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
             <tbody>
@@ -105,16 +105,8 @@
             </tbody>
         </table>
 
-        <p>
-            <strong>View Details:</strong>
-            <a href="{{ view_url }}" target="_blank">Click here to view the request details</a>
-        </p>
-
         <!-- Button group for Approve and Reject -->
         <div class="button-group">
-            <a href="{{ edit_url }}" style="background-color: orange; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px;" class="btn btn-warning btn-custom">
-                <i class="fas fa-edit"></i> Edit Request
-            </a>
             <a href="{{ approve_url }}" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 10px;" class="btn btn-success btn-custom">
                 <i class="fas fa-check"></i> Approve
             </a>

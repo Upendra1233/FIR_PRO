@@ -1,0 +1,32 @@
+from django.db import models
+
+# Create your models here.
+class BillVerify(models.Model):
+    customer_name=models.CharField(max_length=100,null=True,blank=True)
+    profile_type=models.CharField(max_length=100,null=True,blank=True)
+    DTIL_price = models.DateField(null=True,blank=True, verbose_name="Billed For")
+    customer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    tenure=models.CharField(max_length=100,null=True, blank=True)
+    bill_year=models.CharField(max_length=100,null=True, blank=True)
+    start_month=models.DateField(max_length=100,null=True, blank=True)
+    end_month=models.DateField(max_length=100,null=True, blank=True)
+    invoice_number=models.CharField(max_length=100,null=True, blank=True)
+    invoice_date=models.DateField(max_length=100,null=True, blank=True)
+    invoice_qty=models.CharField(max_length=100,null=True, blank=True)
+    start_month=models.DateField(max_length=100,null=True, blank=True)
+    end_month=models.DateField(max_length=100,null=True, blank=True)
+    invoice_number=models.CharField(max_length=100,null=True, blank=True)
+    invoice_date=models.TextField(max_length=100,null=True, blank=True)
+    billed_for=models.TextField(max_length=100,null=True, blank=True)
+
+    po_no=models.CharField(max_length=100,null=True, blank=True)
+    po_date=models.DateField(max_length=100,null=True, blank=True)
+    service_activity=models.CharField(max_length=100,null=True, blank=True)
+    service_line=models.CharField(max_length=100,null=True, blank=True)
+    service_qty=models.IntegerField(null=True, blank=True,verbose_name="Serviced Qty")
+    total_po_qty=models.IntegerField(null=True, blank=True)
+    unique_id=models.CharField(max_length=100,null=True, blank=True)
+    total_balance_qty=models.IntegerField(null=True, blank=True)
+    final_po=models.CharField(max_length=100,null=True, blank=True)
+    validity_date=models.DateField(max_length=100,null=True,blank=True)
+    sr_month=models.DateField(max_length=100,null=True, blank=True)

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FIR Request Approval Notification</title>
+    <style>
+        th {
+            text-align: left; /* Align table headers to the left */
+            background-color: rgb(240,240,240); /* Optional: Light gray background for headers */
+            padding: 5px; /* Add padding for better readability */
+        }
+        td {
+            padding: 5px; /* Add padding for table cells */
+            width: 60%; /* Set a fixed width for the data column */
+            word-wrap: break-word; /* Allow long text to wrap to the next line */
+        }
+        .button {
+                display: inline-block;
+                background-color: #ff9800; /* Orange color */
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color: #e68a00; /* Darker orange on hover */
+            }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Call {{ entry.call_status }} Notification</h2>
+        <p>The following call has been closed by the engineer:</p>
+        <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>Ticket Number</th>
+                    <td>{{direct_call.unique_id }}</td>
+                </tr>
+    
+                <tr>
+                    <th>Date of Complaint</th>
+                    <td>{{ direct_call.date_of_complaint }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Type</th>
+                    <td>{{ direct_call.call_type }}</td>
+                </tr>
+                <tr>
+                    <th>I Alert Ticket No</th>
+                    <td>{{ direct_call.ticket_no }}</td>
+                </tr>
+                
+                <tr>
+                    <th>Vehicle Availability in Workshop</th>
+                    <td>{{ direct_call.vehicle_avl_in_workshop }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Raised From Location</th>
+                    <td>{{ direct_call.complaint_raised_from_location }}</td>
+                <tr>
+                    <th>Customer Voice</th>
+                    <td>{{ direct_call.customer_raised_issue }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Raised</th>
+                    <td>{{ direct_call.complaint_raised }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Raised By</th>
+                    <td>{{ direct_call.complaint_raised_by }}</td>
+                </tr>
+                <tr>
+                    <th>Contact Number</th>
+                    <td>{{ direct_call.contact_number }}</td>
+                </tr>
+                <tr>
+                    <th>Customer Mail ID</th>
+                    <td>{{ direct_call.customer_mail_id }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Raised Through</th>
+                    <td>{{ direct_call.complaint_raised_through }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Received By</th>
+                    <td>{{ direct_call.complaint_received_by }}</td>
+                </tr>
+                <tr>
+                    <th>VIN</th>
+                    <td>{{ direct_call.vin }}</td>
+                </tr>
+                <tr>
+                    <th>Complaint Assigned To</th>
+                    <td>{{ direct_call.complaint_assigned_to }}</td>
+                </tr>
+                <tr>
+                    <th>Submitted To Email</th>
+                    <td>{{ direct_call.submitted_to_email }}</td>
+                </tr>
+                <tr>
+                    <th>Engineer Contact Number</th>
+                    <td>{{ direct_call.engineer_contact_number }}</td>
+                </tr>
+                <tr>
+                    <th>PSN</th>
+                    <td>{{ direct_call.psn }}</td>
+                </tr>
+                <tr>
+                    <th>Device Model</th>
+                    <td>{{ direct_call.device_model }}</td>
+                </tr>
+                <tr>
+                    <th>Telco Status</th>
+                    <td>{{ direct_call.telco_status }}</td>
+                </tr>
+                <tr>
+                    <th>Active Profile</th>
+                    <td>{{ direct_call.active_profile }}</td>
+                </tr>
+                <tr>
+                    <th>Activation Start Date</th>
+                    <td>{{ direct_call.activation_start_date }}</td>
+                </tr>
+                <tr>
+                    <th>Activation End Date</th>
+                    <td>{{ direct_call.activation_end_date }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Sale Date</th>
+                    <td>{{ direct_call.vehicle_sale_date }}</td>
+                </tr>
+                <tr>
+                    <th>First Communication in Darby</th>
+                    <td>{{ direct_call.first_communication_in_darby }}</td>
+                </tr>
+                <tr>
+                    <th>Last Communication in Darby</th>
+                    <td>{{ direct_call.last_communication_in_darby }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Type</th>
+                    <td>{{ direct_call.vehicle_type }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Run</th>
+                    <td>{{ direct_call.vehicle_run }}</td>
+                </tr>
+                <tr>
+                    <th>Kilometers/Hours</th>
+                    <td>{{ direct_call.kilometers_hours }}</td>
+                </tr>
+                <tr>
+                    <th>Main Battery Voltage</th>
+                    <td>{{ direct_call.main_battery_voltage }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Running Location</th>
+                    <td>{{ direct_call.vehicle_running_location }}</td>
+                </tr>
+                <tr>
+                    <th>State</th>
+                    <td>{{ direct_call.state }}</td>
+                </tr>
+                <tr>
+                    <th>Region</th>
+                    <td>{{ direct_call.region }}</td>
+                </tr>
+                <tr>
+                    <th>Contact Person Name</th>
+                    <td>{{ direct_call.contact_person_name }}</td>
+                </tr>
+                <tr>
+                    <th>Contact Person Number</th>
+                    <td>{{ direct_call.contact_person_number }}</td>
+                </tr>
+                <tr>
+                    <th>Contact Category</th>
+                    <td>{{ direct_call.contact_category }}</td>
+                </tr>
+                <tr>
+                    <th>Issue Identified</th>
+                    <td>{{ direct_call.issue_identified }}</td>
+                </tr>
+                <tr>
+                    <th>Issue Analysis</th>
+                    <td>{{ direct_call.issue_analysis }}</td>
+                </tr>
+                <tr>
+                    <th>Existing Software</th>
+                    <td>{{ direct_call.exist_software }}</td>
+                </tr>
+                <tr>
+                    <th>Updated Software</th>
+                    <td>{{ direct_call.updated_software }}</td>
+                </tr>
+                <tr>
+                    <th>Final Action Taken</th>
+                    <td>{{ direct_call.final_action_taken }}</td>
+                </tr>
+                <tr>
+                    <th>Finalised Issue Category</th>
+                    <td>{{ direct_call.finalised_issue_category }}</td>
+                </tr>
+                <tr>
+                    <th>Call Status</th>
+                    <td>{{ direct_call.call_status }}</td>
+                </tr>
+                <tr>
+                    <th>External Modification</th>
+                    <td>{{ direct_call.external_modification }}</td>
+                </tr>
+                <tr>
+                    <th>Device IMEI</th>
+                    <td>{{ direct_call.device_imei }}</td>
+                </tr>
+                <tr>
+                    <th>Device ICCID</th>
+                    <td>{{ direct_call.device_iccid }}</td>
+                </tr>
+                <tr>
+                    <th>Date of Closure</th>
+                    <td>{{ direct_call.date_of_closure }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>You can review the details and take necessary actions by visiting the following link:</p>
+
+        <p><a href="{{ engineer_form_url }}" target="_blank" class="button">Click here</a></p>
+
+        <p>Thank you,<br>Support Team</p>
+    </div>
+</body>
+</html>

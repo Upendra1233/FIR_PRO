@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+        <style>
+        body {
+            font-size: 14px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 95%;
+            padding: 0;
+        }
+        .header-card {
+            background-color: #343a40;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 10px;
+            max-width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header-card h1 {
+            font-size: 18px;
+            margin: 0;
+        }
+        .filter-card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .table-container {
+            max-height: 70vh; /* Adjusted to fit 25 records */
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: white;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+        table {
+            font-size: 17px;
+            width: 100%;
+            background-color: navy; /* Set table background color to navy blue */
+            color: white; /* Set text color to white for better contrast */
+        }
+        th, td {
+            text-align: left;
+            vertical-align: middle;
+            padding: 6px; /* Reduce padding for compactness */
+        }
+        th {
+            background-color: #1a1a80; /* Slightly lighter navy blue for the header */
+            color: white; /* Keep header text color white */
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        tr:nth-child(even) {
+            background-color: #2a2a94; /* Slightly lighter navy blue for even rows */
+        }
+        tr:hover {
+            background-color: #3a3aa8; /* Highlight row on hover with a lighter navy blue */
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+        .pagination-controls {
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: left;
+        }
+        .pagination-controls button {
+            min-width: 40px;
+            margin: 0 5px;
+            padding: 5px;
+        }
+        .pagination-controls i {
+            font-size: 16px;
+        }
+        .popup-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745; /* Green background */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .select2-container--default .select2-selection--multiple {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 5px;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 5px 10px;
+        }
+
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            padding: 2px 5px;
+            margin: 2px;
+        }
+        .chart-container img {
+            max-width: 100%; /* Ensure the chart fits within the container */
+            height: auto;
+        }
+        #realTimeTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #realTimeTable th, #realTimeTable td {
+            white-space: nowrap; /* Prevent text wrapping */
+            text-align: left;
+            padding: 8px;
+        }
+
+        #realTimeTable th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        #realTimeTableBody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #realTimeTableBody tr:hover {
+            background-color: #ddd;
+        }
+        .form-label {
+            font-weight: bold;
+            text-align: left;
+        }
+        div[style*="overflow-x: auto"] {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .select2-container--default .select2-selection--multiple {
+            height: 38px; /* Set a fixed height */
+            overflow: hidden; /* Hide overflowing content */
+            white-space: nowrap; /* Prevent wrapping */
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            max-height: 36px; /* Adjust to fit within the fixed height */
+            overflow-y: auto; /* Add vertical scrolling if needed */
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            display: inline-block; /* Keep selected items inline */
+            margin: 2px 4px; /* Add spacing between items */
+            max-width: 100px; /* Optional: Limit the width of each selected item */
+            overflow: hidden; /* Hide overflowing text */
+            text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        .chart-container canvas {
+            max-width: 400px; /* Increase the width */
+            max-height: 400px; /* Increase the height */
+            margin: 0 auto; /* Center the charts */
+        }
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <!-- Header -->
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <!-- Header -->
+        <div class="header-card d-flex justify-content-center align-items-center" style="height: 60px;">
+            <h2 class="mb-0 text-center">CRSC Call Status - Live</h2>
+            <button id="downloadSelectedFields" class="btn btn-primary ms-3" title="Download Selected Fields">
+                <i class="bi bi-download"></i>
+            </button>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="filter-card">
+            <form id="filterForm" class="row g-2 align-items-center">
+                <div class="col-md-2">
+                    <label for="from_date" class="form-label">Complaint From Date</label>
+                    <input type="datetime-local" id="from_date" name="from_date" class="form-control">
+                    <label for="to_date" class="form-label">Complint To Date</label>
+                    <input type="datetime-local" id="to_date" name="to_date" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label for="date_of_closure_from" class="form-label">Closure From Date</label>
+                    <input type="datetime-local" id="date_of_closure_from" name="date_of_closure_from" class="form-control">
+                    <label for="date_of_closure_to" class="form-label">Closure To Date</label>
+                    <input type="datetime-local" id="date_of_closure_to" name="date_of_closure_to" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label for="call_status" class="form-label">Call Status</label>
+                    <select id="call_status" name="call_status" class="form-control" multiple="multiple">
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                    <label for="call_type" class="form-label">Call Type</label>
+                    <select id="call_type" name="call_type" class="form-control">
+                        <option value="All">All</option>
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label for="assigned_to" class="form-label">Assigned To</label>
+                    <select id="assigned_to" name="assigned_to" class="form-control">
+                        <option value="All">All</option>
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                    <label for="ticket_no" class="form-label">Ticket No</label>
+                    <input type="text" id="ticket_no" name="ticket_no" class="form-control" placeholder="Search Ticket No">
+                </div>
+                <div class="col-md-2">
+                    <label for="vin" class="form-label">VIN</label>
+                    <input type="text" id="vin" name="vin" class="form-control" maxlength="17" placeholder="Search VIN">
+                    <label for="unique_id" class="form-label">Unique ID</label>
+                    <input type="text" id="unique_id" name="unique_id" class="form-control" placeholder="Search Unique ID">
+                </div>
+                <div class="col-md-1">
+                    <label for="d2_exp_start" class="form-label">D2 Exp Start Date</label>
+                    <input type="date" id="d2_exp_start" name="d2_exp_start" class="form-control">
+                    <label for="d2_exp_end" class="form-label">D2 Exp End Date</label>
+                    <input type="date" id="d2_exp_end" name="d2_exp_end" class="form-control">
+                </div>
+
+                <div class="col-md-1">
+                    <label for="d3_exp_start" class="form-label">D3 Exp Start Date</label>
+                    <input type="date" id="d3_exp_start" name="d3_exp_start" class="form-control">
+                    <label for="d3_exp_end" class="form-label">D3 Exp End Date</label>
+                    <input type="date" id="d3_exp_end" name="d3_exp_end" class="form-control">
+                </div>
+<div class="col-md-1">
+  <label for="d2_closure_start" class="form-label">D2 Closure Start</label>
+  <input type="date" id="d2_closure_start" name="d2_closure_start" class="form-control">
+  <label for="d2_closure_end" class="form-label">D2 Closure End</label>
+  <input type="date" id="d2_closure_end" name="d2_closure_end" class="form-control">
+</div>
+
+<div class="col-md-1">
+  <label for="d3_closure_start" class="form-label">D3 Closure Start</label>
+  <input type="date" id="d3_closure_start" name="d3_closure_start" class="form-control">
+  <label for="d3_closure_end" class="form-label">D3 Closure End</label>
+  <input type="date" id="d3_closure_end" name="d3_closure_end" class="form-control">
+</div>
+                <div class="col-md-1">
+                    <label for="product_code" class="form-label">Product Code</label>
+                    <select id="product_code" name="product_code" class="form-control">
+                        <option value="All">All</option>
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                    <label class="form-label">Select Fields</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="selectFieldsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Fields
+                        </button>
+                        <ul class="dropdown-menu p-2" aria-labelledby="selectFieldsDropdown" style="min-width: 300px; max-height: 300px; overflow-y: auto;">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input type="checkbox" class="form-check-input me-2" id="select_all_fields" value="all">
+                                    <b>Select All</b>
+                                </label>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <!-- Dynamically generated field checkboxes -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- Add this inside your <form id="filterForm" ...> -->
+
+            </form>
+        </div>
+        <!-- Data Table -->
+        <div class="table-container">
+            <div style="overflow-x: auto; max-width: 100%;">
+                <table id="realTimeTable" class="table table-bordered">
+                    <thead>
+                        <tr id="tableHeaders">
+                            <!-- Table headers will be dynamically added here -->
+                        </tr>
+                    </thead>
+                    <tbody id="realTimeTableBody">
+                        <!-- Table rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pagination-controls">
+            <button id="prevPage" class="btn btn-secondary" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button id="nextPage" class="btn btn-secondary" disabled>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <!-- Call Counts -->
+        <div class="call-counts mt-3">
+            <div class="row text-center">
+<!-- Call Counts as Cards -->
+<div class="call-counts mt-4">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-3" style="background-color: #d1ecf1;">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Total Calls</h5>
+                    <p class="card-text fs-4 fw-bold" id="totalCalls">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-3" style="background-color: #f8d7da;">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">I Alert Calls</h5>
+                    <p class="card-text fs-4 fw-bold" id="iAlertCalls">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-3" style="background-color: #d4edda;">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Direct Calls</h5>
+                    <p class="card-text fs-4 fw-bold" id="directCalls">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+        <!-- Charts -->
+        <div class="chart-container mt-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-center">Total Calls</h5>
+                    <canvas id="callStatusPieChart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-center">I ALERT TICKET</h5> <!-- Heading for Assigned To Chart -->
+                    <canvas id="assignedToChart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-center">DIRECT CALLS</h5> <!-- Heading for Call Status Chart -->
+                    <canvas id="callStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let lastRecordId = null; // To track the last record ID
+        let currentPage = 1; // Track the current page
+        let assignedToChart, callStatusChart, callStatusPieChart;
+        let selectedFieldsForTable = []; // Track selected fields for table display
+
+        $(document).ready(function () {
+            // Trigger filtering when VIN input changes
+            $('#vin').on('input', function () {
+                const vinValue = $(this).val();
+                if (vinValue.length >= 5) {
+                    fetchFilteredRecords(); // Fetch records if VIN has at least 5 characters
+                }
+            });
+            $('#ticket_no').on('input', function () {
+                const ticketNoValue = $(this).val();
+                if (ticketNoValue.length >= 3) {
+                    fetchFilteredRecords(); // Fetch records if Ticket No has at least 5 characters
+                }
+            });
+                        // Trigger filtering when Unique ID input changes
+            $('#unique_id').on('input', function () {
+                const uniqueIdValue = $(this).val();
+                if (uniqueIdValue.length >= 5) {
+                    fetchFilteredRecords(); // Fetch records if Unique ID has at least 5 characters
+                }
+            });
+
+            // Fetch records when other filters change
+            $('#from_date, #to_date, #call_status, #assigned_to, #call_type, #part_b_status, #d2_exp_start, #d2_exp_end, #d3_exp_start, #d3_exp_end, #date_of_closure_from, #date_of_closure_to, #d2_closure_start, #d2_closure_end, #d3_closure_start, #d3_closure_end,#product_code').on('change', function () {
+    fetchFilteredRecords();
+});
+            fetchFilteredRecords();
+            setInterval(checkForNewRecords, 5000);
+
+            $('#downloadData').on('click', function (e) {
+                e.preventDefault(); // Prevent the default link behavior
+                window.location.href = "{% url 'download_csv' %}"; // Trigger the download
+            });
+        });
+        function fetchFilteredRecords() {
+            const fromDate = $('#from_date').val();
+            const toDate = $('#to_date').val();
+            const callStatus = $('#call_status').val() || []; // Array of selected values
+            const assignedTo = $('#assigned_to').val();
+            const callType = $('#call_type').val();
+            const partBStatus = $('#part_b_status').val() || 'All';
+            const vin = $('#vin').val();
+            const ticketNo = $('#ticket_no').val();
+            const uniqueId = $('#unique_id').val();
+            const d2ExpStart = $('#d2_exp_start').val();
+            const d2ExpEnd = $('#d2_exp_end').val();
+            const d3ExpStart = $('#d3_exp_start').val();
+            const d3ExpEnd = $('#d3_exp_end').val();
+            const dateOfClosureFrom = $('#date_of_closure_from').val();
+            const dateOfClosureTo = $('#date_of_closure_to').val();
+            const d2ClosureStart = $('#d2_closure_start').val();
+            const d2ClosureEnd = $('#d2_closure_end').val();
+            const d3ClosureStart = $('#d3_closure_start').val();
+            const d3ClosureEnd = $('#d3_closure_end').val();
+            const product_code = $('#product_code').val();
+
+            // Use jQuery's param serialization for arrays
+            $.ajax({
+                url: "{% url 'fetch_records_with_fields' %}",
+                method: "GET",
+                traditional: true,
+                data: {
+                    from_date: fromDate,
+                    to_date: toDate,
+                    call_status: callStatus,
+                    assigned_to: assignedTo,
+                    call_type: callType,
+                    part_b_status: partBStatus,
+                    vin: vin,
+                    ticket_no: ticketNo,
+                    unique_id: uniqueId,
+                    d2_exp_start: d2ExpStart,
+                    d2_exp_end: d2ExpEnd,
+                    d3_exp_start: d3ExpStart,
+                    d3_exp_end: d3ExpEnd,
+                    date_of_closure_from: dateOfClosureFrom, // <-- Add this
+                    date_of_closure_to: dateOfClosureTo,     // <-- Add this
+                    d2_closure_start: d2ClosureStart,
+                    d2_closure_end: d2ClosureEnd,
+                    d3_closure_start: d3ClosureStart,
+                    d3_closure_end: d3ClosureEnd,
+                    product_code: product_code,
+                    page: currentPage
+                },
+                success: function (response) {
+                    console.log(response); // Log the response to verify the data
+                    updateTable(response.data); // Update the table with the fetched data
+                    updateTableHeaders(); // Update the table headers dynamically
+
+                    // Update pagination controls
+                    $('#prevPage').prop('disabled', !response.has_previous);
+                    $('#nextPage').prop('disabled', !response.has_next);
+                    $('#pageInfo').text(`Page ${response.current_page} of ${response.total_pages}`);
+
+                    // Update call counts
+                    updateCallCounts(response.call_counts); // Pass call counts from the response
+
+                    // Update charts
+                    updateCharts(response.charts);
+                },
+                error: function (error) {
+                    console.error("Error fetching records:", error);
+                }
+            });
+        }
+        function updateCharts(chartData) {
+    // Assigned To Chart
+    const callStatusPieLabels = chartData.call_status_pie.map(item => item.call_status || "Unknown");
+    const callStatusPieCounts = chartData.call_status_pie.map(item => item.count);
+
+    if (callStatusPieChart) {
+        callStatusPieChart.destroy();
+    }
+    const callStatusPieCtx = document.getElementById('callStatusPieChart').getContext('2d');
+    callStatusPieChart = new Chart(callStatusPieCtx, {
+        type: 'pie',
+        data: {
+            labels: callStatusPieLabels,
+            datasets: [{
+                data: callStatusPieCounts,
+                backgroundColor: callStatusPieLabels.map(label => {
+                    if (label === "Resolved") return "Green";
+                    if (label === "Closed") return "Orange";
+                    if (label === "Pending") return "Red";
+                    if (label === "FIR-Resolved") return "Blue";
+                    if (label === "FIR-For Approval") return "Yellow";
+                    if (label === "Reject") return "Black";
+                    if (label === "Cancelled") return "Gray";
+                    if (label === "D1 Done") return "Pink";
+                    if (label === "D2 Done") return "Silver";
+                    if (label === "FIR-Repair") return "Teal";
+                    if (label === "FIR-Replace_Repair") return "Brown";
+                    if (label === "FIR-Replace") return "SkyBlue";
+
+                    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 70%)`;
+                }),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        size: 14,
+                    },
+                    formatter: (value, context) => {
+                        const label = context.chart.data.labels[context.dataIndex];
+                        return `${value}`;
+                    },
+                },
+            },
+        },
+        plugins: [ChartDataLabels],
+    });
+    const assignedToLabels = chartData.assigned_to.map(item => item.call_status || "Unassigned");
+    const assignedToCounts = chartData.assigned_to.map(item => item.count);
+
+    if (assignedToChart) {
+        assignedToChart.destroy();
+    }
+    const assignedToCtx = document.getElementById('assignedToChart').getContext('2d');
+    assignedToChart = new Chart(assignedToCtx, {
+        type: 'pie',
+        data: {
+            labels: assignedToLabels,
+            datasets: [{
+                data: assignedToCounts,
+                backgroundColor: assignedToLabels.map(label => {
+                    if (label === "Resolved") return "Green";
+                    if (label === "Closed") return "Orange";
+                    if (label === "Pending") return "Red";
+                    if (label === "FIR-Resolved") return "Blue";
+                    if (label === "FIR-For Approval") return "Yellow";
+                    if (label === "Reject") return "Black";
+                    if (label === "Cancelled") return "Gray";
+                    if (label === "D1 Done") return "Pink";
+                    if (label === "D2 Done") return "Silver";
+                    if (label === "FIR-Repair") return "Teal";
+                    if (label === "FIR-Replace_Repair") return "Brown";
+                    if (label === "FIR-Replace") return "SkyBlue";
+                    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 70%)`;
+                }),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        size: 14,
+                    },
+                    formatter: (value, context) => {
+                        const label = context.chart.data.labels[context.dataIndex];
+                        return `${value}`;
+                    },
+                },
+            },
+        },
+        plugins: [ChartDataLabels],
+    });
+    // Call Status Chart
+    const callStatusLabels = chartData.call_status.map(item => item.call_status || "Unknown");
+    const callStatusCounts = chartData.call_status.map(item => item.count);
+    if (callStatusChart) {
+        callStatusChart.destroy();
+    }
+    const callStatusCtx = document.getElementById('callStatusChart').getContext('2d');
+    callStatusChart = new Chart(callStatusCtx, {
+        type: 'pie',
+        data: {
+            labels: callStatusLabels,
+            datasets: [{
+                data: callStatusCounts,
+                backgroundColor: callStatusLabels.map(label => {
+                    if (label === "Resolved") return "Green";
+                    if (label === "Closed") return "Orange";
+                    if (label === "Pending") return "Red";
+                    if (label === "FIR-Resolved") return "Blue";
+                    if (label === "FIR-For Approval") return "Yellow";
+                    if (label === "Reject") return "Black";
+                    if (label === "Cancelled") return "Gray";
+                    if (label === "D1 Done") return "Pink";
+                    if (label === "D2 Done") return "Silver";
+                    if (label === "FIR-Repair") return "Teal";
+                    if (label === "FIR-Replace_Repair") return "Brown";
+                    if (label === "FIR-Replace") return "SkyBlue";
+                    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 70%)`;
+                }),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        size: 14,
+                    },
+                    formatter: (value, context) => {
+                        const label = context.chart.data.labels[context.dataIndex];
+                        return `${value}`;
+                    },
+                },
+            },
+        },
+        plugins: [ChartDataLabels],
+    });
+    // Call Status Distribution Chart
+}
+        function generateColors(count) {
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                colors.push(`hsl(${Math.floor(Math.random() * 360)}, 70%, 70%)`);
+            }
+            return colors;
+        }
+        function updateTableHeaders() {
+    const baseHeaders = `
+<th>Unique ID</th>
+<th>Call Type</th>
+<th>Date of Complaint</th>
+<th>Complaint Raised By</th>
+<th>Assigned To</th>
+<th>VIN</th>
+<th>PSN</th>
+<th>Call Status</th>
+<th>Closure Date</th>
+<th>D1 TAT</th>
+<th>D2 TAT</th>
+<th>TAT</th>
+<th>Final Action Taken</th>
+<th>I Alert Ticket No</th>
+<th>I Alert Ticket Received</th>
+<th>Latest Update</th>
+<th>HOD Comments</th>
+<th>Rating</th>
+<th>Customer Feedback</th>
+<th>Feedback submission datetime</th>
+<th>Contact Number</th>
+<th>Engineer Recommendation</th>
+<th>Vehicle Available in Workshop</th>
+<th>Complaint Raised Location</th>
+<th>Customer Voice</th>
+<th>Complaint Raised</th>
+<th>Customer Mail ID</th>
+<th>Complaint Raised Through</th>
+<th>Complaint Received By</th>
+<th>Device Model</th>
+<th>Telco Status</th>
+<th>Active Profile</th>
+<th>Activation Start Date</th>
+<th>Activation End Date</th>
+<th>Vehicle Sale Date</th>
+<th>First Communication in Darby</th>
+<th>Last Communication in Darby</th>
+<th>Vehicle Type</th>
+<th>Vehicle Run</th>
+<th>Main Battery Voltage</th>
+<th>Engine Type</th>
+<th>Vehicle Running Location</th>
+<th>State</th>
+<th>Region</th>
+<th>Contact Person Name</th>
+<th>Contact Person Number</th>
+<th>Existing Software</th>
+<th>Updated Software</th>
+<th>Issue Identified</th>
+<th>Issue Description</th>
+<th>Issue Analysis</th>
+<th>Issue Category</th>
+<th>Finalised Issue Category</th>
+<th>Remarks In I Alert</th>
+<th>D1 Remarks</th>
+<th>D1 Comments</th>
+
+<th>D1 Engineer</th>
+<th>D2 Remarks</th>
+<th>D2 Comments</th>
+
+<th>D2 Exp Date</th>
+<th>D2 Engineer</th>
+<th>D2 Closure Date</th>
+<th>D3 Remarks</th>
+<th>D3 Comments</th>
+
+<th>D3 Exp Date</th>
+<th>D3 Closure Date</th>
+<th>Call Closed By</th>
+<th>Exp Review Date</th>
+<th>Review By</th>
+<th>Dealer Name</th>
+<th>Actual Review Date</th>
+<th>Lat for Last 7 Days(After Close)</th>
+<th>V Pak for Last 7 Days(After Close)</th>
+<th>Remarks(Review)</th>
+<th>Final conclusion</th>
+<th>Final Action</th>
+    `;
+    $('#tableHeaders').html(baseHeaders);
+}
+
+function updateTable(data) {
+    const tableBody = $("#realTimeTableBody");
+    tableBody.empty();
+
+    // List of all date fields to convert
+    const dateFields = [
+        'date_of_complaint', 'date_of_closure', 'Latest_update','ialert_tk_timestamp', 'activation_start_date',
+        'activation_end_date', 'vehicle_sale_date', 'first_communication_in_darby',
+        'last_communication_in_darby', 'D1_closure_date', 'D2_closure_date', 'D3_closure_date',
+        'feedback_submitted_datetime', 'D2_exp_date', 'D3_exp_date',
+        'exp_review_date', 'called_date'
+    ];
+
+    data.forEach(record => {
+        // Convert all date fields to IST
+        const convertedRecord = { ...record };
+        dateFields.forEach(field => {
+            if (convertedRecord[field]) {
+                convertedRecord[field] = convertToIST(convertedRecord[field]);
+            }
+        });
+
+        const tat = calculateTAT(record.date_of_complaint, record.date_of_closure);
+        const d1TAT = calculateTAT(record.date_of_complaint, record.D1_closure_date);
+        const d2TAT = calculateTAT(record.D1_closure_date, record.D2_closure_date);
+
+        let tatClass = '';
+        if (tat !== '--') {
+            const [hours, minutes] = tat.split(':').map(Number);
+            const totalMinutes = hours * 60 + minutes;
+            if (totalMinutes < 45) {
+                tatClass = 'bg-success text-white';
+            } else if (totalMinutes <= 90) {
+                tatClass = 'bg-warning text-dark';
+            } else {
+                tatClass = 'bg-danger text-white';
+            }
+        }
+
+        let uniqueIdCell = `<a href="/direct_calls/engineer_form/${record.id}/" style="color: blue;">${record.unique_id || 'Fill Details'}</a>`;
+
+        let dateOfComplaintCell;
+        if (
+            record.call_status == 'Closed' ||
+            record.call_status == 'Resolved' ||
+            record.call_status == 'Closed-CI' ||
+            record.call_status == 'Auto Resolved'
+        ) {
+            dateOfComplaintCell = `<a href="/direct_calls/part_b_a/${record.id}/" style="color: blue;">${convertedRecord.date_of_complaint || 'Fill Details'}</a>`;
+        } else {
+            dateOfComplaintCell = `${convertedRecord.date_of_complaint || 'Fill Details'}`;
+        }
+
+        let complaintAssignedTo;
+        if (record.complaint_assigned_to == "--") {
+            complaintAssignedTo = `<a href="/direct_calls/manager_form/${record.id}/" style="color: blue;">${record.complaint_assigned_to || 'Fill Details'}</a>`;
+        } else {
+            complaintAssignedTo = `${record.complaint_assigned_to || 'Fill Details'}`;
+        }
+
+        let row = `
+<tr>
+<td>${uniqueIdCell}</td>
+<td>${record.call_type || ''}</td>
+<td>${dateOfComplaintCell}</td>
+<td>${record.complaint_raised_by || ''}</td>
+<td>${complaintAssignedTo || ''}</td>
+<td>${record.vin || ''}</td>
+<td>${record.psn || ''}</td>
+<td>${record.call_status || ''}</td>
+<td>${convertedRecord.date_of_closure || ''}</td>
+<td>${d1TAT}</td>
+<td>${d2TAT}</td>
+<td class="${tatClass}">${tat}</td>
+<td>${record.final_action_taken || ''}</td>
+<td>${record.ticket_no || ''}</td>
+<td>${convertedRecord.ialert_tk_timestamp || ''}</td>
+<td>${convertedRecord.Latest_update || ''}</td>
+<td>${record.hod_comment || ''}</td>
+<td>${record.rating || ''}</td>
+<td>${record.customer_feedback || ''}</td>
+<td>${convertedRecord.feedback_submitted_datetime || ''}</td>
+<td>${record.contact_number || ''}</td>
+<td>${record.engineer_recommendation || ''}</td>
+<td>${record.vehicle_avl_in_workshop || ''}</td>
+<td>${record.complaint_raised_from_location || ''}</td>
+<td>${record.customer_raised_issue || ''}</td>
+<td>${record.complaint_raised || ''}</td>
+<td>${record.customer_mail_id || ''}</td>
+<td>${record.complaint_raised_through || ''}</td>
+<td>${record.complaint_received_by || ''}</td>
+<td>${record.device_model || ''}</td>
+<td>${record.telco_status || ''}</td>
+<td>${record.active_profile || ''}</td>
+<td>${convertedRecord.activation_start_date || ''}</td>
+<td>${convertedRecord.activation_end_date || ''}</td>
+<td>${convertedRecord.vehicle_sale_date || ''}</td>
+<td>${convertedRecord.first_communication_in_darby || ''}</td>
+<td>${convertedRecord.last_communication_in_darby || ''}</td>
+<td>${record.vehicle_type || ''}</td>
+<td>${record.vehicle_run || ''}</td>
+<td>${record.main_battery_voltage || ''}</td>
+<td>${record.engine_type || ''}</td>
+<td>${record.vehicle_running_location || ''}</td>
+<td>${record.state || ''}</td>
+<td>${record.region || ''}</td>
+<td>${record.contact_person_name || ''}</td>
+<td>${record.contact_person_number || ''}</td>
+<td>${record.exist_software || ''}</td>
+<td>${record.updated_software || ''}</td>
+<td>${record.issue_identified || ''}</td>
+<td>${record.issue_analysis || ''}</td>
+<td>${record.issue_analysis_01 || ''}</td>
+<td>${record.issue_category || ''}</td>
+<td>${record.finalised_issue_category || ''}</td>
+<td>${record.remarks_in_ialert || ''}</td>
+<td>${record.D1_remark || ''}</td>
+<td>${record.D1 || ''}</td>
+<td>${record.D1_engineer || ''}</td>
+<td>${record.D2_remark || ''}</td>
+<td>${record.D2 || ''}</td>
+<td>${convertedRecord.D2_exp_date || ''}</td>
+<td>${record.D2_engineer || ''}</td>
+<td>${convertedRecord.D2_closure_date || ''}</td>
+<td>${record.D3_remark || ''}</td>
+<td>${record.D3 || ''}</td>
+<td>${convertedRecord.D3_exp_date || ''}</td>
+<td>${convertedRecord.D3_closure_date || ''}</td>
+<td>${record.call_closed_by || ''}</td>
+<td>${convertedRecord.exp_review_date || ''}</td>
+<td>${record.engineer_name || ''}</td>
+<td>${record.dealer_name || ''}</td>
+<td>${convertedRecord.called_date || ''}</td>
+<td>${record.latency_for_last_7_days_cc || ''}</td>
+<td>${record.vpacket_for_last_7_days_cc || ''}</td>
+<td>${record.remarks_03 || ''}</td>
+<td>${record.final_conclusion || ''}</td>
+<td>${record.final_status || ''}</td>
+</tr>
+        `;
+        tableBody.append(row);
+    });
+}
+// ...existing code...
+        // Function to check for new records
+        function checkForNewRecords() {
+            $.ajax({
+                url: "{% url 'fetch_records_with_fields' %}",  // Corrected the URL
+                method: "GET",
+                data: {
+                    page: 1 // Always check the first page for new records
+                },
+                success: function (response) {
+                    if (response.data.length > 0) {
+                        const latestRecord = response.data[0];
+                        if (lastRecordId !== latestRecord.unique_id) {
+                            lastRecordId = latestRecord.unique_id;
+                            playNotificationSound();
+                            showPopupNotification("New record added!");
+                            fetchFilteredRecords(); // Refresh the table immediately
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.error("Error checking for new records:", error);
+                }
+            });
+        }
+
+        // Function to convert UTC date to IST
+        function convertToIST(utcDate) {
+            if (!utcDate) return '';
+            try {
+                let s = String(utcDate).trim();
+                if (s.indexOf('T') === -1 && s.indexOf(' ') !== -1) s = s.replace(' ', 'T');
+                s = s.replace(/\.\d+/, '');
+                if (!/([Zz]|[+\-]\d{2}:\d{2})$/.test(s)) s = s + 'Z';
+                const dateObj = new Date(s);
+                if (isNaN(dateObj)) return utcDate;
+                const istOffset = 5.5 * 60 * 60 * 1000;
+                const istDate = new Date(dateObj.getTime() + istOffset);
+                return istDate.toISOString().slice(0, 19).replace('T', ' ');
+            } catch (e) {
+                return utcDate;
+            }
+        }
+
+        // Function to calculate TAT in HH:MM:SS format
+        function calculateTAT(dateOfComplaint, dateOfClosure) {
+            if (!dateOfComplaint || !dateOfClosure) return '--';
+
+            const complaintDate = new Date(dateOfComplaint);
+            const closureDate = new Date(dateOfClosure);
+
+            const diffInMs = closureDate - complaintDate; // Difference in milliseconds
+            if (diffInMs < 0) return '--'; // Invalid case
+
+            const hours = Math.floor(diffInMs / (1000 * 60 * 60));
+            const minutes = Math.floor((diffInMs % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diffInMs % (1000 * 60)) / 1000);
+
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Function to play a notification sound
+        function playNotificationSound() {
+            const audio = new Audio('notification.mp3'); // Replace with the path to your sound file
+            audio.play();
+        }
+
+        // Function to show a popup notification on the top-right
+        function showPopupNotification(message) {
+            const popup = $('<div class="popup-notification"></div>').text(message);
+            $('body').append(popup);
+            popup.fadeIn(300).delay(4000).fadeOut(300, function () {
+                $(this).remove();
+            });
+        }
+
+        // Pagination controls
+        $('#prevPage').on('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchFilteredRecords();
+            }
+        });
+        $('#nextPage').on('click', function() {
+            currentPage++;
+            fetchFilteredRecords();
+        });
+        let lastUpdated = null; // Track the last updated timestamp
+        function refreshTable() {
+            $.ajax({
+                url: "{% url 'fetch_records_with_fields' %}",
+                method: "GET",
+                data: { last_updated: lastUpdated }, // Send the last updated timestamp
+                success: function (response) {
+                    console.log(response); // Log the response to verify the data
+                    updateTable(response.data); // Update the table with the fetched data
+                    lastUpdated = response.last_updated; // Update the last updated timestamp
+                },
+                error: function (error) {
+                    console.error("Error refreshing table:", error);
+                }
+            });
+        }
+
+        let lastChecked = null; // Track the last checked timestamp
+
+        function checkForUpdates() {
+            $.ajax({
+                url: "{% url 'check_for_updates' %}",
+                method: "GET",
+                data: { last_checked: lastChecked },
+                success: function (response) {
+                    if (response.has_updates) {
+                        fetchFilteredRecords(); // Refresh the table if there are updates
+                    }
+                    lastChecked = new Date().toISOString(); // Update the last checked timestamp
+                },
+                error: function (error) {
+                    console.error("Error checking for updates:", error);
+                }
+            });
+        }
+
+        // Periodically check for updates every 5 seconds
+        setInterval(checkForUpdates, 5000);
+
+        function populateDropdowns() {
+            fetch('/direct_calls/get_unique_field_values/')
+                .then(response => response.json())
+                .then(data => {
+                    const callStatusDropdown = document.getElementById('call_status');
+                    const assignedToDropdown = document.getElementById('assigned_to');
+
+                    const callTypeDropdown = document.getElementById('call_type');
+                    const productCodeDropdown = document.getElementById('product_code');
+
+
+                    callStatusDropdown.innerHTML = '<option value="All">All</option>';
+                    data.call_statuses.forEach(status => {
+                        callStatusDropdown.innerHTML += `<option value="${status}">${status}</option>`;
+                    });
+
+                    // Populate Assigned To dropdown
+                    assignedToDropdown.innerHTML = '<option value="All">All</option>';
+                    data.assigned_to.forEach(assignee => {
+                        assignedToDropdown.innerHTML += `<option value="${assignee}">${assignee}</option>`;
+                    });
+
+                    // Populate Call Type dropdown
+                    callTypeDropdown.innerHTML = '<option value="All">All</option>';
+                    data.call_types.forEach(type => {
+                        callTypeDropdown.innerHTML += `<option value="${type}">${type}</option>`;
+                    });
+                    productCodeDropdown.innerHTML = '<option value="All">All</option>';
+                    data.product_code.forEach(typo => {
+                        productCodeDropdown.innerHTML += `<option value="${typo}">${typo}</option>`;
+                    });
+                })
+                .catch(error => console.error('Error fetching dropdown data:', error));
+        }
+
+        // Call the function on page load
+        document.addEventListener('DOMContentLoaded', populateDropdowns);
+
+        function updateCallCounts(callCounts) {
+            // Ensure callCounts contains the required data
+            const totalCalls = callCounts.total || 0;
+            const directCalls = callCounts.direct || 0;
+            const iAlertCalls = callCounts.i_alert || 0;
+
+            // Update the counts in the DOM
+            $('#iAlertCalls').text(iAlertCalls);
+            $('#totalCalls').text(totalCalls);
+            $('#directCalls').text(directCalls);
+        }
+    </script>
+    <script>
+    $(document).ready(function () {
+        // Initialize Select2 with custom template
+        $('#fields').select2({
+            placeholder: "Select additional fields",
+            allowClear: true,
+            closeOnSelect: false, // Keep the dropdown open
+            templateResult: formatOption, // Custom template for options
+            templateSelection: formatSelection, // Custom template for selected items
+            maximumSelectionLength: 40, // Optional: Limit the number of selectable fields
+            dropdownAutoWidth: true, // Ensure the dropdown adjusts to content width
+            width: '100%' // Ensure it fits within the container
+        });
+
+        // Handle "Select All" functionality
+        $('#fields').on('select2:select', function (e) {
+            if (e.params.data.id === 'select_all') {
+                // Select all options
+                $('#fields > option').prop('selected', true).trigger('change');
+            }
+        });
+
+        $('#fields').on('select2:unselect', function (e) {
+            if (e.params.data.id === 'select_all') {
+                // Unselect all options
+                $('#fields > option').prop('selected', false).trigger('change');
+            }
+        });
+
+        // Custom template for options
+        function formatOption(option) {
+            if (!option.id) {
+                return option.text;
+            }
+            return $(
+                `<span><input type="checkbox" style="margin-right: 10px;" /> ${option.text}</span>`
+            );
+        }
+
+        // Custom template for selected items
+        function formatSelection(option) {
+            if (!option.id) {
+                return option.text;
+            }
+            return `<span>${option.text}</span>`; // Keep it simple and compact
+        }
+        $('#fields').on('change', function () {
+            const selectedFields = $(this).val();
+            if (selectedFields.length > 80) { // Limit to 80 fields
+                alert('You can select up to 80 fields only.');
+                $(this).val(selectedFields.slice(0, 80)).trigger('change'); // Keep only the first 80 fields
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#downloadSelectedFields').on('click', function (e) {
+            e.preventDefault();
+
+    // Get checked checkboxes from the dropdown
+    const selectedFields = [];
+    $('.field-checkbox:checked').each(function() {
+        selectedFields.push($(this).val());
+    });
+
+    if (selectedFields.length === 0) {
+        alert('Please select at least one field to download.');
+        return;
+    }
+
+    // Prepare filter values
+    const fromDate = $('#from_date').val();
+    const toDate = $('#to_date').val();
+    const callStatus = $('#call_status').val() || []; // <-- Always array
+    const assignedTo = $('#assigned_to').val();
+    const uniqueId = $('#unique_id').val();
+    const vin = $('#vin').val();
+    const ticketNo = $('#ticket_no').val();
+    const callType = $('#call_type').val();
+    const partBStatus = $('#part_b_status').val() || 'All';
+    const d2ExpStart = $('#d2_exp_start').val();
+    const d2ExpEnd = $('#d2_exp_end').val();
+    const d3ExpStart = $('#d3_exp_start').val();
+    const d3ExpEnd = $('#d3_exp_end').val();
+    const dateOfClosureFrom = $('#date_of_closure_from').val();
+    const dateOfClosureTo = $('#date_of_closure_to').val();
+    const d2ClosureStart = $('#d2_closure_start').val();
+    const d2ClosureEnd = $('#d2_closure_end').val();
+    const d3ClosureStart = $('#d3_closure_start').val();
+    const d3ClosureEnd = $('#d3_closure_end').val();
+    const productCode = $('#product_code').val();
+
+    $.ajax({
+        url: "{% url 'fetch_records_with_fields' %}",
+        method: "GET",
+        traditional: true, // <-- Important for array serialization
+        data: {
+            from_date: fromDate,
+            to_date: toDate,
+            call_status: callStatus, // <-- This will be sent as an array
+            assigned_to: assignedTo,
+            part_b_status: partBStatus,
+            unique_id: uniqueId,
+            vin: vin,
+            ticket_no: ticketNo,
+            call_type: callType,
+            d2_exp_start: d2ExpStart,
+            d2_exp_end: d2ExpEnd,
+            d3_exp_start: d3ExpStart,
+            d3_exp_end: d3ExpEnd,
+            date_of_closure_from: dateOfClosureFrom,
+            date_of_closure_to: dateOfClosureTo,
+            d2_closure_start: d2ClosureStart,
+            d2_closure_end: d2ClosureEnd,
+            d3_closure_start: d3ClosureStart,
+            d3_closure_end: d3ClosureEnd,
+            product_code: productCode,
+
+            fields: selectedFields,
+            page: 'all'
+        },
+        success: function (response) {
+            if (response.data && response.data.length > 0) {
+                downloadCSV(response.data, selectedFields);
+            } else {
+                alert('No data available for the selected fields.');
+            }
+        },
+        error: function (error) {
+            console.error('Error fetching data for download:', error);
+            alert('An error occurred while fetching the data.');
+        }
+    });
+});
+        // Function to download data as a CSV file
+        function downloadCSV(data, fields) {
+            // List of date fields to convert
+            const dateFields = [
+                'date_of_complaint', 'date_of_closure','Latest_update','ialert_tk_timestamp', 'activation_start_date', 'activation_end_date',
+                'vehicle_sale_date', 'first_communication_in_darby', 'last_communication_in_darby',
+                'D1_closure_date', 'D2_closure_date','D3_closure_date','feedback_submitted_datetime','Latest_update'
+            ];
+
+            // Helper to convert UTC to IST
+            function convertToIST(utcDate) {
+                 if (!utcDate) return '';
+                try {
+                    // normalize input and remove fractional seconds (microseconds)
+                    let s = String(utcDate).trim();
+                    // if space between date/time -> make ISO 'T'
+                    if (s.indexOf('T') === -1 && s.indexOf(' ') !== -1) s = s.replace(' ', 'T');
+                    // remove fractional seconds like .032183 (keeps seconds only)
+                    s = s.replace(/\.\d+/, '');
+                    // if no timezone info append 'Z'
+                    if (!/([Zz]|[+\-]\d{2}:\d{2})$/.test(s)) s = s + 'Z';
+                    const dateObj = new Date(s);
+                    if (isNaN(dateObj)) return utcDate;
+                    const istOffset = 5.5 * 60 * 60 * 1000;
+                    const istDate = new Date(dateObj.getTime() + istOffset);
+                    return istDate.toISOString().slice(0, 19).replace('T', ' ');
+                } catch (e) {
+                    return utcDate;
+                }
+            }
+            const csvRows = [];
+            const headers = fields.map(field => field.replace(/_/g, ' '));
+            csvRows.push(headers.join(','));
+            data.forEach(record => {
+                const row = fields.map(field => {
+                    let value = record[field] || '';
+                    if (dateFields.includes(field) && value) {
+                        value = convertToIST(value);
+                    }
+                    return `"${value}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const now = new Date();
+            const istOffset = 0;
+            const istDate = new Date(now.getTime());
+            const year = istDate.getFullYear();
+            const month = String(istDate.getMonth() + 1).padStart(2, '0');
+            const day = String(istDate.getDate()).padStart(2, '0');
+            const hours = String(istDate.getHours()).padStart(2, '0');
+            const minutes = String(istDate.getMinutes()).padStart(2, '0');
+            const seconds = String(istDate.getSeconds()).padStart(2, '0');
+            const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+            const fileName = `CRSC_Calls_${timestamp}.csv`;
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    });
+</script>
+<script>
+$(document).ready(function () {
+    // Initialize Select2 for call_status with checkboxes and drill-down
+    $('#call_status').select2({
+        placeholder: "Select Call Status",
+        allowClear: true,
+        closeOnSelect: false,
+        dropdownAutoWidth: true,
+        width: '100%',
+        templateResult: function (option) {
+            if (!option.id) return option.text;
+            return $('<span><input type="checkbox" style="margin-right:8px;" /> ' + option.text + '</span>');
+        },
+        templateSelection: function (option) {
+            return option.text;
+        }
+    });
+
+    // When call_status changes, fetch records
+    $('#call_status').on('change', function () {
+        fetchFilteredRecords();
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const allFields = [
+        {id: 'unique_id', text: 'Unique ID'},
+        {id: 'date_of_complaint', text: 'Date of Complaint'},
+        {id: 'call_type', text: 'Call Type'},
+        {id: 'vin', text: 'VIN'},
+        {id: 'psn', text: 'PSN'},
+        {id: 'complaint_assigned_to', text: 'Responsible Engineer'},
+        {id: 'call_status', text: 'Call Status'},
+        {id: 'date_of_closure', text: 'Date of Closure'},
+        {id: 'ticket_no', text: 'I Alert Ticket No'},
+        {id: 'ialert_tk_timestamp', text: 'I Alert Ticket Received'},
+        {id: 'final_action_taken', text: 'Final Action Taken'},
+        {id: 'remarks_in_ialert', text: 'Remarks in iAlert'},
+        {id: 'rating', text: 'Rating'},
+        {id: 'confirmation', text: 'Customer Confirmation'},
+        {id: 'complaint_raised_from_location', text: 'Complaint Raised Location'},
+        {id: 'customer_raised_issue', text: 'Customer Voice'},
+        {id: 'complaint_raised', text: 'Complaint Raised'},
+        {id: 'complaint_raised_by', text: 'Complaint Raised By'},
+        {id: 'contact_number', text: 'Contact Number'},
+        {id: 'customer_mail_id', text: 'Customer Mail ID'},
+        {id: 'vehicle_avl_in_workshop', text: 'Vehicle Available in Workshop'},
+        {id: 'complaint_raised_through', text: 'Complaint Raised Through'},
+        {id: 'complaint_received_by', text: 'Complaint Received By'},
+        {id: 'submitted_to_email', text: 'Submitted To Email'},
+        {id: 'engineer_contact_number', text: 'Engineer Contact Number'},
+        {id: 'end_customer_mail_id', text: 'End Customer Mail ID'},
+        {id: 'device_model', text: 'Device Model'},
+        {id: 'telco_status', text: 'Telco Status'},
+        {id: 'active_profile', text: 'Active Profile'},
+        {id: 'activation_start_date', text: 'Activation Start Date'},
+        {id: 'activation_end_date', text: 'Activation End Date'},
+        {id: 'vehicle_sale_date', text: 'Vehicle Sale Date'},
+        {id: 'first_communication_in_darby', text: 'First Communication in Darby'},
+        {id: 'last_communication_in_darby', text: 'Last Communication in Darby'},
+        {id: 'card_status', text: 'Card Status'},
+        {id: 'main_battery_voltage', text: 'Main Battery Voltage'},
+        {id: 'exist_software', text: 'Existing Software'},
+        {id: 'al_mfg_plant', text: 'AL MFG Plant'},
+        {id: 'nrd_category', text: 'NRD Category'},
+        {id: 'vehicle_type', text: 'Vehicle Type'},
+        {id: 'vehicle_run', text: 'Vehicle Run'},
+        {id: 'engine_type', text: 'Engine Type'},
+        {id: 'vehicle_run', text: 'Vehicle Run'},
+        {id: 'vehicle_type', text: 'Vehicle Model'},
+        {id: 'vehicle_sale_date', text: 'Vehicle Sale Date'},
+        {id: 'state', text: 'State'},
+        {id: 'region', text: 'Region'},
+        {id: 'vehicle_run', text: 'Vehicle Run'},
+        {id: 'kilometers_hours', text: 'Kilometers/Hours'},
+        {id: 'vehicle_running_location', text: 'Vehicle Running Location'},
+        {id: 'contact_person_name', text: 'Contact Person Name'},
+        {id: 'contact_category', text: 'Contact Category'},
+        {id: 'contact_person_number', text: 'Contact Person Number'},
+        {id: 'exist_software', text: 'Existing Software'},
+        {id: 'updated_software', text: 'Updated Software'},
+        {id: 'issue_identified', text: 'Issue Identified'},
+        {id: 'issue_analysis', text: 'Issue Description'},
+        {id: 'issue_category', text: 'Issue Category'},
+        {id: 'finalised_issue_category', text: 'Finalised Issue Category'},
+        {id: 'D1_remark', text: 'D1 Remarks'},
+        {id: 'D1', text: 'D1 Comments'},
+        {id: 'complaint_assigned_to', text: 'D1 Engineer'},
+        {id: 'D1_closure_date', text: 'D1 Closure Date'},
+        {id: 'D2_remark', text: 'D2 Remarks'},
+        {id: 'D2', text: 'D2 Comments'},
+        {id: 'D2_exp_date', text: 'D2 Exp Date'},
+        {id: 'D2_closure_date', text: 'D2 Closure Date'},
+        {id: 'D2_engineer', text: 'D2 Engineer'},
+        {id: 'D3_remark', text: 'D3 Remarks'},
+        {id: 'D3', text: 'D3 Comments'},
+        {id: 'D3_exp_date', text: 'D3 Exp Date'},
+        {id: 'D3_closure_date', text: 'D3 Closure Date'},
+        {id: 'Latest_update', text: 'Latest Update'},
+        {id: 'D3_engineer', text: 'D3 Engineer'},
+        {id: 'call_closure_cat', text: 'Call Closure Category'},
+        {id: 'engineer_recommendation', text: 'Engineer Recommendation'},
+        {id: 'analysis', text: 'Analysis'},
+        {id: 'chargable_or_not', text: 'Chargable or Not'},
+        {id: 'payment_status', text: 'Payment Status'},
+        {id: 'hod_comment', text: 'HOD Comments'},
+        {id: 'remarks', text: 'Remarks'},
+        {id: 'external_modification', text: 'External Modification'},
+        {id: 'device_IMEI', text: 'Device IMEI'},
+        {id: 'device_ICCID', text: 'Device ICCID'},
+        {id: 'device_to_be_sent', text: 'Device to be Sent'},
+        {id: 'dealer_address', text: 'Dealer Address'},
+        {id: 'dealer_name', text: 'Dealer Name'},
+        {id: 'rating', text: 'Rating'},
+        {id: 'feedback', text: 'Customer Feedback'},
+        {id: 'customer_feedback', text: 'Additional Feedback'},
+        {id: 'feedback_submitted_datetime', text: 'Feedback Submission datetime'},
+        {id: 'engineer_name', text: 'Review By'},
+        {id: 'call_closed_by', text: 'Call Closed By'},
+        {id: 'exp_review_date', text: 'Exp Review Date'},
+        {id: 'engineer_name', text: 'Review By'},
+        {id: 'called_date', text: 'Actual Review Date'},
+        {id: 'latency_for_last_7_days_cc', text: 'Lat for Last 7 Days (After Close)'},
+        {id: 'vpacket_for_last_7_days_cc', text: 'V Pak for Last 7 Days (After Close)'},
+        {id: 'remarks_03', text: 'Remarks (Review)'},
+        {id: 'final_conclusion', text: 'Final Conclusion'},
+        {id: 'final_status', text: 'Final Action'}
+    ];
+
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    // Dynamically generate checkboxes for all fields
+    allFields.forEach(field => {
+        const checkboxHTML = `
+            <li>
+                <label class="dropdown-item">
+                    <input type="checkbox" class="form-check-input field-checkbox me-2" value="${field.id}">${field.text}
+                </label>
+            </li>
+        `;
+        dropdownMenu.innerHTML += checkboxHTML;
+    });
+});
+</script>
+<!-- Add this line for Bootstrap 5 dropdowns to work -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Select all checkboxes by default on first load
+    setTimeout(function() {
+        $('.field-checkbox').prop('checked', true).trigger('change');
+        $('#select_all_fields').prop('checked', true);
+    }, 500);
+
+    // "Select All" functionality
+    $(document).on('change', '#select_all_fields', function() {
+        $('.field-checkbox').prop('checked', this.checked).trigger('change');
+    });
+
+    // "Clear Selection" button (if you have it)
+    $(document).on('click', '#clearSelectionButton', function(e) {
+        e.preventDefault();
+        $('.field-checkbox').prop('checked', false).trigger('change');
+        $('#select_all_fields').prop('checked', false);
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 330);
+    now.setHours(1, 0, 0, 0);
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const defaultDateTime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+    // Set the value
+    document.getElementById('from_date').value = defaultDateTime;
+});
+</script>
+
+
+<script>
+// ...existing code...
+// When building fetch URL / params, include closure values:
+function addDateFilters(params) {
+  params.set('d2_closure_start', document.getElementById('d2_closure_start').value || '');
+  params.set('d2_closure_end', document.getElementById('d2_closure_end').value || '');
+  params.set('d3_closure_start', document.getElementById('d3_closure_start').value || '');
+  params.set('d3_closure_end', document.getElementById('d3_closure_end').value || '');
+}
+// call addDateFilters(params) from your existing fetch routine before sending request
+</script>
+</body>
+</html>
+

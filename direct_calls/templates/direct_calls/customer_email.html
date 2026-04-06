@@ -7,7 +7,7 @@
     <style>        
     th {
         text-align: left; /* Align table headers to the left */
-        background-color: rgba(128, 128, 128, 0.965); /* Optional: Light gray background for headers */
+        background-color: rgb(240,240,240); /* Optional: Light gray background for headers */
         padding: 5px; /* Add padding for better readability */
     }
     td {
@@ -40,12 +40,32 @@
                 </tr>
                 <tr>
                     <th>Engineer Email</th>
-                    <td>{{ entry.submitted_to_email }}</td>
+                    <td>{{ entry.engineer_email }}</td>
                 </tr>
+                {% if entry.call_type == "Direct Call" or entry.call_type == "DBM NRD" %}
+                <tr>
+                    <th>Technician Support Required At</th>
+                    <td>{{ tech_support_needed }}</td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
+
         <p>If you have any questions, feel free to contact us.</p>
-        <p>Thank you,<br>Customer Support Team</p>
+        <div class="logo-section">
+            <br>
+            <b>Danlaw Technologies Service & Support Team
+            <br>
+Email : Support.al@danlawtech.com
+<br>
+Support Team - 6303908940 / 04431436579
+<br>
+Online support : 09:00AM to 05:30PM, Monday to Saturday
+<br>
+Thank you</b>
+<img src="data:image/png;base64,{{ logo_base64 }}" alt="Danlaw Logo" class="logo-left" style="width: 150px; height: auto;">
+
+        </div>
     </div>
 </body>
 </html>

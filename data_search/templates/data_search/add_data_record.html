@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Data</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f8fa;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #222;
+        }
+        form {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        input[type="text"] {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 220px;
+        }
+        button {
+            padding: 5px 14px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 18px 12px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            max-width: 98vw;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .darby-table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            background: #f9fbfd;
+            padding: 10px;
+        }
+        #darby-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.90rem;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #darby-summary-table th, #darby-summary-table td {
+            border: 1px solid #dee2e6;
+            padding: 4px 6px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        #darby-summary-table th {
+            background: #e9f2fb;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            color: #222;
+        }
+        #darby-summary-table tbody tr:nth-child(even) {
+            background: #f6fafd;
+        }
+        #darby-summary-table tbody tr:hover {
+            background: #e2eafc;
+            transition: background 0.2s;
+        }
+        #darby-summary-table th.rotate {
+            height: 60px;
+            white-space: nowrap;
+            vertical-align: bottom;
+            padding: 1px 2px;
+            font-size: 0.75em;
+            transform: rotate(-20deg);
+        }
+        #darby-summary-table td {
+            font-size: 0.90em;
+        }
+        #darby-summary-table td:first-child, #darby-summary-table th:first-child {
+            text-align: right;
+            font-weight: 500;
+        }
+        .percent {
+            color: #007bff;
+            font-size: 0.85em;
+        }
+        .api-result {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 1rem;
+            color: #333;
+        }
+        #vin-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            margin-bottom: 1rem;
+        }
+        #vin-details-table th, #vin-details-table td {
+            border: 1px solid #dee2e6;
+            padding: 6px 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        #vin-details-table th {
+            background: #e9f2fb;
+            font-weight: 600;
+            color: #222;
+        }
+        #vin-details-table tbody tr:nth-child(even) {
+            background: #f6fafd;
+        }
+        @media (max-width: 900px) {
+            #darby-summary-table th.rotate {
+                font-size: 0.65em;
+            }
+            #darby-summary-table th, #darby-summary-table td {
+                padding: 2px 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Search by VIN</h2>
+    <!-- Only VIN input -->
+    <form method="get" action="/data_search/search/">
+        <input type="text" name="vin" placeholder="Enter VIN" value="{{ vin|default:'' }}">
+        <button type="submit">Search</button>
+        <button id="download-excel-btn" style="margin-bottom:10px;float:right;">Download Excel</button>
+
+    </form>
+    {% if vin %}
+    <div class="result-box">
+        <div class="darby-table-container">
+            <h5>VIN Details</h5>
+            <table class="table table-bordered" id="vin-details-table">
+                <thead>
+            <tr>
+                <th>VIN</th>
+                <th>Product Serial Number</th>
+                <th>Product Code</th>
+                <th>Card State</th>
+                <th>Card Status</th>
+                <th>Alert Packet Kafka Published Time</th>
+                <th>V Packet Kafka Published Time</th>
+                <th>A Packet Kafka Published Time</th>
+                <th>IMEI</th>
+                <th>Ignition Status</th>
+                <th>Vehicle Battery Potential</th>
+                <th>Latest CS Renewal End Date</th>
+                <th>Address</th>
+                <th>Com Status</th>
+                <th>State</th>
+                <th>Country</th>
+            </tr>
+                </thead>
+                <tbody>
+                    <!-- Filled by JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="darby-table-container">
+            <h5>Darby 7 Days Analysis</h5>
+            <table class="table table-bordered" id="darby-summary-table">
+                <thead>
+                        <th>Date</th>
+                        <th>Start<br>ODO</th>
+                        <th>End<br>ODO</th>
+                        <th>Kms</th>
+                        <th>Total<br>PKTS</th>
+                        <th>A<br>PKT</th>
+                        <th>A<br>PKT %</th>
+                        <th>V<br>PKT</th>
+                        <th>V<br>PKT %</th>
+                        <th>LAT<br>0-5<br>(%)</th>
+                        <th>LAT<br>5-15</th>
+                        <th>LAT<br>15-30</th>
+                        <th>LAT<br>30-1Hr</th>
+                        <th>LAT<br>1-3Hr</th>
+                        <th>LAT<br>3-6Hr</th>
+                        <th>LAT<br>6-12Hr</th>
+                        <th>LAT<br>12-24Hr</th>
+                        <th>LAT<br>&gt;24Hr</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Filled by JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="darby-table-container" style="background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-radius: 12px; margin-bottom: 2rem; padding: 24px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; justify-content: space-between;">
+        <div style="flex: 1 1 350px; min-width: 320px; max-width: 48%;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="font-size: 1.1rem; font-weight: 600; color: #1939f1;">&#128200;</span>
+                <span style="font-size: 1.1rem; font-weight: 600;">Latency Distribution (100% Stacked Bar)</span>
+            </div>
+            <canvas id="latencyStackedBar" height="120"></canvas>
+        </div>
+        <div style="flex: 1 1 350px; min-width: 320px; max-width: 48%;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="font-size: 1.1rem; font-weight: 600; color: #039b17;">&#128202;</span>
+                <span style="font-size: 1.1rem; font-weight: 600;">A PKT & V PKT Distribution (100% Stacked Bar)</span>
+            </div>
+            <canvas id="pktStackedBar" height="120"></canvas>
+        </div>
+    </div>
+    <div style="margin-top: 18px; text-align: center; font-size: 0.95rem; color: #555;">
+        <span style="background: #e9f2fb; border-radius: 6px; padding: 4px 12px;">
+            <b>Tip:</b> Hover over bars to see exact percentages.
+        </span>
+    </div>
+</div>
+        <div id="api-result" class="api-result"></div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+        <div style="color: red;">{{ error }}</div>
+    {% endif %}
+
+    <!-- Add SheetJS from CDN just before your script -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+Chart.register(ChartDataLabels);
+
+function renderLatencyStackedBar(summaryTable) {
+    if (!summaryTable || summaryTable.length === 0) return;
+
+    const labels = summaryTable.map(row => row.date);
+    const categories = [
+        { key: 'lat_0_5', label: 'LAT 0-5 (%)', color: '#039b17ff' },
+        { key: 'lat_5_15', label: 'LAT 5-15', color: '#1939f1ff' },
+        { key: 'lat_15_30', label: 'LAT 15-30', color: '#ecde15ff' },
+        { key: 'lat_30_1h', label: 'LAT 30-1Hr', color: '#ffa500' },
+        {
+            key: ['lat_1h_3h', 'lat_3h_6h', 'lat_6h_12h', 'lat_12h_24h', 'lat_gt_24h'],
+            label: 'LAT >1 Hr',
+            color: '#f71010ff'
+        }
+    ];
+
+    const percentData = categories.map(cat => ({
+        label: cat.label,
+        backgroundColor: cat.color,
+        data: summaryTable.map(row => {
+            const lat0_5 = Number(row.lat_0_5) || 0;
+            const lat5_15 = Number(row.lat_5_15) || 0;
+            const lat15_30 = Number(row.lat_15_30) || 0;
+            const lat30_1h = Number(row.lat_30_1h) || 0;
+            const lat1h_3h = Number(row.lat_1h_3h) || 0;
+            const lat3h_6h = Number(row.lat_3h_6h) || 0;
+            const lat6h_12h = Number(row.lat_6h_12h) || 0;
+            const lat12h_24h = Number(row.lat_12h_24h) || 0;
+            const lat_gt_24h = Number(row.lat_gt_24h) || 0;
+            const latSum = lat0_5 + lat5_15 + lat15_30 + lat30_1h + lat1h_3h + lat3h_6h + lat6h_12h + lat12h_24h + lat_gt_24h;
+
+            let value;
+            if (Array.isArray(cat.key)) {
+                // Sum all the fields for "LAT >1 Hr"
+                value = cat.key.reduce((sum, k) => sum + (Number(row[k]) || 0), 0);
+            } else {
+                value = Number(row[cat.key]) || 0;
+            }
+            if (latSum === 0) return 0;
+            return ((value / latSum) * 100).toFixed(2);
+        }),
+        stack: 'latency'
+    }));
+    console.log('percentData', percentData);
+    if (window.latencyStackedBarChart) {
+        window.latencyStackedBarChart.destroy();
+    }
+    const ctx = document.getElementById('latencyStackedBar').getContext('2d');
+    window.latencyStackedBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: percentData
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: false },
+                tooltip: { mode: 'index', intersect: false, callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                    }
+                }},
+                datalabels: {
+                    display: true,
+                    formatter: (value) => value > 0 ? value + '%' : '',
+                    color: '#fff', // White color for data labels
+                    anchor: 'center'
+                }
+            },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            scales: {
+                x: { stacked: true },
+                y: {
+                    stacked: true,
+                    title: { display: true, text: 'Latency (%)' },
+                    min: 0,
+                    max: 100,
+                    ticks: { callback: function(val) { return val + '%'; } }
+                }
+            }
+        }
+    });
+}
+
+// NEW FUNCTION: Render A PKT & V PKT stacked bar chart
+function renderPktStackedBar(summaryTable) {
+    if (!summaryTable || summaryTable.length === 0) return;
+
+    const labels = summaryTable.map(row => row.date);
+    const aPktData = summaryTable.map((row, i) => {
+        const total = Number(row.total_packets) || 0;
+        const a = Number(row.a_packets) || 0;
+        return total ? ((a / total) * 100).toFixed(2) : 0;
+    });
+    const vPktData = summaryTable.map((row, i) => {
+        const total = Number(row.total_packets) || 0;
+        const v = Number(row.v_packets) || 0;
+        return total ? ((v / total) * 100).toFixed(2) : 0;
+    });
+
+    if (window.pktStackedBarChart) {
+        window.pktStackedBarChart.destroy();
+    }
+    const ctx = document.getElementById('pktStackedBar').getContext('2d');
+    window.pktStackedBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'A PKT (%)',
+                    data: aPktData,
+                    backgroundColor: '#007bff',
+                    stack: 'pkt'
+                },
+                {
+                    label: 'V PKT (%)',
+                    data: vPktData,
+                    backgroundColor: '#f39c12',
+                    stack: 'pkt'
+                }
+            ]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y}%`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    formatter: function(value) {
+                        return value > 0 ? value + '%' : '';
+                    },
+                    color: '#fff',
+                    anchor: 'center'
+                }
+            },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            scales: {
+                x: { stacked: true },
+                y: {
+                    stacked: true,
+                    title: { display: true, text: 'Packet Percentage (%)' },
+                    min: 0,
+                    max: 100,
+                    ticks: { callback: function(val) { return val + '%'; } }
+                }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const vin = "{{ vin|default:'' }}";
+    if (vin) {
+        fetch(`/data_search/api/fetch/?vin=${encodeURIComponent(vin)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('API error: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response:', data); // <-- Add this line
+                // VIN Details Table
+                const vinDetails = data.vin_details || {};
+                const api1Data = data.api_1_data || {};
+                const vinDetailsTableBody = document.querySelector('#vin-details-table tbody');
+                vinDetailsTableBody.innerHTML = '';
+                if (Object.keys(vinDetails).length > 0 || Object.keys(api1Data).length > 0) {
+                    vinDetailsTableBody.innerHTML += `
+                        <tr>
+                            <td>${vinDetails.vin || ''}</td>
+                            <td>${vinDetails.productSerialNumber || ''}</td>
+                            <td>${vinDetails.productCode || ''}</td>
+                            <td>${vinDetails.cardState || ''}</td>
+                            <td>${vinDetails.cardStatus || ''}</td>
+                            <td>${vinDetails.alertPacketKafkaPublishedTime || ''}</td>
+                            <td>${vinDetails.vpacketKafkaPublishedTime || ''}</td>
+                            <td>${vinDetails.apacketKafkaPublishedTime || ''}</td>
+                            <td>${api1Data.imei || ''}</td>
+<td>${api1Data.ignitionStatus === 1 ? 'ON' : (api1Data.ignitionStatus === 0 ? 'OFF' : '')}</td>                            
+                            <td>${api1Data.vehicleBatteryPotential || ''}</td>
+                            <td>${api1Data.latestCsRenewalEndDate || ''}</td>
+                            <td>${api1Data.address || ''}</td>
+                            <td>${api1Data.comStatus || ''}</td>
+                            <td>${api1Data.state || ''}</td>
+                            <td>${api1Data.country || ''}</td>
+                        </tr>
+                    `;
+                } else {
+                    vinDetailsTableBody.innerHTML = '<tr><td colspan="16">No details found</td></tr>';
+                }
+                const summaryTable = data.summary_table || [];
+                const summaryRow = data.summary_row || null;
+                const tableBody = document.querySelector('#darby-summary-table tbody');
+                tableBody.innerHTML = '';
+
+                // Helper to format date if needed
+                function formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    if (dateStr === "Summary") return "Summary";
+                    const parts = dateStr.split('-');
+                    if (parts.length === 3) {
+                        return `${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[2]}`;
+                    }
+                    return dateStr;
+                }
+
+                if (summaryTable.length > 0) {
+                    summaryTable.forEach(row => {
+                        let vPacketPercent = row.total_packets ? ((row.v_packets / row.total_packets) * 100).toFixed(2) : "0.00";
+                        let aPacketPercent = row.total_packets ? ((row.a_packets / row.total_packets) * 100).toFixed(2) : "0.00";
+                        const lat0_5 = Number(row.lat_0_5) || 0;
+                        const lat5_15 = Number(row.lat_5_15) || 0;
+                        const lat15_30 = Number(row.lat_15_30) || 0;
+                        const lat30_1h = Number(row.lat_30_1h) || 0;
+                        const lat1h_3h = Number(row.lat_1h_3h) || 0;
+                        const lat3h_6h = Number(row.lat_3h_6h) || 0;
+                        const lat6h_12h = Number(row.lat_6h_12h) || 0;
+                        const lat12h_24h = Number(row.lat_12h_24h) || 0;
+                        const lat_gt_24h = Number(row.lat_gt_24h) || 0;
+                        const latSum = lat0_5 + lat5_15 + lat15_30 + lat30_1h + lat1h_3h + lat3h_6h + lat6h_12h + lat12h_24h + lat_gt_24h;
+
+                        let lat0_5_percent = latSum ? ((lat0_5 / latSum) * 100).toFixed(2) : "0.00";
+                        let lat5_15_percent = latSum ? ((lat5_15 / latSum) * 100).toFixed(2) : "0.00";
+                        let lat15_30_percent = latSum ? ((lat15_30 / latSum) * 100).toFixed(2) : "0.00";
+                        let lat30_1h_percent = latSum ? ((lat30_1h / latSum) * 100).toFixed(2) : "0.00";
+                        let lat1h_3h_percent = latSum ? ((lat1h_3h / latSum) * 100).toFixed(2) : "0.00";
+                        let lat3h_6h_percent = latSum ? ((lat3h_6h / latSum) * 100).toFixed(2) : "0.00";
+                        let lat6h_12h_percent = latSum ? ((lat6h_12h / latSum) * 100).toFixed(2) : "0.00";
+                        let lat12h_24h_percent = latSum ? ((lat12h_24h / latSum) * 100).toFixed(2) : "0.00";
+                        let lat_gt_24h_percent = latSum ? ((lat_gt_24h / latSum) * 100).toFixed(2) : "0.00";
+
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${formatDate(row.date)}</td>
+                                <td>${row.start_odo}</td>
+                                <td>${row.end_odo}</td>
+                                <td>${row.kms}</td>
+                                <td>${row.total_packets}</td>
+                                <td>${row.a_packets}</td>
+                                <td>${aPacketPercent}%</td>
+                                <td>${row.v_packets}</td>
+                                <td>${vPacketPercent}%</td>
+                                <td>${lat0_5_percent}</td>
+                                <td>${lat5_15_percent}</td>
+                                <td>${lat15_30_percent}</td>
+                                <td>${lat30_1h_percent}</td>
+                                <td>${lat1h_3h_percent}</td>
+                                <td>${lat3h_6h_percent}</td>
+                                <td>${lat6h_12h_percent}</td>
+                                <td>${lat12h_24h_percent}</td>
+                                <td>${lat_gt_24h_percent}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="18">No data</td></tr>';
+                }
+
+                if (summaryRow) {
+                    let vPacketPercent = summaryRow.total_packets ? ((summaryRow.v_packets / summaryRow.total_packets) * 100).toFixed(2) : "0.00";
+                    let aPacketPercent = summaryRow.total_packets ? ((summaryRow.a_packets / summaryRow.total_packets) * 100).toFixed(2) : "0.00";
+                    const lat0_5 = Number(summaryRow.lat_0_5) || 0;
+                    const lat5_15 = Number(summaryRow.lat_5_15) || 0;
+                    const lat15_30 = Number(summaryRow.lat_15_30) || 0;
+                    const lat30_1h = Number(summaryRow.lat_30_1h) || 0;
+                    const lat1h_3h = Number(summaryRow.lat_1h_3h) || 0;
+                    const lat3h_6h = Number(summaryRow.lat_3h_6h) || 0;
+                    const lat6h_12h = Number(summaryRow.lat_6h_12h) || 0;
+                    const lat12h_24h = Number(summaryRow.lat_12h_24h) || 0;
+                    const lat_gt_24h = Number(summaryRow.lat_gt_24h) || 0;
+                    const latSum = lat0_5 + lat5_15 + lat15_30 + lat30_1h + lat1h_3h + lat3h_6h + lat6h_12h + lat12h_24h + lat_gt_24h;
+
+                    let lat0_5_percent = latSum ? ((lat0_5 / latSum) * 100).toFixed(2) : "0.00";
+                    let lat5_15_percent = latSum ? ((lat5_15 / latSum) * 100).toFixed(2) : "0.00";
+                    let lat15_30_percent = latSum ? ((lat15_30 / latSum) * 100).toFixed(2) : "0.00";
+                    let lat30_1h_percent = latSum ? ((lat30_1h / latSum) * 100).toFixed(2) : "0.00";
+                    let lat1h_3h_percent = latSum ? ((lat1h_3h / latSum) * 100).toFixed(2) : "0.00";
+                    let lat3h_6h_percent = latSum ? ((lat3h_6h / latSum) * 100).toFixed(2) : "0.00";
+                    let lat6h_12h_percent = latSum ? ((lat6h_12h / latSum) * 100).toFixed(2) : "0.00";
+                    let lat12h_24h_percent = latSum ? ((lat12h_24h / latSum) * 100).toFixed(2) : "0.00";
+                    let lat_gt_24h_percent = latSum ? ((lat_gt_24h / latSum) * 100).toFixed(2) : "0.00";
+
+                    tableBody.innerHTML += `
+                        <tr style="font-weight:bold;background:#e9f2fb;color:#0056b3;">
+                            <td>${formatDate(summaryRow.date)}</td>
+                            <td>${summaryRow.start_odo}</td>
+                            <td>${summaryRow.end_odo}</td>
+                            <td>${summaryRow.kms}</td>
+                            <td>${summaryRow.total_packets}</td>
+                            <td>${summaryRow.a_packets}</td>
+                            <td>${aPacketPercent}%</td>
+                            <td>${summaryRow.v_packets}</td>
+                            <td>${vPacketPercent}%</td>
+                            <td>${lat0_5_percent}</td>
+                            <td>${lat5_15_percent}</td>
+                            <td>${lat15_30_percent}</td>
+                            <td>${lat30_1h_percent}</td>
+                            <td>${lat1h_3h_percent}</td>
+                            <td>${lat3h_6h_percent}</td>
+                            <td>${lat6h_12h_percent}</td>
+                            <td>${lat12h_24h_percent}</td>
+                            <td>${lat_gt_24h_percent}</td>
+                        </tr>
+                    `;
+                }
+
+                document.getElementById('api-result').textContent = '';
+
+                // Render the latency stacked bar chart
+                renderLatencyStackedBar(summaryTable);
+                renderPktStackedBar(summaryTable); // <-- Call new chart function
+            })
+            .catch(error => {
+                document.getElementById('api-result').textContent = 'Error fetching VIN details: ' + error;
+            });
+    }
+
+    // Excel download logic
+    document.getElementById('download-excel-btn').addEventListener('click', function () {
+        // Helper: convert table to array of arrays
+        function tableToArray(tableId) {
+            const table = document.getElementById(tableId);
+            const data = [];
+            for (let r = 0; r < table.rows.length; r++) {
+                const row = [];
+                for (let c = 0; c < table.rows[r].cells.length; c++) {
+                    row.push(table.rows[r].cells[c].innerText);
+                }
+                data.push(row);
+            }
+            return data;
+        }
+
+        // Get both tables as arrays
+        const vinTable = tableToArray('vin-details-table');
+        const darbyTable = tableToArray('darby-summary-table');
+
+        // Combine: VIN table, 3 empty rows, then Darby table
+        let combined = [];
+        if (vinTable.length > 0) {
+            combined = combined.concat(vinTable);
+        }
+        combined.push([], [], []); // 3 empty rows
+        if (darbyTable.length > 0) {
+            combined = combined.concat(darbyTable);
+        }
+
+        // Create worksheet and workbook
+        const ws = XLSX.utils.aoa_to_sheet(combined);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'VIN & Darby Analysis');
+
+        XLSX.writeFile(wb,`${vin}_darby_analysis.xlsx`);
+    });
+});
+
+function renderLatencyStackedBar(summaryTable) {
+    if (!summaryTable || summaryTable.length === 0) return;
+
+    const labels = summaryTable.map(row => row.date);
+    const categories = [
+        { key: 'lat_0_5', label: 'LAT 0-5 (%)', color: '#039b17ff' },
+        { key: 'lat_5_15', label: 'LAT 5-15', color: '#1939f1ff' },
+        { key: 'lat_15_30', label: 'LAT 15-30', color: '#ecde15ff' },
+        { key: 'lat_30_1h', label: 'LAT 30-1Hr', color: '#ffa500' },
+        {
+            key: ['lat_1h_3h', 'lat_3h_6h', 'lat_6h_12h', 'lat_12h_24h', 'lat_gt_24h'],
+            label: 'LAT >1 Hr',
+            color: '#f71010ff'
+        }
+    ];
+
+    const percentData = categories.map(cat => ({
+        label: cat.label,
+        backgroundColor: cat.color,
+        data: summaryTable.map(row => {
+            const lat0_5 = Number(row.lat_0_5) || 0;
+            const lat5_15 = Number(row.lat_5_15) || 0;
+            const lat15_30 = Number(row.lat_15_30) || 0;
+            const lat30_1h = Number(row.lat_30_1h) || 0;
+            const lat1h_3h = Number(row.lat_1h_3h) || 0;
+            const lat3h_6h = Number(row.lat_3h_6h) || 0;
+            const lat6h_12h = Number(row.lat_6h_12h) || 0;
+            const lat12h_24h = Number(row.lat_12h_24h) || 0;
+            const lat_gt_24h = Number(row.lat_gt_24h) || 0;
+            const latSum = lat0_5 + lat5_15 + lat15_30 + lat30_1h + lat1h_3h + lat3h_6h + lat6h_12h + lat12h_24h + lat_gt_24h;
+
+            let value;
+            if (Array.isArray(cat.key)) {
+                // Sum all the fields for "LAT >1 Hr"
+                value = cat.key.reduce((sum, k) => sum + (Number(row[k]) || 0), 0);
+            } else {
+                value = Number(row[cat.key]) || 0;
+            }
+            if (latSum === 0) return 0;
+            return ((value / latSum) * 100).toFixed(2);
+        }),
+        stack: 'latency'
+    }));
+    console.log('percentData', percentData);
+    if (window.latencyStackedBarChart) {
+        window.latencyStackedBarChart.destroy();
+    }
+    const ctx = document.getElementById('latencyStackedBar').getContext('2d');
+    window.latencyStackedBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: percentData
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: false },
+                tooltip: { mode: 'index', intersect: false, callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                    }
+                }},
+                datalabels: {
+                    display: true,
+                    formatter: (value) => value > 0 ? value + '%' : '',
+                    color: '#fff', // White color for data labels
+                    anchor: 'center'
+                }
+            },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            scales: {
+                x: { stacked: true },
+                y: {
+                    stacked: true,
+                    title: { display: true, text: 'Latency (%)' },
+                    min: 0,
+                    max: 100,
+                    ticks: { callback: function(val) { return val + '%'; } }
+                }
+            }
+        }
+    });
+}
+
+function renderPktStackedBar(summaryTable) {
+    if (!summaryTable || summaryTable.length === 0) return;
+
+    const labels = summaryTable.map(row => row.date);
+    const aPktData = summaryTable.map((row, i) => {
+        const total = Number(row.total_packets) || 0;
+        const a = Number(row.a_packets) || 0;
+        return total ? ((a / total) * 100).toFixed(2) : 0;
+    });
+    const vPktData = summaryTable.map((row, i) => {
+        const total = Number(row.total_packets) || 0;
+        const v = Number(row.v_packets) || 0;
+        return total ? ((v / total) * 100).toFixed(2) : 0;
+    });
+
+    if (window.pktStackedBarChart) {
+        window.pktStackedBarChart.destroy();
+    }
+    const ctx = document.getElementById('pktStackedBar').getContext('2d');
+    window.pktStackedBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'A PKT (%)',
+                    data: aPktData,
+                    backgroundColor: '#039b17ff',
+                    stack: 'pkt'
+                },
+                {
+                    label: 'V PKT (%)',
+                    data: vPktData,
+                    backgroundColor: '#f71010ff',
+                    stack: 'pkt'
+                }
+            ]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y}%`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    formatter: function(value) {
+                        return value > 0 ? value + '%' : '';
+                    },
+                    color: '#fff',
+                    anchor: 'center'
+                }
+            },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            scales: {
+                x: { stacked: true },
+                y: {
+                    stacked: true,
+                    title: { display: true, text: 'Packet Percentage (%)' },
+                    min: 0,
+                    max: 100,
+                    ticks: { callback: function(val) { return val + '%'; } }
+                }
+            }
+        }
+    });
+}
+
+// Register datalabels plugin
+Chart.register(ChartDataLabels);
+</script>
+</body>
+</html>

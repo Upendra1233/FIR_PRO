@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.timezone import now
 from django.http import HttpResponse
 import csv
-import uuid
 
 class MappingProcess(models.Model):
     mapping_req_received_date = models.DateTimeField(blank=True, null=True)
@@ -26,7 +25,7 @@ class MappingProcess(models.Model):
     mapping_completion_date = models.DateField(blank=True, null=True)
     warranty_of_the_device = models.DateField(blank=True, null=True)
     mapping_done_by = models.EmailField(null=True, blank=True)  # Engineer's email
-    ticket_id = models.CharField(max_length=255, unique=True, default=uuid.uuid4)
+    ticket_id = models.CharField(max_length=20, unique=True, null=True, blank=True)  # Ticket ID
 
     manager_approval_status = models.CharField(
         max_length=100,

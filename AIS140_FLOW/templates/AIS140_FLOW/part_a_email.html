@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part A Form Submission</title>
+    <style>
+        th {
+            text-align: left;
+            background-color: rgb(240,240,240);
+            padding: 5px;
+        }
+        td {
+            padding: 5px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;     
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #e68a00;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h4>Dear Dilip,</h4>
+        <p>Your Part A form has been successfully submitted. Below are the details:</p>
+        <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
+            <tbody>
+                <tr><th>Ticket ID</th><td>{{ entry.unique_id }}</td></tr>
+                <tr><th>Date of request</th><td>{{ entry.call_type }}</td></tr>
+                <tr><th>I Alert Ticket No</th><td>{{ entry.ticket_no }}</td></tr>
+                <tr><th>Vehicle Availability in Workshop</th><td>{{ entry.vehicle_avl_in_workshop }}</td></tr>
+                <tr><th>Date of Complaint</th><td>{{ entry.date_of_complaint }}</td></tr>
+                <tr><th>Complaint Raised From Location</th><td>{{ entry.complaint_raised_from_location }}</td></tr>
+                <tr><th>Customer Voice</th><td>{{ entry.customer_raised_issue }}</td></tr>
+                <tr><th>Complaint Raised</th><td>{{ entry.complaint_raised }}</td></tr>
+                <tr><th>Complaint Raised By</th><td>{{ entry.complaint_raised_by }}</td></tr>
+                <tr><th>Contact Number</th><td>{{ entry.contact_number }}</td></tr>
+                <tr><th>Customer Mail ID</th><td>{{ entry.customer_mail_id }}</td></tr>
+                <tr><th>Complaint Raised Through</th><td>{{ entry.complaint_raised_through }}</td></tr>
+                <tr><th>Complaint Received By</th><td>{{ entry.complaint_received_by }}</td></tr>
+                <tr><th>VIN</th><td>{{ entry.vin }}</td></tr>
+                <tr><th>PSN</th><td>{{ entry.psn }}</td></tr>
+                <tr><th>Complaint Assigned To</th><td>{{ entry.complaint_assigned_to }}</td></tr>
+                <tr><th>Complaint Assigned To Email</th><td>{{ entry.submitted_to_email }}</td></tr>
+                <tr><th>Complaint Assigned Contact Number</th><td>{{ entry.engineer_contact_number }}</td></tr>
+            </tbody>
+        </table>
+        <p>Click the link below to fill out the second part of the form:</p>
+        <a href="{{ part_b_url }}" target="_blank" class="button">Fill Part B Form</a>
+        <br><br>
+        <p>Thank you,</p>
+        <p><b>Danlaw Technologies Service & Support Team</b></p>
+        <p>Email: crscdanlaw@danlawtechnologies.com</p>
+        <p>Support Team: 6303908940 / 04431436579</p>
+        <p>Online support: 09:00 AM to 05:30 PM, Monday to Saturday</p>
+        <img src="data:image/png;base64,{{ logo_base64 }}" alt="Danlaw Logo" style="width: 150px; height: auto;">
+    </div>
+</body>
+</html>

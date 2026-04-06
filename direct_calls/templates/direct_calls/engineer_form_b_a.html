@@ -1,0 +1,793 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+<div class="container form-container">
+    <div class="card">
+        <div class="card-header">
+
+        </div>
+        <div class="card-body">
+            {% if is_closed %}
+                <div class="alert alert-info text-center">
+                    <strong>Form is closed and cannot be edited.</strong>
+                </div>
+            {% endif %}
+        <form id="engineer-form" method="post" enctype="multipart/form-data"
+        {% if is_closed %}class="form-closed" style="pointer-events: none; opacity: 0.6;"{% endif %}>
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                <li>{{ field }}: {{ errors|join:", " }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="text-center">Customer Input(READ) - PART A</h5>
+                        <div class="border p-3 rounded" style="border: 2px solid #007bff; background-color: #f8f9fa;">
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="date_of_complaint">Date of Complaint:</label>
+                                <input type="text" id="date_of_complaint" class="form-control" value="{{ entry.date_of_complaint }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="unique_id">Ticket ID:</label>
+                                <input type="text" id="unique_id" class="form-control" value="{{ entry.unique_id }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised_from_location">Complaint Raised Location:</label>
+                                <input type="text" id="complaint_raised_from_location" class="form-control" value="{{ entry.complaint_raised_from_location }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="customer_raised_issue">Customer Voice:</label>
+                                <input type="text" id="customer_raised_issue" class="form-control" value="{{ entry.customer_raised_issue }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised">Complaint Raised:</label>
+                                <input type="text" id="complaint_raised" class="form-control" value="{{ entry.complaint_raised }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised_by">Complaint Raised By:</label>
+                                <input type="text" id="complaint_raised_by" class="form-control" value="{{ entry.complaint_raised_by }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="contact_number">Contact Number:</label>
+                                <input type="text" id="contact_number" class="form-control" value="{{ entry.contact_number }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="customer_mail_id">Customer Mail ID:</label>
+                                <input type="email" id="customer_mail_id" class="form-control" value="{{ entry.customer_mail_id }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="vehicle_avl_in_workshop">Vehicle Availability in Workshop:</label>
+                                <input type="text" id="vehicle_avl_in_workshop" class="form-control" value="{{ entry.vehicle_avl_in_workshop }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_raised_through">Complaint Raised Through:</label>
+                                <input type="text" id="complaint_raised_through" class="form-control" value="{{ entry.complaint_raised_through }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_received_by">Complaint Received By:</label>
+                                <input type="text" id="complaint_received_by" class="form-control" value="{{ entry.complaint_received_by }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="vin">VIN:</label>
+                                <input type="text" id="vin" class="form-control" value="{{ entry.vin }}" readonly>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="complaint_assigned_to">Complaint Assigned To:</label>
+                                <input type="text" id="complaint_assigned_to" class="form-control" value="{{ entry.complaint_assigned_to }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="submitted_to_email">Complaint Assigned Email ID:</label>
+                                <input type="email" id="submitted_to_email" class="form-control" value="{{ entry.submitted_to_email }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="engineer_contact_number">Complaint Assigned Contact Number:</label>
+                                <input type="text" id="engineer_contact_number" class="form-control" value="{{ entry.engineer_contact_number }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="call_type">Complaint Type:</label>
+                                <input type="text" id="call_type" class="form-control" value="{{ entry.call_type }}" readonly>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="ticket_no">I Alert Ticket No:</label>
+                                <input type="text" id="ticket_no" class="form-control" value="{{ entry.ticket_no }}" readonly>
+                            </div>
+                    </div>
+                </div>
+                <h4 class="text-center">Analysis - PART B</h4><br>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+    <label for="psn">PSN:</label>
+    <input type="text" id="psn" class="form-control" value="{{ entry.psn }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="end_customer_mail_id">End Customer Mail ID:</label>
+    <input type="email" id="end_customer_mail_id" class="form-control" value="{{ entry.end_customer_mail_id }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="device_model">Device Model:</label>
+    <input type="text" id="device_model" class="form-control" value="{{ entry.device_model }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="telco_status">Telco Status:</label>
+    <input type="text" id="telco_status" class="form-control" value="{{ entry.telco_status }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="active_profile">Active Profile:</label>
+    <input type="text" id="active_profile" class="form-control" value="{{ entry.active_profile }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="C_trigger_date">C Trigger Date:</label>
+    <input type="text" id="C_trigger_date" class="form-control" value="{{ entry.C_trigger_date }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="activation_start_date">Activation Start Date:</label>
+    <input type="text" id="activation_start_date" class="form-control" value="{{ entry.activation_start_date }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="activation_end_date">Activation End Date:</label>
+    <input type="text" id="activation_end_date" class="form-control" value="{{ entry.activation_end_date }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="S_trigger_date">S Trigger Date:</label>
+    <input type="text" id="S_trigger_date" class="form-control" value="{{ entry.S_trigger_date }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="s_trigger_completion_date">S Trigger Completion Date:</label>
+    <input type="text" id="s_trigger_completion_date" class="form-control" value="{{ entry.s_trigger_completion_date }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="first_communication_in_darby">First Communication in Darby:</label>
+    <input type="text" id="first_communication_in_darby" class="form-control" value="{{ entry.first_communication_in_darby }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="last_communication_in_darby">Last Communication in Darby:</label>
+    <input type="text" id="last_communication_in_darby" class="form-control" value="{{ entry.last_communication_in_darby }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="card_status">Card Status:</label>
+    <input type="text" id="card_status" class="form-control" value="{{ entry.card_status }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="main_battery_voltage">Main Battery Voltage:</label>
+    <input type="text" id="main_battery_voltage" class="form-control" value="{{ entry.main_battery_voltage }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="exist_software">Existing Software:</label>
+    <input type="text" id="exist_software" class="form-control" value="{{ entry.exist_software }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="al_mfg_plant">AL MFG Plant:</label>
+    <input type="text" id="al_mfg_plant" class="form-control" value="{{ entry.al_mfg_plant }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="nrd_category">NRD Category:</label>
+    <input type="text" id="nrd_category" class="form-control" value="{{ entry.nrd_category }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="veh_model">Vehicle Model:</label>
+    <input type="text" id="veh_model" class="form-control" value="{{ entry.veh_model }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="vehicle_sale_date">Vehicle Sale Date:</label>
+    <input type="text" id="vehicle_sale_date" class="form-control" value="{{ entry.vehicle_sale_date }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="kilometers_hours">Kilometers/Hours:</label>
+    <input type="text" id="kilometers_hours" class="form-control" value="{{ entry.kilometers_hours }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="Latency_3_months">Latency 3 Months:</label>
+    <input type="text" id="Latency_3_months" class="form-control" value="{{ entry.Latency_3_months }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="V_packet_3_months">V Packet 3 Months:</label>
+    <input type="text" id="V_packet_3_months" class="form-control" value="{{ entry.V_packet_3_months }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="Latency_7_days">Latency 7 Days:</label>
+    <input type="text" id="Latency_7_days" class="form-control" value="{{ entry.Latency_7_days }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="V_packet_7_days">V Packet 7 Days:</label>
+    <input type="text" id="V_packet_7_days" class="form-control" value="{{ entry.V_packet_7_days }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="contact_person_name">Contact Person Name:</label>
+    <input type="text" id="contact_person_name" class="form-control" value="{{ entry.contact_person_name }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="contact_person_number">Contact Person Number:</label>
+    <input type="text" id="contact_person_number" class="form-control" value="{{ entry.contact_person_number }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="contact_category">Contact Category:</label>
+    <input type="text" id="contact_category" class="form-control" value="{{ entry.contact_category }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="issue_identified">Issue Category:</label>
+    <input type="text" id="issue_identified" class="form-control" value="{{ entry.issue_identified }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="issue_analysis">Issue Description:</label>
+    <input type="text" id="issue_analysis" class="form-control" value="{{ entry.issue_analysis }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="issue_analysis_01">Issue Analysis:</label>
+    <input type="text" id="issue_analysis_01" class="form-control" value="{{ entry.issue_analysis_01 }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="complaint_assigned_to">D1 Engineer:</label>
+    <input type="text" id="complaint_assigned_to" class="form-control" value="{{ entry.complaint_assigned_to }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="finalised_issue_category">Finalised Issue Category:</label>
+    <input type="text" id="finalised_issue_category" class="form-control" value="{{ entry.finalised_issue_category }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="final_action_taken">Final Action Taken:</label>
+    <input type="text" id="final_action_taken" class="form-control" value="{{ entry.final_action_taken }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="remarks_in_ialert">Remarks in IAlert:</label>
+    <input type="text" id="remarks_in_ialert" class="form-control" value="{{ entry.remarks_in_ialert }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="engineer_recommendation">Engineer Recommendation:</label>
+    <input type="text" id="engineer_recommendation" class="form-control" value="{{ entry.engineer_recommendation }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="call_closure_cat">Call Closure Category:</label>
+    <input type="text" id="call_closure_cat" class="form-control" value="{{ entry.call_closure_cat }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="analysis">Analysis:</label>
+    <input type="text" id="analysis" class="form-control" value="{{ entry.analysis }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="chargable_or_not">Chargable or Not:</label>
+    <input type="text" id="chargable_or_not" class="form-control" value="{{ entry.chargable_or_not }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="payment_status">Payment Status:</label>
+    <input type="text" id="payment_status" class="form-control" value="{{ entry.payment_status }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="call_closed_by">Call Closed By:</label>
+    <input type="text" id="call_closed_by" class="form-control" value="{{ entry.call_closed_by }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="call_status">Call Status:</label>
+    <input type="text" id="call_status" class="form-control" value="{{ entry.call_status }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="manager_comments">Manager Comments:</label>
+    <input type="text" id="manager_comments" class="form-control" value="{{ entry.manager_comments }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="hod_comment">HOD Comments:</label>
+    <input type="text" id="hod_comment" class="form-control" value="{{ entry.hod_comment }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="remarks">Remarks:</label>
+    <input type="text" id="remarks" class="form-control" value="{{ entry.remarks }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="date_of_closure">Date of Closure:</label>
+    <input type="text" id="date_of_closure" class="form-control" value="{{ entry.date_of_closure }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="external_modification">External Modification:</label>
+    <input type="text" id="external_modification" class="form-control" value="{{ entry.external_modification }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="device_IMEI">Device IMEI:</label>
+    <input type="text" id="device_IMEI" class="form-control" value="{{ entry.device_IMEI }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="device_ICCID">Device ICCID:</label>
+    <input type="text" id="device_ICCID" class="form-control" value="{{ entry.device_ICCID }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="device_to_be_sent">Device to be Sent:</label>
+    <input type="text" id="device_to_be_sent" class="form-control" value="{{ entry.device_to_be_sent }}" readonly>
+</div>
+<div class="col-md-3 mb-3">
+    <label for="dealer_address">Dealer Address:</label>
+    <input type="text" id="dealer_address" class="form-control" value="{{ entry.dealer_address }}" readonly>
+</div>
+</div>
+<h4 class="text-center">Review - PART B(A)</h4><br>
+<div class="row">
+<div class="col-md-3 mb-3">
+    {{ form.call_closed_by|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.exp_review_date|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    <label for="engineer_name">Engineer Name:</label>
+    <select id="engineer_name" name="engineer_name" class="form-control">
+        <option value="--" {% if form.engineer_name.value == "--" %}selected{% endif %}>--</option>
+        <option value="Arun G" {% if form.engineer_name.value == "Arun G" %}selected{% endif %}>Arun G</option>
+        <option value="Eliyas" {% if form.engineer_name.value == "Eliyas" %}selected{% endif %}>Eliyas</option>
+        <option value="Gayadhar" {% if form.engineer_name.value == "Gayadhar" %}selected{% endif %}>Gayadhar</option>
+        <option value="Dilip Kumar" {% if form.engineer_name.value == "Dilip Kumar" %}selected{% endif %}>Dilip Kumar</option>
+        <option value="Swamy" {% if form.engineer_name.value == "Swamy" %}selected{% endif %}>Swamy</option>
+        <option value="Rishwanth" {% if form.engineer_name.value == "Rishwanth" %}selected{% endif %}>Rishwanth</option>
+        <option value="Yoga" {% if form.engineer_name.value == "Yoga" %}selected{% endif %}>Yoga</option>
+        <option value="Narendra" {% if form.engineer_name.value == "Narendra" %}selected{% endif %}>Narendra</option>
+        <option value="Dilip Kumar" {% if form.engineer_name.value == "Dilip Kumar" %}selected{% endif %}>Dilip Kumar</option>
+        <option value="Siva" {% if form.engineer_name.value == "Siva" %}selected{% endif %}>Siva</option>
+        <option value="Others" {% if form.engineer_name.value == "Others" %}selected{% endif %}>Others</option>
+    </select>
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.called_date|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.latency_for_last_7_days_cc|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.vpacket_for_last_7_days_cc|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.customer_feedback_eng_review|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.remarks_03|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.final_conclusion|as_crispy_field }}
+</div>
+<div class="col-md-3 mb-3">
+    {{ form.final_status|as_crispy_field }}
+</div>
+
+</div>
+</div>
+</div>
+
+                <!-- Submit Button -->
+                {% if not is_closed %}
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg"
+                            style="background: linear-gradient(to right, #007bff, #00b342);
+                                   color: white;
+                                   border: none;
+                                   border-radius: 8px;
+                                   padding: 10px 20px;
+                                   transition: all 0.3s ease;">
+                        Submit
+                    </button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Message -->
+<div id="popup-message" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000;">
+    Form saved successfully!
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the HOD comment and call status fields
+        const hodCommentField = document.getElementById('id_hod_comment'); // Ensure this matches the actual ID of the HOD comment field
+        const callStatusField = document.getElementById('call_status'); // Ensure this matches the actual ID of the call_status field
+
+        // Function to update call_status when typing in hod_comment
+        function updateCallStatus() {
+            if (hodCommentField && callStatusField) {
+                if (hodCommentField.value.trim() !== '') {
+                    callStatusField.value = 'FIR-Resolved'; // Automatically set call_status to "FIR-Resolved"
+                }
+            }
+        }
+        // Add event listener to the HOD comment field
+        if (hodCommentField) {
+            hodCommentField.addEventListener('input', updateCallStatus);
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('engineer-form');
+        const popupMessage = document.getElementById('popup-message');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show the popup message
+                    popupMessage.textContent = data.message;
+                    popupMessage.style.display = 'block';
+
+                    // Hide the popup after 3 seconds and refresh the page
+                    setTimeout(() => {
+                        popupMessage.style.display = 'none';
+                        location.reload(); // Refresh the page
+                    }, 3000);
+                } else {
+                    // Show actual form errors
+                    let errorMsg = 'There was an error saving the form. Please check the fields.';
+                    if (data.errors) {
+                        errorMsg += '\n' + Object.entries(data.errors).map(([field, errs]) => `${field}: ${errs.join(', ')}`).join('\n');
+                    } else if (data.message) {
+                        errorMsg += '\n' + data.message;
+                    }
+                    alert(errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An unexpected error occurred.');
+            });
+        });
+        // Automatically convert input to uppercase for Contact Person Name
+        const contactPersonName = document.getElementById('contact_person_name');
+        contactPersonName.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Automatically convert input to uppercase for Vehicle Running Location
+        const vehicleRunningLocation = document.getElementById('vehicle_running_location');
+        vehicleRunningLocation.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Restrict Contact Person Number to numeric input only
+        const contactPersonNumber = document.getElementById('contact_person_number');
+        contactPersonNumber.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10); // Limit to 10 digits
+            }
+        });
+
+        const fieldsWithOthers = [
+            'external_modification',
+            'device_to_be_sent'
+        ];
+        fieldsWithOthers.forEach(field => {
+            const dropdown = document.getElementById(field);
+            const otherInput = document.getElementById(`${field}_other`);
+            dropdown.addEventListener('change', function () {
+                if (dropdown.value === 'Others') {
+                    otherInput.style.display = 'block';
+                    otherInput.required = true;
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.required = false;
+                    otherInput.value = ''; // Clear the input
+                }
+            });
+        });
+
+        // Restrict IMEI to 15 digits
+        const imeiInput = document.getElementById('device_IMEI');
+        imeiInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);
+        });
+
+        // Restrict ICCID to 20 digits
+        const iccidInput = document.getElementById('device_ICCID');
+        iccidInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 20);
+        });
+
+        const callStatusField = document.getElementById('call_status');
+        const conditionalFields = document.getElementById('conditional-fields');
+
+        function toggleConditionalFields() {
+    if (callStatusField.value === 'FIR-For Approval' || callStatusField.value === 'FIR-Resolved' || callStatusField.value === 'FIR-Repair' || callStatusField.value === 'FIR-Replace' || callStatusField.value === 'FIR-Replace_Repair') {
+        conditionalFields.style.display = 'block';
+    } else {
+        conditionalFields.style.display = 'none';
+        // Clear the values of the hidden fields
+        conditionalFields.querySelectorAll('input, select, textarea').forEach(field => {
+            field.value = '';
+        });
+    }
+}
+        // Initialize the visibility on page load
+        toggleConditionalFields();
+        // Add event listener to toggle visibility on change
+        callStatusField.addEventListener('change', toggleConditionalFields);
+        const callType = "{{ call_type }}";
+        if (callType === "Direct Call") {
+            // Hide the fields
+            document.querySelectorAll('#D1, #D2, #D3').forEach(field => {
+                field.style.display = 'none';
+            });
+        }
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Check if final_status is "Closed"
+    var finalStatusInput = document.getElementById('id_final_status');
+    var reviewFieldIds = [
+        'engineer_name',
+        'id_called_date',
+        'id_latency_for_last_7_days_cc',
+        'id_vpacket_for_last_7_days_cc',
+        'id_remarks_03',
+        'id_final_conclusion',
+        'id_final_status',
+        'id_call_closed_by',
+        'id_exp_review_date',
+        'id_customer_feedback_eng_review'
+    ];
+    if (finalStatusInput && finalStatusInput.value.trim().toLowerCase() === 'closed') {
+        reviewFieldIds.forEach(function(id) {
+            var field = document.getElementById(id);
+            if (field) {
+                field.setAttribute('readonly', true);
+                field.setAttribute('disabled', true);
+                field.style.backgroundColor = '#f8d7da';
+                field.style.color = '#a94442';
+            }
+        });
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const entryId = "{{ entry.id }}";
+    if (!entryId) return;
+
+    fetch(`/direct_calls/api/darby-communication/${entryId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const telcoStatusInput = document.getElementById('telco_status');
+            if (telcoStatusInput && data.telco_status) {
+                telcoStatusInput.value = data.telco_status;
+                telcoStatusInput.dispatchEvent(new Event('change'));
+            }
+            // Use the correct IDs for crispy fields
+            const existSoftwareInput = document.getElementById('id_exist_software');
+            if (existSoftwareInput && data.exist_software) {
+                existSoftwareInput.value = data.exist_software;
+                existSoftwareInput.dispatchEvent(new Event('change'));
+            }
+            const activeProfileInput = document.getElementById('active_profile');
+            if (activeProfileInput && data.active_profile) {
+                let found = false;
+                for (let option of activeProfileInput.options) {
+                    if (option.value === data.active_profile) {
+                        activeProfileInput.value = data.active_profile;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    activeProfileInput.value = "Others";
+                    const otherInput = document.getElementById('active_profile_other');
+                    if (otherInput) {
+                        otherInput.value = data.active_profile;
+                        otherInput.style.display = 'block';
+                    }
+                }
+                activeProfileInput.dispatchEvent(new Event('change'));
+            }
+
+            // Set Last Communication in Darby
+            if (data.last_communication_in_darby) {
+                const lastCommInput = document.getElementById('id_last_communication_in_darby');
+                if (lastCommInput) {
+                    lastCommInput.value = data.last_communication_in_darby;
+                }
+            }
+            // Set First Communication in Darby
+ if (data.first_communication_in_darby) {
+    const firstCommInput = document.getElementById('id_first_communication_in_darby');
+    if (firstCommInput) {
+        firstCommInput.value = data.first_communication_in_darby;
+    }
+}
+            // Set AL MFG Plant
+            const alMfgPlantInput = document.getElementById('id_al_mfg_plant');
+            if (alMfgPlantInput && data.al_mfg_plant !== undefined) {
+                alMfgPlantInput.value = data.al_mfg_plant;
+                alMfgPlantInput.dispatchEvent(new Event('change'));
+            }
+            // Set NRD Category
+            const nrdCategoryInput = document.getElementById('id_nrd_category');
+            if (nrdCategoryInput && data.nrd_category !== undefined) {
+                nrdCategoryInput.value = data.nrd_category;
+                nrdCategoryInput.dispatchEvent(new Event('change'));
+            }
+            // Set Card Status
+            const cardStatusInput = document.getElementById('id_card_status');
+            if (cardStatusInput && data.card_status !== undefined) {
+                cardStatusInput.value = data.card_status;
+                cardStatusInput.dispatchEvent(new Event('change'));
+            }
+            // Set psn
+            const psnInput = document.getElementById('id_psn');
+            if (psnInput && data.psn !== undefined) {
+                psnInput.value = data.psn;
+                psnInput.dispatchEvent(new Event('change'));
+            }
+
+            // Set Main Battery Voltage
+            const mainBatteryVoltageInput = document.getElementById('id_main_battery_voltage');
+            if (mainBatteryVoltageInput && data.main_battery_voltage !== undefined) {
+                mainBatteryVoltageInput.value = data.main_battery_voltage;
+            }
+
+            // Set Activation Start Date
+            const activationStartDateInput = document.getElementById('id_activation_start_date');
+            if (activationStartDateInput && data.activation_start_date) {
+                activationStartDateInput.value = data.activation_start_date;
+            }
+            // Set Activation End Date
+            const activationEndDateInput = document.getElementById('id_activation_end_date');
+            if (activationEndDateInput && data.activation_end_date) {
+                activationEndDateInput.value = data.activation_end_date;
+            }
+            const S_trigger_dateInput = document.getElementById('id_S_trigger_date');
+            if (S_trigger_dateInput && data.S_trigger_date) {
+                S_trigger_dateInput.value = data.S_trigger_date;
+            }
+            const s_trigger_completion_dateInput = document.getElementById('id_s_trigger_completion_date');
+            if (s_trigger_completion_dateInput && data.s_trigger_completion_date) {
+                s_trigger_completion_dateInput.value = data.s_trigger_completion_date;
+            }
+            const C_trigger_dateInput = document.getElementById('id_C_trigger_date');
+            if (C_trigger_dateInput && data.C_trigger_date) {
+                C_trigger_dateInput.value = data.C_trigger_date;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching device model from API:', error);
+        });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dateOfClosureInput = document.getElementById('date_of_closure');
+    // Try both possible IDs for Exp review date
+    const expReviewDateInput = document.getElementById('id_exp_review_date') || document.getElementById('exp_review_date');
+    function setExpReviewDate() {
+        if (dateOfClosureInput && expReviewDateInput) {
+            let value = dateOfClosureInput.value;
+            // Try to parse as date
+            let closureDate = new Date(value);
+            // If parsing fails, try to parse as "Sept. 4, 2025, 1:38 p.m."
+            if (isNaN(closureDate.getTime())) {
+                // Try to extract date part
+                let match = value.match(/([A-Za-z]+\.? \d{1,2}, \d{4})/);
+                if (match) {
+                    closureDate = new Date(match[1]);
+                }
+            }
+            if (!isNaN(closureDate.getTime())) {
+                closureDate.setDate(closureDate.getDate() + 7);
+                let year = closureDate.getFullYear();
+                let month = String(closureDate.getMonth() + 1).padStart(2, '0');
+                let day = String(closureDate.getDate()).padStart(2, '0');
+                // Set value in yyyy-MM-dd format for input type="date"
+                expReviewDateInput.value = `${year}-${month}-${day}`;
+            } else {
+                expReviewDateInput.value = "";
+            }
+        }
+    }
+    setExpReviewDate();
+    if (dateOfClosureInput) {
+        dateOfClosureInput.addEventListener('input', setExpReviewDate);
+    }
+});
+</script>
+<style>
+.form-closed input,
+.form-closed select,
+.form-closed textarea {
+    font-weight: bold !important;
+    color:rgb(245, 67, 7) !important;
+}
+</style>
+<style>
+    .darby-table-container {
+        overflow-x: auto;
+        margin-bottom: 2rem;
+    }
+    #darby-summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        background: #fff;
+    }
+    #darby-summary-table th, #darby-summary-table td {
+        border: 1px solid #dee2e6;
+        padding: 6px 8px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    #darby-summary-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    #darby-summary-table tbody tr:nth-child(even) {
+        background: #f2f6fa;
+    }
+    #darby-summary-table tbody tr:hover {
+        background: #e2eafc;
+    }
+    #darby-summary-table th.rotate {
+        height: 80px;
+        white-space: nowrap;
+        vertical-align: bottom;
+        padding: 2px 6px;
+        font-size: 0.85em;
+        transform: rotate(-20deg);
+    }
+    #darby-summary-table td {
+        font-size: 0.97em;
+    }
+    #darby-summary-table td:first-child, #darby-summary-table th:first-child {
+        text-align: right;
+        font-weight: 500;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Only make Review - PART B(A) fields editable
+    const editableIds = [
+        'id_call_closed_by',
+        'id_exp_review_date',
+        'engineer_name',
+        'id_called_date',
+        'id_latency_for_last_7_days_cc',
+        'id_vpacket_for_last_7_days_cc',
+        'id_customer_feedback_eng_review',
+        'id_remarks_03',
+        'id_final_conclusion',
+        'id_final_status'
+    ];
+    document.querySelectorAll('#engineer-form input, #engineer-form select, #engineer-form textarea').forEach(function(field) {
+        if (!editableIds.includes(field.id)) {
+            field.setAttribute('readonly', true);
+            field.setAttribute('tabindex', '-1'); // Prevent tab focus
+        } else {
+            field.removeAttribute('readonly');
+            field.removeAttribute('disabled');
+            field.removeAttribute('tabindex');
+        }
+    });
+});
+</script>
+<a href="https://danlawtechu.pythonanywhere.com/data_search/search/?vin={{ entry.vin }}" class="btn btn-secondary" target="_blank">VIN Analysis</a>
+{% endblock %}

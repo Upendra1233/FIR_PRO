@@ -3,92 +3,39 @@
 <head>
     <title>Fill New SR Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745; /* Green background for success */
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
-    <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
-        <tbody>
-            <tr>
-                <th>Request ID</th>
-                <td>{{ sr_request.id }}</td>
-            </tr>
-            <tr>
-                <th>PSN</th>
-                <td>{{ sr_request.psn }}</td>
-            </tr>
-            <tr>
-                <th>Engineer</th>
-                <td>{{ sr_request.engineer }}</td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td>{{ sr_request.category }}</td>
-            </tr>
-            <tr>
-                <th>Plan</th>
-                <td>{{ sr_request.plan }}</td>
-            </tr>
-            <tr>
-                <th>Billing To</th>
-                <td>{{ sr_request.billing_to }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>{{ sr_request.status }}</td>
-            </tr>
-            <tr>
-                <th>Requestor Comments</th>
-                <td>{{ sr_request.requestor_comments }}</td>
-            </tr>
-            <tr>
-                <th>SIM Status During Request</th>
-                <td>{{ sr_request.sim_status_during_request }}</td>
-            </tr>
-            <tr>
-                <th>Requestor Validity Start Date</th>
-                <td>{{ sr_request.requestor_validity_start_date }}</td>
-            </tr>
-            <tr>
-                <th>Requestor Validity End Date</th>
-                <td>{{ sr_request.requestor_validity_end_date }}</td>
-            </tr>
-            <tr>
-                <th>Remarks</th>
-                <td>{{ sr_request.remarks }}</td>
-            </tr>
-            <tr>
-                <th>New SR No</th>
-                <td>{{ sr_request.new_sr_no }}</td>
-            </tr>
-            <tr>
-                <th>SR Date</th>
-                <td>{{ sr_request.sr_date }}</td>
-            </tr>
-            <tr>
-                <th>SR Success Date</th>
-                <td>{{ sr_request.sr_success_date }}</td>
-            </tr>
-        </tbody>
-    </table>
     <div class="container mt-5">
-        <h2>Fill New SR Details for Request {{ sr_request.psn }}</h2>
+        <h2>Fill New SR Details for Request {{ sr_request.unique_id }}</h2>
         {% if read_only %}
             <div class="alert alert-warning" role="alert">
                 This form is read-only because the status is set to "Closed".
             </div>
         {% endif %}
-        <form method="post">
+        <form id="new-sr-details-form" method="post">
             {% csrf_token %}
+
             <div class="mb-3">
-                <label for="id_new_sr_no" class="form-label">New SR No</label>
-                {{ form.new_sr_no }} {% if read_only %}readonly{% endif %}
+                <label for="id_New_sw_sch_date" class="form-label">New S/W Scheduled Date</label>
+                {{ form.New_sw_sch_date }} {% if read_only %}readonly{% endif %}
             </div>
             <div class="mb-3">
-                <label for="id_sr_date" class="form-label">SR Date</label>
-                {{ form.sr_date }} {% if read_only %}readonly{% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="id_sr_success_date" class="form-label">SR Success Date</label>
-                {{ form.sr_success_date }} {% if read_only %}readonly{% endif %}
+                <label for="id_New_sw_success_date" class="form-label">New S/W Success Date</label>
+                {{ form.New_sw_success_date }} {% if read_only %}readonly{% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_status" class="form-label">Status</label>
@@ -99,5 +46,49 @@
             {% endif %}
         </form>
     </div>
+
+    <!-- Popup Message -->
+    <div id="popup-message" class="popup-message">Details submitted successfully!</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('new-sr-details-form');
+            const popup = document.getElementById('popup-message');
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Show the popup message
+                        popup.style.display = 'block';
+
+                        // Hide the popup after 3 seconds
+                        setTimeout(() => {
+                            popup.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        alert('Error: ' + JSON.stringify(data.errors));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
 </body>
 </html>

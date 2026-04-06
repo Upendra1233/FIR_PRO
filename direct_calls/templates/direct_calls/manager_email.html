@@ -9,14 +9,41 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        body { font-family: Arial, sans-serif; }
+
         th {
-            text-align: left; /* Align table headers to the left */
-            background-color: rgb(240,240,240); /* Optional: Light gray background for headers */
-            padding: 5px; /* Add padding for better readability */
+            text-align: left;
+            background-color: rgb(240,240,240);
+            padding: 5px;
+            width: 40%;
         }
+
         td {
-            padding: 5px; /* Add padding for table cells */
+            padding: 5px;
+            width: 60%;
+            word-wrap: break-word;
         }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .button {
+                display: inline-block;
+                background-color: #ff9800; /* Orange color */
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color: #e68a00; /* Darker orange on hover */
+            }
     </style>
 </head>
 <body>
@@ -26,32 +53,46 @@
                 <h4>A new direct call has been assigned to {{ entry.complaint_assigned_to }} and Request ID: {{ entry.unique_id }}. Below are the details:</h4>
                 <table border="1" cellpadding="5" cellspacing="0" class="table table-bordered">
                     <tbody>
-                        <tr><th>Ticket ID</th><td>{{ entry.unique_id }}</td></tr>
-                        <tr><th>Complaint Type</th><td>{{ entry.call_type }}</td></tr>
-                        <tr><th>I Alert ticket No</th><td>{{ entry.ticket_no }}</td></tr>
-                        <tr><th>Date of Complaint</th><td>{{ entry.date_of_complaint }}</td></tr>
-                        <tr><th>Complaint Raised From Location</th><td>{{ entry.complaint_raised_from_location }}</td></tr>
-                        <tr><th>Customer Voice</th><td>{{ entry.customer_raised_issue }}</td></tr>
-                        <tr><th>Complaint Raised</th><td>{{ entry.complaint_raised }}</td></tr>
-                        <tr><th>Complaint Raised By</th><td>{{ entry.complaint_raised_by }}</td></tr>
-                        <tr><th>Contact Number</th><td>{{ entry.contact_number }}</td></tr>
-                        <tr><th>Customer Mail ID</th><td>{{ entry.customer_mail_id }}</td></tr>
-                        <tr><th>Complaint Raised Through</th><td>{{ entry.complaint_raised_through }}</td></tr>
-                        <tr><th>Complaint Received By</th><td>{{ entry.complaint_received_by }}</td></tr>
-                        <tr><th>VIN</th><td>{{ entry.vin }}</td></tr>
-                        <tr><th>PSN</th><td>{{ entry.psn }}</td></tr>
-                        <tr><th>Complaint Assigned To</th><td>{{ entry.complaint_assigned_to }}</td></tr>
-                        <tr><th>Complaint Assigned To Email</th><td>{{ entry.submitted_to_email }}</td></tr>
-                        <tr><th>Complaint Assigned Contact Number</th><td>{{ entry.engineer_contact_number }}</td></tr>
+                <tr><th>Ticket ID</th><td>{{ entry.unique_id|default:"" }}</td></tr>
+                <tr><th>Date of Complaint</th><td>{{ entry.date_of_complaint|default:"" }}</td></tr>
+                <tr><th>Complaint Type</th><td>{{ entry.call_type|default:"" }}</td></tr>
+                <tr><th>I Alert ticket No</th><td>{{ entry.ticket_no|default:"" }}</td></tr>
+                <tr><th>Vehicle Availability in Workshop</th><td>{{ entry.vehicle_avl_in_workshop|default:"" }}</td></tr>
+                <tr><th>Complaint Raised From Location</th><td>{{ entry.complaint_raised_from_location|default:"" }}</td></tr>
+                <tr><th>Customer Voice</th><td>{{ entry.customer_raised_issue|default:"" }}</td></tr>
+                <tr><th>Complaint Raised</th><td>{{ entry.complaint_raised|default:"" }}</td></tr>
+                <tr><th>Complaint Raised By</th><td>{{ entry.complaint_raised_by|default:"" }}</td></tr>
+                <tr><th>Contact Number</th><td>{{ entry.contact_number|default:"" }}</td></tr>
+                <tr><th>Customer Mail ID</th><td>{{ entry.customer_mail_id|default:"" }}</td></tr>
+                <tr><th>VIN</th><td>{{ entry.vin|default:"" }}</td></tr>
+                <tr><th>PSN</th><td>{{ entry.psn|default:"" }}</td></tr>
+                <tr><th>Complaint Assigned To</th><td>{{ entry.complaint_assigned_to|default:"" }}</td></tr>
+
+
 
                     </tbody>
                 </table>
 
                 <!-- Button group for Approve and Reject -->
                 <p>Click the link below to fill out the second part of the form:</p>
-                <a href="{{ site_domain }}/direct_calls/engineer_form/{{ entry.id }}/" style="color: blue;">Fill Details</a>
+                <a href="{{ site_domain }}/direct_calls/engineer_form/{{ entry.id }}/" target="_blank" class="button">Fill Details</a>
+            </div>
+            <div class="logo-section">
+                <br>
+                <b>Danlaw Technologies Service & Support Team
+                <br>
+Email : crscdanlaw@danlawtechnologies.com
+<br>
+Support Team - 6303908940 / 04431436579
+<br>
+Online support : 09:00AM to 05:30PM, Monday to Saturday
+<br>
+Thank you</b><br>
+<img src="data:image/png;base64,{{ logo_base64 }}" alt="Danlaw Logo" class="logo-left" style="width: 150px; height: auto;">
+
             </div>
         </div>
- 
+        </div>
+    </div>
 </body>
 </html>

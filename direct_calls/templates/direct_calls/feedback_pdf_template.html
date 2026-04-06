@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feedback Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 20px auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-height: 60px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+        }
+        .no-border th, .no-border td {
+            border: none;
+            padding: 4px 8px;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <img src="{{ danlaw_logo_base64 }}" alt="Danlaw Logo">
+            <img src="{{ service_logo_base64 }}" alt="Service Logo">
+        </div>
+
+        <h2>Customer Feedback Report</h2>
+
+<table class="no-border">
+    <tr>
+        <th>Ticket ID:</th>
+        <td>{{ direct_call.unique_id }}</td>
+    </tr>
+    <tr>
+        <th>VIN:</th>
+        <td>{{ direct_call.vin }}</td>
+    </tr>
+    <tr>
+        <th>Customer Name:</th>
+        <td>{{ direct_call.complaint_raised_by }}</td>
+    </tr>
+    <tr>
+        <th>Call Status:</th>
+        <td>{{ direct_call.call_status }}</td>
+    </tr>
+    <tr>
+        <th>Date of Closure:</th>
+        <td>{{ direct_call.date_of_closure }}</td>
+    </tr>
+</table>
+
+        <h3>Feedback Details</h3>
+        <!-- Bordered Table -->
+        <table>
+            <tr>
+                <th>Confirmation</th>
+                <td>{{ direct_call.confirmation }}</td>
+            </tr>
+            <tr>
+                <th>Feedback</th>
+                <td>{{ direct_call.feedback }}</td>
+            </tr>
+            <tr>
+                <th>Rating</th>
+                <td>{{ direct_call.rating }}</td>
+            </tr>
+            <tr>
+                <th>Additional Feedback</th>
+                <td>{{ direct_call.customer_feedback }}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

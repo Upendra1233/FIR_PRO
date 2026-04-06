@@ -87,12 +87,12 @@ def send_summary_email(entry):
     subject = f'New FIR Entry Submitted - Request No: {entry.unique_id}'
     message = render_to_string('psnapp/manager_email.html', {
         'entry': entry,
-        'approve_url': f"http://127.0.0.1:8000/approve_request/{entry.id}/",
-        'reject_url': f"http://127.0.0.1:8000/reject_request/{entry.id}/",
-        'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
+        'approve_url': f"{settings.SITE_DOMAIN}/approve_request/{entry.id}/",
+        'reject_url': f"{settings.SITE_DOMAIN}/reject_request/{entry.id}/",
+        'view_details_url': f"{settings.SITE_DOMAIN}/request_details/{entry.id}/"
     })
     recipient_list = [entry.manager_email]
-    cc_list = [ entry.engineer_email]
+    cc_list = [ entry.engineer_email,"sales@danlawtech.com"]
     email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, cc=cc_list)
     email.content_subtype = 'html'  # To indicate the email content is HTML
 
@@ -125,28 +125,28 @@ def approve_request(request, id):
     message = render_to_string('psnapp/engineer_email.html', {
         'entry': entry,
         'csrf_token': csrf_token,
-        'form_url': f"http://127.0.0.1:8000/engineer_response/{entry.id}/"
+        'form_url': f"{settings.SITE_DOMAIN}/engineer_response/{entry.id}/"
     })
 
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [entry.engineer_email])
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, ["mupendramzvpsp@gmail.com"])
     email.content_subtype = 'html'  # To indicate the email content is HTML
     if entry.upload_file:
         email.attach_file(entry.upload_file.path)
     email.send()
 
     # Send email to the HOD
-    hod_email = "settings.HOD_EMAIL"  # Email address of the HOD
+    hod_email = "sales@danlawtech.com"  # Email address of the HOD
     subject = 'FIR Request Approved by Manager - HOD Approval Required'
     message = render_to_string('psnapp/hod_email.html', {
         'entry': entry,
         'csrf_token': csrf_token,
-        'approve_url': f"http://127.0.0.1:8000/approve_hod_request/{entry.id}/",
-        'reject_url': f"http://127.0.0.1:8000/reject_hod_request/{entry.id}/",
-        'view_details_url': f"http://127.0.0.1:8000/request_details/{entry.id}/"
+        'approve_url': f"{settings.SITE_DOMAIN}/approve_hod_request/{entry.id}/",
+        'reject_url': f"{settings.SITE_DOMAIN}/reject_hod_request/{entry.id}/",
+        'view_details_url': f"{settings.SITE_DOMAIN}/request_details/{entry.id}/"
     })
     recipient_list = ['sales@danlawtech.com']
     cc_list = [entry.manager_email, entry.engineer_email]
-    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [hod_email], cc=[engineer_email, entry.manager_email,'sales@danlawtech.com'],)
+    email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [hod_email], cc=['sales@danlawtech.com'],)
     email.content_subtype = 'html'
     if entry.upload_file:
         email.attach_file(entry.upload_file.path)

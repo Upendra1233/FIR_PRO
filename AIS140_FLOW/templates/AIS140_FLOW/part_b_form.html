@@ -1,0 +1,1777 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIS140 Part B Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            min-height: 100vh;
+            padding: 30px 0;
+            margin: 0;
+            color: #2d2d2d;
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .form-container {
+            max-width: 1500px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            background: #ffffff;
+            animation: slideInUp 0.6s ease-out;
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+            transform: translateY(-4px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px 14px;
+            background: #fafbfc;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+        .form-control:hover, .form-select:hover {
+            border-color: #d1d5db;
+            background: #ffffff;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.01);
+            outline: none;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px 28px;
+            width: auto;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+    <!-- Add this inside the <head> section, after existing styles -->
+    <style>
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 160, 0, 0.05) 100%);
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .required-badge {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .cert-section-alert {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.08) 0%, rgba(220, 53, 69, 0.04) 100%);
+            border-left: 3px solid #dc3545;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin: 18px 0;
+            color: #721c24;
+            font-weight: 500;
+        }
+        h5 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 24px 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            display: block;
+            text-transform: capitalize;
+            letter-spacing: 0.2px;
+        }
+        .form-row,
+        .row {
+            margin-bottom: 12px;
+        }
+        .card-body {
+            padding: 32px 28px;
+        }
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px 16px 0 0;
+            border: none;
+            padding: 24px 28px;
+        }
+        .modal-title {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .btn-close-white {
+            filter: brightness(0) invert(1);
+        }
+        button[type="submit"],
+        button[type="reset"],
+        .btn {
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        button[type="submit"]:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+        .nav-tabs {
+            border-bottom: 2px solid #e5e7eb;
+            gap: 8px;
+        }
+        .nav-link {
+            color: #6b7280;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            padding: 12px 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
+        }
+        .nav-link.active {
+            color: #667eea;
+            background: transparent;
+            border-bottom: 3px solid #667eea;
+        }
+        .form-section {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            border: 1px solid #e5e7eb;
+        }
+        .footer-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+        textarea.form-control {
+            min-height: 44px;
+            max-height: 120px;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+        }
+        .text-muted {
+            color: #9ca3af !important;
+            font-size: 0.85rem;
+        }
+    </style>
+
+    <!-- Add this before the closing </head> tag -->
+    <script>
+        // Certificate requirements mapping by completion_status
+        const certRequirements = {
+            'Temporary': {
+                required: ['upload_certificate_in_ialert'],
+                label: 'Temporary'
+            },
+            'Permanent': {
+                required: ['upload_certificate_in_ialert_01'],
+                label: 'Permanent'
+            },
+            'Temp + Perm': {
+                required: ['upload_certificate_in_ialert', 'upload_certificate_in_ialert_01'],
+                label: 'Temporary + Permanent'
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container form-container">
+        <div class="card">
+
+            <div class="card-body">
+                <h5 class="text-primary"><i class="fas fa-info-circle"></i> Part-A Details (Read-Only)</h5>
+                <div class="row">
+                    <!-- Date of Request -->
+                    <div class="row">
+    <div class="col-md-3 mb-3">
+        <label for="unique_id">Ticket No:</label>
+        <input type="text" id="unique_id" class="form-control" value="{{ form.instance.unique_id|default_if_none:'' }}" readonly>
+    </div>
+    <!-- Date of Request -->
+    <div class="col-md-3 mb-3">
+        <label for="date_of_request">Date of Request:</label>
+        <input type="text" id="date_of_request" class="form-control" value="{{ part_a_data.date_of_request|date:'d-m-Y H:i:s' }}" readonly>
+    </div>
+<!-- Requested By -->
+<div class="col-md-3 mb-3">
+    <label>Customer Assigned Date:</label>
+    <input
+        type="text"
+        class="form-control"
+        value="{{ part_a_data.Customer_assigned_date|date:'d-m-Y H:i:s' }}"
+        readonly
+    >
+</div>
+
+<div class="col-md-3 mb-3">
+    <label>AL Assigned Date:</label>
+    <input
+        type="text"
+        class="form-control"
+        value="{{ part_a_data.AL_assigned_date|date:'d-m-Y H:i:s' }}"
+        readonly
+    >
+</div>
+
+        <!-- Requested By -->
+        <div class="col-md-3 mb-3">
+            <label for="requested_by">Requested By:</label>
+            <input type="text" id="requested_by" class="form-control" value="{{ part_a_data.requested_by|default_if_none:'N/A' }}" readonly>
+        </div>
+        <!-- Requested Name -->
+        <div class="col-md-3 mb-3">
+            <label for="requested_name">Requestor Name:</label>
+            <input type="text" id="requested_name" class="form-control" value="{{ part_a_data.requested_name|default_if_none:'' }}" readonly>
+        </div>
+
+        <!-- Requested Phone Number -->
+        <div class="col-md-3 mb-3">
+            <label for="requested_phone_number">Requestor Phone Number:</label>
+            <input type="text" id="requested_phone_number" class="form-control" value="{{ part_a_data.requested_phone_number|default_if_none:'' }}" readonly>
+        </div>
+
+    <!-- State -->
+    <div class="col-md-3 mb-3">
+        <label for="state">State:</label>
+        <input type="text" id="state" class="form-control" value="{{ part_a_data.state|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Chassis No -->
+    <div class="col-md-3 mb-3">
+        <label for="vin_no">Chassis No:</label>
+        <input type="text" id="vin_no" class="form-control" value="{{ part_a_data.vin_no|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Engine No -->
+    <div class="col-md-3 mb-3">
+        <label for="engine">Engine No:</label>
+        <input type="text" id="engine" class="form-control" value="{{ part_a_data.engine|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- PSN No -->
+    <div class="col-md-3 mb-3">
+        <label for="psn">PSN No:</label>
+        <input type="text" id="psn" class="form-control" value="{{ part_a_data.psn|default_if_none:'' }}" readonly>
+    </div>
+
+
+
+    <!-- Request Type -->
+    <div class="col-md-3 mb-3">
+        <label for="request_type">Request Type:</label>
+        <input type="text" id="request_type" class="form-control" value="{{ part_a_data.request_type|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Vehicle Regd No -->
+    <div class="col-md-3 mb-3">
+        <label for="vehicle_no">Vehicle Regn No:</label>
+        <input type="text" id="vehicle_no" class="form-control" value="{{ part_a_data.vehicle_no|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Vehicle Model -->
+    <div class="col-md-3 mb-3">
+        <label for="vehicle_model">Vehicle Model:</label>
+        <input type="text" id="vehicle_model" class="form-control" value="{{ part_a_data.vehicle_model|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Customer Name -->
+    <div class="col-md-3 mb-3">
+        <label for="customer_name">Customer Name:</label>
+        <input type="text" id="customer_name" class="form-control" value="{{ part_a_data.customer_name|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Customer Phone -->
+    <div class="col-md-3 mb-3">
+        <label for="customer_phone">Customer Phone No:</label>
+        <input type="text" id="customer_phone" class="form-control" value="{{ part_a_data.customer_phone|default_if_none:'' }}" readonly>
+    </div>
+
+
+    <!-- RTO Name -->
+    <div class="col-md-3 mb-3">
+        <label for="rto_name">RTO Name:</label>
+        <input type="text" id="rto_name" class="form-control" value="{{ part_a_data.rto_name|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- RTO Code -->
+    <div class="col-md-3 mb-3">
+        <label for="rto_code">RTO Code:</label>
+        <input type="text" id="rto_code" class="form-control" value="{{ part_a_data.rto_code|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Dealer Name -->
+    <div class="col-md-3 mb-3">
+        <label for="dealer_name">Dealer Name:</label>
+        <input type="text" id="dealer_name" class="form-control" value="{{ part_a_data.dealer_name|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Zone -->
+    <div class="col-md-3 mb-3">
+        <label for="zone">Zone:</label>
+        <input type="text" id="zone" class="form-control" value="{{ part_a_data.zone|default_if_none:'' }}" readonly>
+    </div>
+
+    <!-- Remarks -->
+    <div class="col-md-3 mb-3">
+        <label for="remarks">Remarks:</label>
+        <textarea id="remarks" class="form-control" rows="1" readonly>{{ part_a_data.remarks|default_if_none:'' }}</textarea>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="AL_remarks">AL Remarks:</label>
+        <textarea id="AL_remarks" class="form-control" rows="1" readonly>{{ part_a_data.AL_remarks|default_if_none:'' }}</textarea>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="AL_comments">AL Comments:</label>
+        <textarea id="AL_comments" class="form-control" rows="1" readonly>{{ part_a_data.remarks|default_if_none:'' }}</textarea>
+    </div>
+    <!-- Category -->
+    <div class="col-md-3 mb-3">
+        <label for="category">Category:</label>
+        <input type="text" id="category" class="form-control" value="{{ part_a_data.category|default_if_none:'' }}" readonly>
+    </div>
+    <!-- Complaint Assigned To -->
+    <div class="col-md-3 mb-3">
+    <label for="assigned_engineer_email">Cert. Generation Assigned To:</label>
+    <input type="text" id="assigned_engineer_email" class="form-control"
+           value="{{ form.instance.assigned_engineer_email|default_if_none:'' }}" readonly>
+</div>
+
+    <!-- User ID -->
+    <div class="col-md-3 mb-3">
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" class="form-control" value="{{ part_a_data.user_id|default_if_none:'' }}" readonly>
+    </div>
+</div>
+                </div>
+                <hr>
+
+<form method="POST" enctype="multipart/form-data" id="engineerForm">
+    {% csrf_token %}
+
+    <!-- Add these hidden data attributes for modals -->
+    {% if error_message %}<div data-error-message="{{ error_message }}" data-error-reasons="{{ error_reasons }}"></div>{% endif %}
+    {% if show_success_modal %}<div data-success-message="{{ success_message }}"></div>{% endif %}
+
+                    <h5 class="text-primary"><i class="fas fa-mobile-alt"></i> Device Information</h5>
+                    <div class="row">
+
+                        <div class="col-md-3 mb-3">
+                            <label for="icicid_no">ICICID No:</label>
+                            <input type="text" id="icicid_no" name="icicid_no" class="form-control"
+                                   value="{{ form.instance.icicid_no|default_if_none:'' }}" placeholder="Enter ICICID No" maxlength="20">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="imei_no">IMEI No:</label>
+                            <input type="text" id="imei_no" name="imei_no" class="form-control"
+                                   value="{{ form.instance.imei_no|default_if_none:'' }}" placeholder="Enter IMEI No" maxlength="17">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="device_mode">Device Model:</label>
+                            <input type="text" id="device_mode" name="device_mode" class="form-control"
+                                   value="{{ form.instance.device_mode|default_if_none:'' }}" placeholder="Ente Device Model">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="D1_engineer">D1 Engineer : </label>
+                            <select id="D1_engineer" name="D1_engineer" class="form-control">
+                            <option value="" {% if form.D1_engineer.value == "" %}selected{% endif %}>--</option>
+                            <option value="arung@danlawtech.com" {% if form.D1_engineer.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
+                            <option value="eliyasp@danlawtech.com" {% if form.D1_engineer.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
+                            <option value="gayadhar@danlawtech.com" {% if form.D1_engineer.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
+                            <option value="pantnagarplant@danlawtech.com" {% if form.D1_engineer.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
+                            <option value="sales@danlawtech.com" {% if form.D1_engineer.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
+
+                            <option value="dilipkumarn@danlawtech.com" {% if form.D1_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                            <option value="swamy@danlawtech.com" {% if form.D1_engineer.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
+                            <option value="rishwanthr@danlawtech.com" {% if form.D1_engineer.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
+                            <option value="yoganandam@danlawtech.com" {% if form.D1_engineer.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
+                            <option value="narendrareddyg@danlawtech.com" {% if form.D1_engineer.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
+                            <option value="dilipkumarn@danlawtech.com" {% if form.D1_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                            <option value="sivanambirajant@danlawtech.com" {% if form.D1_engineer.value == "sivanambirajant@danlawtech.com" %}selected{% endif %}>Siva</option>
+                            <option value="others" {% if form.D1_engineer.value == "others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="D1_engineer_other" name="D1_engineer_other"
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+
+    <!-- D1 REMARKS -->
+<div class="col-md-3 mb-3">
+    <label for="d1">D1 Remarks:</label>
+    <select id="d1" name="d1" class="form-control">
+        <option value="">--</option>
+
+        <option value="CONTACT DETAIL WRONG"
+            {% if form.instance.d1 == "CONTACT DETAIL WRONGg" %}selected{% endif %}>
+            CONTACT DETAIL WRONG
+        </option>
+
+        <option value="CUSTOMER NOT ANSWERING"
+            {% if form.instance.d1 == "CUSTOMER NOT ANSWERING" %}selected{% endif %}>
+            CUSTOMER NOT ANSWERING
+        </option>
+
+        <option value="SOS NOT FITTED"
+            {% if form.instance.d1 == "SOS NOT FITTED" %}selected{% endif %}>
+            SOS NOT FITTED
+        </option>
+
+        <option value="SOS NOT WORKING"
+            {% if form.instance.d1 == "SOS NOT WORKING" %}selected{% endif %}>
+            SOS NOT WORKING
+        </option>
+
+        <option value="WIRE CUT ALERT"
+            {% if form.instance.d1 == "WIRE CUT ALERT" %}selected{% endif %}>
+            WIRE CUT ALERT
+        </option>
+
+        <option value="VEHICLE IN BODY BUILDING"
+            {% if form.instance.d1 == "VEHICLE IN BODY BUILDING" %}selected{% endif %}>
+            VEHICLE IN BODY BUILDING
+        </option>
+
+        <option value="TP- DEVICE TO UNTAG"
+            {% if form.instance.d1 == "TP- DEVICE TO UNTAG" %}selected{% endif %}>
+            TP- DEVICE TO UNTAG
+        </option>
+
+        <option value="DEVICE GETTING NOT POWERING ON"
+            {% if form.instance.d1 == "DEVICE GETTING NOT POWERING ON" %}selected{% endif %}>
+            DEVICE GETTING NOT POWERING ON
+        </option>
+
+        <option value="SIM VALIDITY NOT OK"
+            {% if form.instance.d1 == "SIM VALIDITY NOT OK" %}selected{% endif %}>
+            SIM VALIDITY NOT OK
+        </option>
+
+        <option value="VEHICLE REPORT TO WS"
+            {% if form.instance.d1 == "VEHICLE REPORT TO WS" %}selected{% endif %}>
+            VEHICLE REPORT TO WS
+        </option>
+        <option value="MISMAPPING"
+            {% if form.instance.d1 == "MISMAPPING" %}selected{% endif %}>
+            MISMAPPING
+        </option>
+        <option value="TP- DEVICE FITTED"
+            {% if form.instance.d1 == "TP- DEVICE FITTED" %}selected{% endif %}>
+            TP- DEVICE FITTED
+        </option>
+        <option value="VEHICLE OUT OF STATE"
+            {% if form.instance.d1 == "VEHICLE OUT OF STATE" %}selected{% endif %}>
+            VEHICLE OUT OF STATE
+        </option>
+        <option value="SERVER ISSUE"
+            {% if form.instance.d1 == "SERVER ISSUE" %}selected{% endif %}>
+            SERVER ISSUE
+        </option>
+
+
+    </select>
+</div>
+
+    <!-- D1 COMMENTS -->
+<div class="col-md-3 mb-3">
+    <label for="D1_comments">D1 Comments:</label>
+    <textarea id="D1_comments" name="D1_comments"
+              class="form-control" rows="1">{{ form.instance.D1_comments|default_if_none:'' }}</textarea>
+</div>
+
+    <div class="col-md-3 mb-3">
+        <label for="D1_closure">D1 Closure Date:</label>
+        <input type="text" id="D1_closure" name="D1_closure" class="form-control"
+               value="{{ form.instance.D1_closure|default_if_none:'' }}">
+    </div>
+
+<!-- JAVASCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const d1Dropdown = document.getElementById("d1");
+    const commentsBox = document.getElementById("D1_comments");
+
+    const commentsMap = {
+
+        "CONTACT DETAIL WRONG":
+            "Called given customer no:( ). Wrong contact no. AL to provide correct No",
+
+        "CUSTOMER NOT ANSWERING":
+            "Called given number ( ). Not answering",
+
+        "SOS NOT FITTED":
+            "Verified in the vehicle and found NO SOS switch fitted. Customer /AL to re assign / call ( )",
+
+        "SOS NOT WORKING":
+            "Verified in the vehicle and found SOS alert not going to STU server. Pl check SOS wiring. Customer /AL to re assign / call ( )",
+
+        "WIRE CUT ALERT":
+            "Verified in the vehicle and found Wire cut / Tamper alert being recd in STU server. Pl check SOS wiring. Customer /AL to re assign / call ( )",
+
+        "VEHICLE IN BODY BUILDING":
+            "Verified and found vehicle in Body Building. Customer /AL to re assign / call ( ) once Body building is completed and Vehicle in LIVE status with ignition ON.",
+
+        "TP- DEVICE TO UNTAG":
+            "Verified and found Third party device fitted / Device SL. No. updated in Vahan portal. Request customer to remove the device / take up with the third party vendor and ask him to untag his device from Vahan portal. Pl call once done",
+
+        "DEVICE GETTING NOT POWERING ON":
+            "Device not getting power from Vehicle wiring. Please check with dealer for proper Fuse fitment / Wiring connection to the device. Customer to call back once Powering issue is resolved to ( )",
+
+        "D1-SIM Expired":
+            "SIM expired. Request to take up with AL Ialert team. Regret to continue Certification",
+
+        "SIM VALIDITY NOT OK":
+            "Found the vehicle SIM subscription is not meeting the requirement of certification, AL to update and reassign",
+
+        "VEHICLE REPORT TO WS":
+            "",
+
+        "MISMAPPING":
+            "Device   found  with  wrong PSN physically . ",
+        "VEHICLE OUT OF STATE":
+            "Vehicle is  not running  in  Requested  Registration  state .  Running location:(  )",
+
+        "SERVER ISSUE":
+            "STU server not  working",
+    };
+
+    d1Dropdown.addEventListener("change", function () {
+
+        const selectedValue = this.value;
+
+        if (commentsMap[selectedValue]) {
+            commentsBox.value = commentsMap[selectedValue];
+        } else {
+            commentsBox.value = "";
+        }
+
+    });
+
+});
+</script>
+
+
+                        <div class="col-md-3 mb-3">
+                            <label for="D2_engineer">D2 Engineer :</label>
+                            <select id="D2_engineer" name="D2_engineer" class="form-control">
+                                <option value="" {% if form.D2_engineer.value == "" %}selected{% endif %}>--</option>
+                                <option value="arung@danlawtech.com" {% if form.D2_engineer.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
+                                <option value="eliyasp@danlawtech.com" {% if form.D2_engineer.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
+                                <option value="gayadhar@danlawtech.com" {% if form.D2_engineer.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
+                                <option value="pantnagarplant@danlawtech.com" {% if form.D2_engineer.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
+                                <option value="sales@danlawtech.com" {% if form.D2_engineer.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
+
+                                <option value="dilipkumarn@danlawtech.com" {% if form.D2_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="swamy@danlawtech.com" {% if form.D2_engineer.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
+                                <option value="rishwanthr@danlawtech.com" {% if form.D2_engineer.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
+                                <option value="yoganandam@danlawtech.com" {% if form.D2_engineer.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
+                                <option value="narendrareddyg@danlawtech.com" {% if form.D2_engineer.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
+                                <option value="dilipkumarn@danlawtech.com" {% if form.D2_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="swamy@danlawtech.com" {% if form.D2_engineer.value == "swamy@danlawtech.com" %}selected{% endif %}>Siva</option>
+                                <option value="Others" {% if form.D2_engineer.value == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="D2_engineer_other" name="D2_engineer_other"
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+
+    <div class="col-md-3 mb-3">
+        <label for="d2">D2 Remarks:</label>
+                            <select id="d2" name="d2" class="form-control">
+                            <option value="" {% if form.d2.value == "" %}selected{% endif %}>--</option>
+                            <option value="CONTACT DETAIL WRONG" {% if form.d2.value == "CONTACT DETAIL WRONG" %}selected{% endif %}>CONTACT DETAIL WRONG</option>
+                            <option value="CUSTOMER NOT ANSWERING" {% if form.d2.value == "CUSTOMER NOT ANSWERING" %}selected{% endif %}>CUSTOMER NOT ANSWERING</option>
+                            <option value="SOS NOT FITTED" {% if form.d2.value == "SOS NOT FITTED" %}selected{% endif %}>SOS NOT FITTED</option>
+                            <option value="SOS NOT WORKING" {% if form.d2.value == "SOS NOT WORKING" %}selected{% endif %}>SOS NOT WORKING</option>
+                            <option value="WIRE CUT ALERT" {% if form.d2.value == "WIRE CUT ALERT" %}selected{% endif %}>WIRE CUT ALERT</option>
+                            <option value="VEHICLE IN BODY BUILDING" {% if form.d2.value == "VEHICLE IN BODY BUILDING" %}selected{% endif %}>VEHICLE IN BODY BUILDING</option>
+                            <option value="TP- DEVICE TO UNTAG" {% if form.d2.value == "TP- DEVICE TO UNTAG" %}selected{% endif %}>TP- DEVICE TO UNTAG</option>
+                            <option value="DEVICE GETTING NOT POWERING ON" {% if form.d2.value == "DEVICE GETTING NOT POWERING ON" %}selected{% endif %}>DEVICE GETTING NOT POWERING ON</option>
+                            <option value="SIM VALIDITY NOT OK" {% if form.d2.value == "SIM VALIDITY NOT OK" %}selected{% endif %}>SIM VALIDITY NOT OK</option>
+                            <option value="VEHICLE REPORT TO WS" {% if form.d2.value == "VEHICLE REPORT TO WS" %}selected{% endif %}>VEHICLE REPORT TO WS</option>
+                            <option value="MISMAPPING" {% if form.d2.value == "MISMAPPING" %}selected{% endif %}>MISMAPPING</option>
+                            <option value="TP- DEVICE FITTED" {% if form.d2.value == "TP- DEVICE FITTED" %}selected{% endif %}>TP- DEVICE FITTED</option>
+                            <option value="VEHICLE OUT OF STATE" {% if form.d2.value == "VEHICLE OUT OF STATE" %}selected{% endif %}>VEHICLE OUT OF STATE</option>
+                            <option value="SERVER ISSUE" {% if form.d2.value == "SERVER ISSUE" %}selected{% endif %}>SERVER ISSUE</option>
+
+
+                            </select>
+    </div>
+<div class="col-md-3 mb-3">
+    <label for="D2_comments">D2 Comments:</label>
+    <textarea id="D2_comments" name="D2_comments"
+              class="form-control" rows="1">{{ form.instance.D2_comments|default_if_none:'' }}</textarea>
+</div>
+    <div class="col-md-3 mb-3">
+        <label for="D2_closure">D2 Closure Date:</label>
+        <input type="text" id="D2_closure" name="D2_closure" class="form-control"
+               value="{{ form.instance.D2_closure|default_if_none:'' }}">
+    </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const d2Dropdown = document.getElementById("d2");
+    const d2CommentsBox = document.getElementById("D2_comments");
+
+    const d2CommentsMap = {
+
+        "CONTACT DETAIL WRONG":
+            "Called given customer no:( ). Wrong contact no. AL to provide correct No",
+
+        "CUSTOMER NOT ANSWERING":
+            "Called given number ( ). Not answering",
+
+        "SOS NOT FITTED":
+            "Verified in the vehicle and found NO SOS switch fitted. Customer /AL to re assign / call ( )",
+
+        "SOS NOT WORKING":
+            "Verified in the vehicle and found SOS alert not going to STU server. Pl check SOS wiring. Customer /AL to re assign / call ( )",
+
+        "WIRE CUT ALERT":
+            "Verified in the vehicle and found Wire cut / Tamper alert being recd in STU server. Pl check SOS wiring. Customer /AL to re assign / call ( )",
+
+        "VEHICLE IN BODY BUILDING":
+            "Verified and found vehicle in Body Building. Customer /AL to re assign / call ( ) once Body building is completed and Vehicle in LIVE status with ignition ON.",
+
+        "TP- DEVICE TO UNTAG":
+            "Verified and found Third party device fitted / Device SL. No. updated in Vahan portal. Request customer to remove the device / take up with the third party vendor and ask him to untag his device from Vahan portal. Pl call once done",
+
+        "DEVICE GETTING NOT POWERING ON":
+            "Device not getting power from Vehicle wiring. Please check with dealer for proper Fuse fitment / Wiring connection to the device. Customer to call back once Powering issue is resolved to ( )",
+
+        "D1-SIM Expired":
+            "SIM expired. Request to take up with AL Ialert team. Regret to continue Certification",
+
+        "SIM VALIDITY NOT OK":
+            "Found the vehicle SIM subscription is not meeting the requirement of certification, AL to update and reassign",
+
+        "VEHICLE REPORT TO WS":
+            "",
+
+        "MISMAPPING":
+            "Device   found  with  wrong PSN physically . ",
+        "VEHICLE OUT OF STATE":
+            "Vehicle is  not running  in  Requested  Registration  state .  Running location:(  )",
+
+        "SERVER ISSUE":
+            "STU server not  working",
+    };
+
+    d2Dropdown.addEventListener("change", function () {
+
+        const selectedValue = this.value;
+
+        if (d2CommentsMap[selectedValue]) {
+            d2CommentsBox.value = d2CommentsMap[selectedValue];
+        } else {
+            d2CommentsBox.value = "";
+        }
+
+    });
+
+});
+</script>
+
+<!--
+                        <div class="col-md-3 mb-3">
+                            <label for="subscription_raised_by">Subscription Raised By:</label>
+                            <select id="subscription_raised_by" name="subscription_raised_by" class="form-control">
+                                <option value="API" {% if form.instance.subscription_raised_by == "API" %}selected{% endif %}>API</option>
+                                <option value="Manual" {% if form.instance.subscription_raised_by == "Manual" %}selected{% endif %}>Manual</option>
+                            </select>
+                        </div>
+
+                        <div id="conditional-fields">
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="current_sim_status">Current SIM Status:</label>
+            <select id="current_sim_status" name="current_sim_status" class="form-control">
+                <option value="BS ACTIVE" {% if form.instance.current_sim_status == "BS ACTIVE" %}selected{% endif %}>BS ACTIVE</option>
+                <option value="SINGLE AIR TEL" {% if form.instance.current_sim_status == "SINGLE AIR TEL" %}selected{% endif %}>SINGLE AIR TEL</option>
+                <option value="DUAL" {% if form.instance.current_sim_status == "DUAL" %}selected{% endif %}>DUAL</option>
+                <option value="BS EXPIRED" {% if form.instance.current_sim_status == "BS EXPIRED" %}selected{% endif %}>BS EXPIRED</option>
+                <option value="C EXPIRED" {% if form.instance.current_sim_status == "C EXPIRED" %}selected{% endif %}>C EXPIRED</option>
+                <option value="BS SUSPENDED" {% if form.instance.current_sim_status == "BS SUSPENDED" %}selected{% endif %}>BS SUSPENDED</option>
+                <option value="OTHERS" {% if form.instance.current_sim_status == "OTHERS" %}selected{% endif %}>OTHERS</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="existing_plan_start_date">Existing Plan Start Date:</label>
+            <input type="datetime-local" id="existing_plan_start_date" name="existing_plan_start_date" class="form-control"
+                   value="{{ form.instance.existing_plan_start_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="existing_plan_end_date">Existing Plan End Date:</label>
+            <input type="datetime-local" id="existing_plan_end_date" name="existing_plan_end_date" class="form-control"
+                   value="{{ form.instance.existing_plan_end_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="reqd_plan_start_date">Required Plan Start Date:</label>
+            <input type="datetime-local" id="reqd_plan_start_date" name="reqd_plan_start_date" class="form-control"
+                   value="{{ form.instance.reqd_plan_start_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="reqd_plan_end_date">Required Plan End Date:</label>
+            <input type="datetime-local" id="reqd_plan_end_date" name="reqd_plan_end_date" class="form-control"
+                   value="{{ form.instance.reqd_plan_end_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="plan_reqd">Plan Required:</label>
+            <select id="plan_reqd" name="plan_reqd" class="form-control">
+                <option value="Dual 12" {% if form.instance.plan_reqd == "Dual 12" %}selected{% endif %}>Dual 12</option>
+                <option value="Dual 24" {% if form.instance.plan_reqd == "Dual 24" %}selected{% endif %}>Dual 24</option>
+                <option value="Dual 25" {% if form.instance.plan_reqd == "Dual 25" %}selected{% endif %}>Dual 25</option>
+                <option value="Top-Up Requested" {% if form.instance.plan_reqd == "Top-Up Requested" %}selected{% endif %}>Top-Up Requested</option>
+                <option value="Others" {% if form.instance.plan_reqd == "Others" %}selected{% endif %}>Others</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="top_up_reqd_for">Top-Up Required For:</label>
+            <textarea id="top_up_reqd_for" name="top_up_reqd_for" class="form-control" rows="1">{{ form.instance.top_up_reqd_for|default_if_none:'' }}</textarea>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="sr_req_no">SR Request Number:</label>
+            <input type="text" id="sr_req_no" name="sr_req_no" class="form-control"
+                   value="{{ form.instance.sr_req_no|default_if_none:'' }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="sr_req_date">SR Request Date:</label>
+            <input type="datetime-local" id="sr_req_date" name="sr_req_date" class="form-control"
+                   value="{{ form.instance.sr_req_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="sr_success_date">SR Success Date:</label>
+            <input type="datetime-local" id="sr_success_date" name="sr_success_date" class="form-control"
+                   value="{{ form.instance.sr_success_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="tat_sr_s_sr_r">TAT SR-S-SR R:</label>
+            <input type="text" id="tat_sr_s_sr_r" name="tat_sr_s_sr_r" class="form-control"
+                   value="{{ form.instance.tat_sr_s_sr_r|default_if_none:'' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="existing_sw">Existing SW:</label>
+            <input type="text" id="existing_sw" name="existing_sw" class="form-control"
+                   value="{{ form.instance.existing_sw|default_if_none:'' }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="sch_sw">Scheduled SW:</label>
+            <input type="text" id="sch_sw" name="sch_sw" class="form-control"
+                   value="{{ form.instance.sch_sw|default_if_none:'' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="sw_sch_date">SW Scheduled Date:</label>
+            <input type="datetime-local" id="sw_sch_date" name="sw_sch_date" class="form-control"
+                   value="{{ form.instance.sw_sch_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="sw_success_date">SW Success Date:</label>
+            <input type="datetime-local" id="sw_success_date" name="sw_success_date" class="form-control"
+                   value="{{ form.instance.sw_success_date|date:'Y-m-d\\TH:i' }}">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="tat_sws_swsch">TAT SWS-SWSCH:</label>
+            <input type="text" id="tat_sws_swsch" name="tat_sws_swsch" class="form-control"
+                   value="{{ form.instance.tat_sws_swsch|default_if_none:'' }}">
+        </div>
+    </div>
+</div>
+
+
+                    </div>
+
+                <div class="row">
+    <div class="col-md-3 mb-3">
+        <label for="veh_status">Vehicle Status:</label>
+        <select id="veh_status" name="veh_status" class="form-control">
+            <option value="In BB Location" {% if form.instance.veh_status == "In BB Location" %}selected{% endif %}>In BB Location</option>
+            <option value="BB Completed" {% if form.instance.veh_status == "BB Completed" %}selected{% endif %}>BB Completed</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-3" id="bb_completed_date_field" style="display: none;">
+        <label for="bb_completed_date">BB Completed Date:</label>
+        <input type="date" id="bb_completed_date" name="bb_completed_date" class="form-control"
+               value="{{ form.instance.bb_completed_date|date:'Y-m-d' }}">
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <label for="sos_fitment">SOS Fitment:</label>
+        <select id="sos_fitment" name="sos_fitment" class="form-control">
+            <option value="Done" {% if form.instance.sos_fitment == "Done" %}selected{% endif %}>Done</option>
+            <option value="Not Done" {% if form.instance.sos_fitment == "Not Done" %}selected{% endif %}>Not Done</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-3" id="sos_fitment_date_field" style="display: none;">
+        <label for="sos_fitment_date">SOS Fitment Date:</label>
+        <input type="datetime-local" id="sos_fitment_date" name="sos_fitment_date" class="form-control"
+               value="{{ form.instance.sos_fitment_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+
+
+    <div class="col-md-3 mb-3">
+        <label for="sos_verification_reqd">SOS Verification Required:</label>
+        <select id="sos_verification_reqd" name="sos_verification_reqd" class="form-control">
+            <option value="Yes" {% if form.instance.sos_verification_reqd == "Yes" %}selected{% endif %}>Yes</option>
+            <option value="No" {% if form.instance.sos_verification_reqd == "No" %}selected{% endif %}>No</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-3" id="sos_verified_date_field" style="display: none;">
+        <label for="sos_verified_date">SOS Verified Date:</label>
+        <input type="datetime-local" id="sos_verified_date" name="sos_verified_date" class="form-control"
+               value="{{ form.instance.sos_verified_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <label for="data_posting_verification">Data Posting Verification:</label>
+        <select id="data_posting_verification" name="data_posting_verification" class="form-control">
+            <option value="Yes" {% if form.instance.data_posting_verification == "Yes" %}selected{% endif %}>Yes</option>
+            <option value="No" {% if form.instance.data_posting_verification == "No" %}selected{% endif %}>No</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-3" id="data_verified_date_field" style="display: none;">
+        <label for="data_verified_date">Data Verified Date:</label>
+        <input type="datetime-local" id="data_verified_date" name="data_verified_date" class="form-control"
+               value="{{ form.instance.data_verified_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get dropdowns and fields
+        const vehStatus = document.getElementById("veh_status");
+        const sosFitment = document.getElementById("sos_fitment");
+        const sosVerificationReqd = document.getElementById("sos_verification_reqd");
+        const dataPostingVerification = document.getElementById("data_posting_verification");
+
+        const bbCompletedDateField = document.getElementById("bb_completed_date_field");
+        const sosFitmentDateField = document.getElementById("sos_fitment_date_field");
+        const sosVerifiedDateField = document.getElementById("sos_verified_date_field");
+        const dataVerifiedDateField = document.getElementById("data_verified_date_field");
+
+        // Function to toggle fields
+        function toggleFields() {
+            // Toggle BB Completed Date
+            if (vehStatus.value === "BB Completed") {
+                bbCompletedDateField.style.display = "block";
+            } else {
+                bbCompletedDateField.style.display = "none";
+            }
+
+            // Toggle SOS Fitment Date
+            if (sosFitment.value === "Done") {
+                sosFitmentDateField.style.display = "block";
+            } else {
+                sosFitmentDateField.style.display = "none";
+            }
+
+            // Toggle SOS Verified Date
+            if (sosVerificationReqd.value === "Yes") {
+                sosVerifiedDateField.style.display = "block";
+            } else {
+                sosVerifiedDateField.style.display = "none";
+            }
+
+            // Toggle Data Verified Date
+            if (dataPostingVerification.value === "Yes") {
+                dataVerifiedDateField.style.display = "block";
+            } else {
+                dataVerifiedDateField.style.display = "none";
+            }
+        }
+
+        // Attach event listeners
+        vehStatus.addEventListener("change", toggleFields);
+        sosFitment.addEventListener("change", toggleFields);
+        sosVerificationReqd.addEventListener("change", toggleFields);
+        dataPostingVerification.addEventListener("change", toggleFields);
+
+        // Initialize on page load
+        toggleFields();
+    });
+</script>
+
+                    <div class="row">
+    <div class="col-md-3 mb-3">
+        <label for="otp_generated_date">OTP Generated Date:</label>
+        <input type="datetime-local" id="otp_generated_date" name="otp_generated_date" class="form-control"
+               value="{{ form.instance.otp_generated_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <label for="otp_updated_date">OTP Updated Date:</label>
+        <input type="datetime-local" id="otp_updated_date" name="otp_updated_date" class="form-control"
+               value="{{ form.instance.otp_updated_date|date:'Y-m-d\\TH:i' }}">
+    </div>   -->
+
+    <h5 class="text-primary"><i class="fas fa-certificate"></i> Certificate</h5>
+    <div class="col-md-3 mb-3">
+        <label for="temp_cert_reqd">Temporary Certificate Required:</label>
+        <select id="temp_cert_reqd" name="temp_cert_reqd" class="form-control">
+            <option value="Yes" {% if form.instance.temp_cert_reqd == "Yes" %}selected{% endif %}>Yes</option>
+            <option value="No" {% if form.instance.temp_cert_reqd == "No" %}selected{% endif %}>No</option>
+        </select>
+    </div>
+<div class="col-md-3 mb-3">
+    <label for="upload_certificate_in_ialert">Temp Certificate:</label>
+    <input type="file" id="upload_certificate_in_ialert" name="upload_certificate_in_ialert" class="form-control">
+    {% if form.instance.upload_certificate_in_ialert %}
+        <a href="{{ form.instance.upload_certificate_in_ialert.url }}" target="_blank">View Uploaded File</a>
+    {% endif %}
+</div>
+    <div class="col-md-3 mb-3">
+        <label for="temp_cert_date">Temporary Certificate Date:</label>
+        <input type="datetime-local" id="temp_cert_date" name="temp_cert_date" class="form-control"
+               value="{{ form.instance.temp_cert_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="temp_raised_by">Temporary Certificate Raised By:</label>
+                            <select id="temp_raised_by" name="temp_raised_by" class="form-control">
+                                <option value="" {% if form.temp_raised_by.value == "" %}selected{% endif %}>--</option>
+                                <option value="arung@danlawtech.com" {% if form.temp_raised_by.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
+                                <option value="eliyasp@danlawtech.com" {% if form.temp_raised_by.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
+                                <option value="gayadhar@danlawtech.com" {% if form.temp_raised_by.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
+                                <option value="pantnagarplant@danlawtech.com" {% if form.temp_raised_by.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
+                                <option value="sales@danlawtech.com" {% if form.temp_raised_by.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
+                                <option value="dilipkumarn@danlawtech.com" {% if form.temp_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="swamy@danlawtech.com" {% if form.temp_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
+                                <option value="rishwanthr@danlawtech.com" {% if form.temp_raised_by.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
+                                <option value="yoganandam@danlawtech.com" {% if form.temp_raised_by.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
+                                <option value="narendrareddyg@danlawtech.com" {% if form.temp_raised_by.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
+                                <option value="dilipkumarn@danlawtech.com" {% if form.temp_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="swamy@danlawtech.com" {% if form.temp_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Siva</option>
+                                <option value="Others" {% if form.temp_raised_by.value == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="temp_raised_by_other" name="temp_raised_by_other"
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>
+<div class="col-md-3 mb-3">
+    <label for="upload_certificate_in_ialert_02">Vahan Certificate:</label>
+    <input type="file" id="upload_certificate_in_ialert_02" name="upload_certificate_in_ialert_02" class="form-control">
+    {% if form.instance.upload_certificate_in_ialert_02 %}
+        <a href="{{ form.instance.upload_certificate_in_ialert_02.url }}" target="_blank">View Uploaded File</a>
+    {% endif %}
+</div>
+
+
+
+
+<!--
+ <div class="col-md-3 mb-3">
+        <label for="D2_closure">D2 Closure Date:</label>
+        <input type="text" id="D2_closure" name="D2_closure" class="form-control"
+               value="{{ form.instance.D2_closure|default_if_none:'' }}">
+    </div>
+-->
+
+
+
+<div class="col-md-3 mb-3">
+    <label for="upload_certificate_in_ialert_01">Permanent Certificate:</label>
+    <input type="file" id="upload_certificate_in_ialert_01" name="upload_certificate_in_ialert_01" class="form-control">
+    {% if form.instance.upload_certificate_in_ialert_01 %}
+        <a href="{{ form.instance.upload_certificate_in_ialert_01.url }}" target="_blank">View Uploaded File</a>
+    {% endif %}
+</div>
+
+
+    <div class="col-md-3 mb-3">
+        <label for="permanent_cert_date">Permanent Certificate Date:</label>
+        <input type="datetime-local" id="permanent_cert_date" name="permanent_cert_date" class="form-control"
+               value="{{ form.instance.permanent_cert_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="perm_raised_by">Permanent Certificate Raised By:</label>
+                            <select id="perm_raised_by" name="perm_raised_by" class="form-control">
+                                <option value="" {% if form.perm_raised_by.value == "" %}selected{% endif %}>--</option>
+                                <option value="arung@danlawtech.com" {% if form.perm_raised_by.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
+                                <option value="eliyasp@danlawtech.com" {% if form.perm_raised_by.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
+                                <option value="gayadhar@danlawtech.com" {% if form.perm_raised_by.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
+                                <option value="pantnagarplant@danlawtech.com" {% if form.perm_raised_by.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
+                                <option value="sales@danlawtech.com" {% if form.perm_raised_by.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
+                                <option value="dilipkumarn@danlawtech.com" {% if form.perm_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="swamy@danlawtech.com" {% if form.perm_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
+                                <option value="rishwanthr@danlawtech.com" {% if form.perm_raised_by.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
+                                <option value="yoganandam@danlawtech.com" {% if form.perm_raised_by.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
+                                <option value="narendrareddyg@danlawtech.com" {% if form.perm_raised_by.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
+                                <option value="dilipkumarn@danlawtech.com" {% if form.perm_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="swamy@danlawtech.com" {% if form.perm_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Siva</option>
+                                <option value="Others" {% if form.perm_raised_by.value == "Others" %}selected{% endif %}>Others</option>
+                            </select>
+                            <input type="text" id="perm_raised_by_other" name="perm_raised_by_other"
+                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
+                        </div>    
+<!--
+    <div class="col-md-3 mb-3">
+        <label for="mail_to_customer">Mail to Customer:</label>
+        <input type="email" id="mail_to_customer" name="mail_to_customer" class="form-control" value="{{ form.instance.mail_to_customer|default_if_none:'' }}" multiple>
+        <small class="text-muted"></small>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <label for="Dealer_mail">Mail to Dealer:</label>
+        <input type="email" id="Dealer_mail" name="Dealer_mail" class="form-control" value="{{ form.instance.Dealer_mail|default_if_none:'' }}" multiple>
+        <small class="text-muted"></small>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="TSM_mail">Mail to TSM:</label>
+        <input type="email" id="TSM_mail" name="TSM_mail" class="form-control" value="{{ form.instance.TSM_mail|default_if_none:'' }}" placeholder="TSM Mail ID">
+        <small class="text-muted">Auto-filled from State; you can edit if needed.</small>
+    </div>
+    <script>
+        (function(){
+            const mapping = {
+                "ANDAMAN NICOBAR ISLANDS": "elanchezhian.a@ashokleyland.com",
+                "ANDHRA PRADESH": "elanchezhian.a@ashokleyland.com",
+                "ARUNACHAL PRADESH": "kamal.pandey2@ashokleyland.com",
+                "ASSAM": "kamal.pandey2@ashokleyland.com",
+                "BIHAR": "kamal.pandey2@ashokleyland.com",
+                "CHANDIGARH": "amit.tiwari@ashokleyland.com",
+                "CHHATTISGARH": "swadesh.bhattacharya@ashokleyland.com",
+                "DADRA AND NAGAR HAVELI AND DAMAN AND DIU": "kapil.mohan@ashokleyland.com",
+                "DELHI": "navneet.singh1@ashokleyland.com",
+                "GOA": "elanchezhian.a@ashokleyland.com",
+                "GUJARAT": "shekhar.chandra2@ashokleyland.com",
+                "HARYANA": "navneet.singh1@ashokleyland.com",
+                "HIMACHAL PRADESH": "amit.tiwari@ashokleyland.com",
+                "JAMMU & KASHMIR": "amit.tiwari@ashokleyland.com",
+                "JHARKHAND": "kamal.pandey2@ashokleyland.com",
+                "KARNATAKA": "elanchezhian.a@ashokleyland.com",
+                "KERALA": "elanchezhian.a@ashokleyland.com",
+                "LADAKH": "amit.tiwari@ashokleyland.com",
+                "LAKSHADWEEP": "elanchezhian.a@ashokleyland.com",
+                "MADHYA PRADESH": "swadesh.bhattacharya@ashokleyland.com",
+                "MAHARASTRA": "ashish.rawat2@ashokleyland.com",
+                "MANIPUR": "kamal.pandey2@ashokleyland.com",
+                "MEGHALAYA": "kamal.pandey2@ashokleyland.com",
+                "MIZORAM": "kamal.pandey2@ashokleyland.com",
+                "NAGALAND": "kamal.pandey2@ashokleyland.com",
+                "ODISHA": "kamal.pandey2@ashokleyland.com",
+                "PUDUCHERRY": "elanchezhian.a@ashokleyland.com",
+                "PONDICHERRY": "elanchezhian.a@ashokleyland.com",
+                "PUNJAB": "amit.tiwari@ashokleyland.com",
+                "RAJASTHAN": "amit.tiwari@ashokleyland.com",
+                "SIKKIM": "kamal.pandey2@ashokleyland.com",
+                "TAMIL NADU": "elanchezhian.a@ashokleyland.com",
+                "TELANGANA": "elanchezhian.a@ashokleyland.com",
+                "TRIPURA": "kamal.pandey2@ashokleyland.com",
+                "UTTAR PRADESH": "puran.nath@ashokleyland.com",
+                "UTTARAKHAND": "puran.nath@ashokleyland.com",
+                "WEST BENGAL": "kamal.pandey2@ashokleyland.com"
+            };
+
+            function setTSMFromState(){
+                const stateEl = document.getElementById('state');
+                const tsmEl = document.getElementById('TSM_mail');
+                if(!tsmEl) return;
+                if(!stateEl) return;
+                const stateValue = stateEl.value.toUpperCase().trim();
+                const email = mapping[stateValue];
+                if(email){
+                    tsmEl.value = email;
+                    tsmEl.readOnly = false;
+                } else {
+                    tsmEl.readOnly = false;
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', setTSMFromState);
+            const stateEl = document.getElementById('state');
+            if(stateEl) stateEl.addEventListener('change', setTSMFromState);
+        })();
+    </script>
+
+    <div class="col-md-3 mb-3">
+        <label for="upload_certificate_in_danlaw_server">Upload Certificate in Danlaw Server:</label>
+        <select id="upload_certificate_in_danlaw_server" name="upload_certificate_in_danlaw_server" class="form-control">
+            <option value="Yes" {% if form.instance.upload_certificate_in_danlaw_server == "Yes" %}selected{% endif %}>Yes</option>
+            <option value="No" {% if form.instance.upload_certificate_in_danlaw_server == "No" %}selected{% endif %}>No</option>
+        </select>
+    </div>
+
+-->
+
+   
+    <div class="col-md-3 mb-3">
+        <label for="completion_status">Completion Status:</label>
+        <select id="completion_status" name="completion_status" class="form-control">
+            <option value="Pending" {% if form.instance.completion_status == "Pending" %}selected{% endif %}>Pending</option>
+            <option value="Temporary" {% if form.instance.completion_status == "Temporary" %}selected{% endif %}>Temporary</option>
+            <option value="Permanent" {% if form.instance.completion_status == "Permanent" %}selected{% endif %}>Permanent</option>
+            <option value="Cancelled" {% if form.instance.completion_status == "Cancelled" %}selected{% endif %}>Cancelled</option>
+            <option value="Hold" {% if form.instance.completion_status == "Hold" %}selected{% endif %}>Hold</option>
+            <option value="Reject" {% if form.instance.completion_status == "Reject" %}selected{% endif %}>Reject</option>
+            <option value="Third Party Device-Rejected" {% if form.instance.completion_status == "Third Party Device-Rejected" %}selected{% endif %}>Third Party Device-Rejected</option>
+
+        </select>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="Update_to_AL_API">Update to AL API:</label>
+        <select id="Update_to_AL_API" name="Update_to_AL_API" class="form-control">
+            <option value="D1" {% if form.instance.Update_to_AL_API == "D1" %}selected{% endif %}>D1</option>
+            <option value="D2" {% if form.instance.Update_to_AL_API == "D2" %}selected{% endif %}>D2</option>
+            <option value="Temporary" {% if form.instance.Update_to_AL_API == "Temporary" %}selected{% endif %}>Temporary</option>
+            <option value="Permanent" {% if form.instance.Update_to_AL_API == "Permanent" %}selected{% endif %}>Permanent</option>
+        </select>
+    </div> 
+    <div class="col-md-3 mb-3">
+        <label for="completion_date">Completion Date:</label>
+        <input type="datetime-local" id="completion_date" name="completion_date" class="form-control"
+               value="{{ form.instance.completion_date|date:'Y-m-d\\TH:i' }}">
+    </div>
+<div class="col-md-3 mb-3">
+    <label for="total_tat">Total TAT:</label>
+    <input type="text" id="total_tat" name="total_tat" class="form-control"
+           value="{{ form.instance.total_tat|default_if_none:'' }}">
+</div>
+
+<h5 class="text-primary"><i class="fas fa-check-circle"></i> Verification</h5>
+<div class="col-md-3 mb-3">
+    <label for="certification_start_date">Certification Start Date:</label>
+    <input type="date" id="certification_start_date" name="certification_start_date" class="form-control"
+           value="{{ form.instance.certification_start_date|date:'Y-m-d' }}">
+</div>
+<div class="col-md-3 mb-3">
+    <label for="certification_end_date">Certification End Date:</label>
+    <input type="date" id="certification_end_date" name="certification_end_date" class="form-control"
+           value="{{ form.instance.certification_end_date|date:'Y-m-d' }}">
+</div>
+    <div class="col-md-3 mb-3">
+        <label for="remarks_02">Remarks:</label>
+        <input type="text" id="remarks_02" name="remarks_02" class="form-control"
+               value="{{ form.instance.remarks_02|default_if_none:'' }}">
+    </div>
+</div>
+<div class="row">
+</div>
+                    <!-- Submit Button -->
+
+
+        {% if not is_read_only %}
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                <i class="fas fa-save"></i> Submit
+            </button>
+        </div>
+        {% else %}
+        <div class="text-center mt-4">
+            <button type="button" class="btn btn-secondary btn-lg" disabled>
+                <i class="fas fa-lock"></i> Form Locked - Cannot Submit
+            </button>
+        </div>
+        {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function restrictInput(element, maxLength) {
+            if (element.value.length > maxLength) {
+                element.value = element.value.slice(0, maxLength);
+            }
+        }
+
+
+
+
+        function toggleFields() {
+            // Get field values
+            const vehStatus = document.getElementById("veh_status").value;
+            const sosFitment = document.getElementById("sos_fitment").value;
+            const sosVerificationReqd = document.getElementById("sos_verification_reqd").value;
+            const dataPostingVerification = document.getElementById("data_posting_verification").value;
+
+            // Get field containers
+            const bbCompletedDateField = document.getElementById("bb_completed_date_field");
+            const sosFitmentDateField = document.getElementById("sos_fitment_date_field");
+            const sosVerifiedDateField = document.getElementById("sos_verified_date_field");
+            const dataVerifiedDateField = document.getElementById("data_verified_date_field");
+
+            // Toggle BB Completed Date
+            if (vehStatus === "In BB Location") {
+                bbCompletedDateField.style.display = "none";
+            } else {
+                bbCompletedDateField.style.display = "block";
+            }
+
+            // Toggle SOS Fitment Date
+            if (sosFitment === "Not Done") {
+                sosFitmentDateField.style.display = "none";
+            } else {
+                sosFitmentDateField.style.display = "block";
+            }
+
+            // Toggle SOS Verified Date
+            if (sosVerificationReqd === "No") {
+                sosVerifiedDateField.style.display = "none";
+            } else {
+                sosVerifiedDateField.style.display = "block";
+            }
+
+            // Toggle Data Verified Date
+            if (dataPostingVerification === "No") {
+                dataVerifiedDateField.style.display = "none";
+            } else {
+                dataVerifiedDateField.style.display = "block";
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener("DOMContentLoaded", toggleFields);
+    </script>
+
+    <script>
+document.getElementById('engineerForm').addEventListener('submit', function(e) {
+    var emailInput = document.getElementById('mail_to_customer');
+    var value = emailInput.value;
+    if (value.includes(';')) {
+        alert("Please separate multiple emails with commas, not semicolons.\nExample: user1@example.com, user2@example.com");
+        emailInput.focus();
+        e.preventDefault();
+        return false;
+    }
+    // Optional: check each email format
+    var emails = value.split(',').map(function(e){return e.trim();}).filter(Boolean);
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    for (var i = 0; i < emails.length; i++) {
+        if (!emailPattern.test(emails[i])) {
+            alert("Invalid email: " + emails[i])
+            emailInput.focus();
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+</script>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        const entryId = "{{ form.instance.id }}";
+        if (!entryId) return;
+        const url = "{% url 'fetch_darby_communication_ais140' form.instance.id %}";
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                console.debug('Darby API fetch response:', data);
+                // prefer parsed fields
+                let iccidVal = data.iccid || (data.raw && (data.raw.iccid || data.raw.iccid_no)) || '';
+                let imeiVal  = data.imei  || (data.raw && (data.raw.imei  || data.raw.imei_no))  || '';
+                let productCode = data.productCode || '';
+
+                // also try nested raw -> first candidate list
+                if (data.raw) {
+                    try {
+                        // look into common nested structures
+                        const find = (obj, keylist) => {
+                            if (!obj) return '';
+                            if (Array.isArray(obj)) {
+                                for (const el of obj) {
+                                    const v = find(el, keylist);
+                                    if (v) return v;
+                                }
+                                return '';
+                            }
+                            if (typeof obj === 'object') {
+                                for (const k of Object.keys(obj)) {
+                                    const v = obj[k];
+                                    if (keylist.includes(k) && v) return v;
+                                    const nested = find(v, keylist);
+                                    if (nested) return nested;
+                                }
+                            }
+                            return '';
+                        };
+                        const rawIccid = !iccidVal ? find(data.raw, ['iccid','iccid_no','iccidNumber']) : '';
+                        const rawImei  = !imeiVal  ? find(data.raw, ['imei','imei_no','imeiNumber'])  : '';
+                        const rawProductCode = !productCode ? find(data.raw, ['productCode', 'product_code', 'productname', 'productName']) : '';
+
+                        if (!iccidVal && rawIccid) iccidVal = rawIccid;
+                        if (!imeiVal  && rawImei)  imeiVal  = rawImei;
+                        if (!productCode && rawProductCode) productCode = rawProductCode;
+                    } catch (e) { console.debug(e); }
+                }
+
+                if (iccidVal) {
+                    const icc = document.getElementById('icicid_no');
+                    if (icc && !icc.value) icc.value = iccidVal;
+                }
+                if (imeiVal) {
+                    const im = document.getElementById('imei_no');
+                    if (im && !im.value) im.value = imeiVal;
+                }
+                if (productCode) {
+                    const deviceInput = document.getElementById('device_mode');
+                    if (deviceInput && !deviceInput.value) {
+                        deviceInput.value = productCode;
+                    }
+                }
+            })
+            .catch(err => console.error('Failed to fetch Darby data:', err));
+    } catch (e) {
+        console.error(e);
+    }
+});
+
+</script>
+</body>
+</html>
+
+<!-- Add this modal HTML before </body> tag -->
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none;">
+                <h5 class="modal-title" id="successModalLabel" style="color: white; font-weight: 600;">
+                    <i class="fas fa-check-circle" style="margin-right: 10px;"></i>Form Submitted Successfully
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 40px 30px; text-align: center;">
+                <div style="font-size: 3rem; color: #28a745; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <p style="font-size: 1.1rem; color: #333; margin-bottom: 10px;">
+                    <strong>Your form has been submitted successfully!</strong>
+                </p>
+                <p style="color: #666; margin-bottom: 0;">
+                    Ticket ID: <strong id="ticketIdSuccess"></strong>
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #eee; justify-content: center;">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="padding: 8px 30px;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: none;">
+                <h5 class="modal-title" id="errorModalLabel" style="color: white; font-weight: 600;">
+                    <i class="fas fa-times-circle" style="margin-right: 10px;"></i>Form Submission Failed
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 30px; background-color: #fff5f5;">
+                <div style="margin-bottom: 20px;">
+                    <p style="font-size: 0.95rem; color: #333; margin-bottom: 15px;">
+                        <strong>Form submission rejected!</strong>
+                    </p>
+                    <div style="background: white; border-left: 4px solid #dc3545; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <p style="margin: 0; color: #666; font-size: 0.95rem;" id="errorMessage"></p>
+                    </div>
+                </div>
+
+                <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; padding: 12px; margin-bottom: 15px;">
+                    <strong style="color: #721c24; font-size: 0.9rem;">Please fix the following issues:</strong>
+                    <ul id="errorReasonsList" style="margin: 10px 0 0 20px; color: #721c24; font-size: 0.9rem;">
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #eee; justify-content: space-between;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
+                    <i class="fas fa-edit"></i> Edit Form
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this script before the closing </body> tag, after other scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('engineerForm');
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+
+    // Check for success message in page
+    const successMessage = document.querySelector('[data-success-message]');
+    if (successMessage) {
+        const ticketId = successMessage.getAttribute('data-success-message');
+        document.getElementById('ticketIdSuccess').textContent = ticketId;
+        successModal.show();
+    }
+
+    // Check for error message in page
+    const errorMessage = document.querySelector('[data-error-message]');
+    if (errorMessage) {
+        const errorText = errorMessage.getAttribute('data-error-message');
+        const errorReasons = errorMessage.getAttribute('data-error-reasons');
+
+        document.getElementById('errorMessage').textContent = errorText;
+
+        if (errorReasons) {
+            const reasonsList = document.getElementById('errorReasonsList');
+            reasonsList.innerHTML = '';
+            const reasons = errorReasons.split('|');
+            reasons.forEach(reason => {
+                if (reason.trim()) {
+                    const li = document.createElement('li');
+                    li.textContent = reason.trim();
+                    reasonsList.appendChild(li);
+                }
+            });
+        }
+
+        errorModal.show();
+    }
+
+    // Handle form submission with validation
+    form.addEventListener('submit', function(e) {
+        // Get completion status
+        const completionStatus = document.getElementById('completion_status').value;
+
+        // Certificate requirements
+        const certRequirements = {
+            'Temporary': ['upload_certificate_in_ialert'],
+            'Permanent': ['upload_certificate_in_ialert_01'],
+            'Temp + Perm': ['upload_certificate_in_ialert', 'upload_certificate_in_ialert_01'],
+        };
+
+        // Check certificates if status requires them
+        if (certRequirements[completionStatus]) {
+            const required = certRequirements[completionStatus];
+            const missing = [];
+
+            for (const fieldName of required) {
+                const fileInput = document.getElementById(fieldName);
+                const hasNewFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+                // Check for existing file link
+                let hasExistingFile = false;
+                if (fileInput) {
+                    let sibling = fileInput.nextElementSibling;
+                    while (sibling) {
+                        if (sibling.tagName === 'A' && sibling.textContent.includes('View')) {
+                            hasExistingFile = true;
+                            break;
+                        }
+                        sibling = sibling.nextElementSibling;
+                    }
+                }
+
+                if (!hasNewFile && !hasExistingFile) {
+                    if (fieldName === 'upload_certificate_in_ialert') {
+                        missing.push('Temporary Certificate');
+                    } else if (fieldName === 'upload_certificate_in_ialert_01') {
+                        missing.push('Permanent Certificate');
+                    } 
+                }
+            }
+
+            if (missing.length > 0) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Show error modal
+                document.getElementById('errorMessage').textContent =
+                    `Missing required certificates for "${completionStatus}" status. Please upload all required files before submitting.`;
+
+                const reasonsList = document.getElementById('errorReasonsList');
+                reasonsList.innerHTML = '';
+                missing.forEach(cert => {
+                    const li = document.createElement('li');
+                    li.textContent = cert;
+                    reasonsList.appendChild(li);
+                });
+
+                errorModal.show();
+                return false;
+            }
+        }
+
+        // New validations based on Update_to_AL_API value
+        const updateToAlApi = document.getElementById('Update_to_AL_API').value;
+        if (updateToAlApi === 'D1') {
+            const d1Remarks = document.getElementById('d1').value.trim();
+            if (!d1Remarks) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('errorMessage').textContent = 'D1 Remarks is required when Update to A.L API is set to "D1".';
+                errorModal.show();
+                return false;
+            }
+        } else if (updateToAlApi === 'D2') {
+            const d2Remarks = document.getElementById('d2').value.trim();
+            if (!d2Remarks) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('errorMessage').textContent = 'D2 Remarks is required when Update to A.L API is set to "D2".';
+                errorModal.show();
+                return false;
+            }
+        } else if (updateToAlApi === 'Temporary') {
+            const tempCertInput = document.getElementById('upload_certificate_in_ialert');
+            const hasNewFile = tempCertInput && tempCertInput.files && tempCertInput.files.length > 0;
+            let hasExistingFile = false;
+            if (tempCertInput) {
+                let sibling = tempCertInput.nextElementSibling;
+                while (sibling) {
+                    if (sibling.tagName === 'A' && sibling.textContent.includes('View')) {
+                        hasExistingFile = true;
+                        break;
+                    }
+                    sibling = sibling.nextElementSibling;
+                }
+            }
+            if (!hasNewFile && !hasExistingFile) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('errorMessage').textContent = 'Temporary Certificate is required when Update to A.L API is set to "Temporary".';
+                errorModal.show();
+                return false;
+            }
+        } else if (updateToAlApi === 'Permanent') {
+            const permCertInput = document.getElementById('upload_certificate_in_ialert_01');
+            const hasNewFile = permCertInput && permCertInput.files && permCertInput.files.length > 0;
+            let hasExistingFile = false;
+            if (permCertInput) {
+                let sibling = permCertInput.nextElementSibling;
+                while (sibling) {
+                    if (sibling.tagName === 'A' && sibling.textContent.includes('View')) {
+                        hasExistingFile = true;
+                        break;
+                    }
+                    sibling = sibling.nextElementSibling;
+                }
+            }
+            if (!hasNewFile && !hasExistingFile) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('errorMessage').textContent = 'Permanent Certificate is required when Update to A.L API is set to "Permanent".';
+                errorModal.show();
+                return false;
+            }
+        }
+    });
+
+    function getLocalDateTimeValue() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    function setCurrentDatetimeField(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.value = getLocalDateTimeValue();
+        }
+    }
+
+    function setCurrentClosureTimestamp(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.value = getLocalDateTimeValue();
+        }
+    }
+
+    const tempCertificateInput = document.getElementById('upload_certificate_in_ialert');
+    if (tempCertificateInput) {
+        tempCertificateInput.addEventListener('change', function () {
+            if (tempCertificateInput.files && tempCertificateInput.files.length > 0) {
+                setCurrentDatetimeField('temp_cert_date');
+            }
+        });
+    }
+
+    const permanentCertificateInput = document.getElementById('upload_certificate_in_ialert_01');
+    if (permanentCertificateInput) {
+        permanentCertificateInput.addEventListener('change', function () {
+            if (permanentCertificateInput.files && permanentCertificateInput.files.length > 0) {
+                setCurrentDatetimeField('permanent_cert_date');
+            }
+        });
+    }
+
+    const d1Select = document.getElementById('d1');
+    if (d1Select) {
+        d1Select.addEventListener('change', function () {
+            if (d1Select.value) {
+                setCurrentClosureTimestamp('D1_closure');
+            }
+        });
+    }
+
+    const d2Select = document.getElementById('d2');
+    if (d2Select) {
+        d2Select.addEventListener('change', function () {
+            if (d2Select.value) {
+                setCurrentClosureTimestamp('D2_closure');
+            }
+        });
+    }
+});
+</script>
+
+
+<script>
+function showStylishPopup(message, type) {
+    /* …same function you used earlier… */
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // if we got an error message from the backend, show it
+    const err = "{{ error_message|default:'' }}";
+    if (err) {
+        showStylishPopup(err, 'error');
+    }
+    // …existing AJAX submit handler goes here if you want it…
+});
+</script>
+
+
+</body>
+</html>
+{% endblock %}
+
+
+
+
+
+
+

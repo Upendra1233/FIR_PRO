@@ -36,19 +36,17 @@ def mapping_process_form(request):
             # Generate URLs for approval and rejection
             approve_url = request.build_absolute_uri(f"/mapping_process/approve/{instance.id}/")
             reject_url = request.build_absolute_uri(f"/mapping_process/reject/{instance.id}/")
-            view_url = request.build_absolute_uri(f"/mapping_process/view/{instance.id}/")
 
             # Send email to the manager
-            subject = f"Approval Needed for Mapping Request {instance.ticket_id}"
-            recipient_email = "sales@danlawtech.com"  # Manager's email
+            subject = f"Mapping Request {instance.ticket_id} Raised by {instance.req_raised_by} ON {instance.vin}"
+            recipient_emails = ["narendrareddy@danlawtech.com", "rajendran@danlawtech.com"]
             context = {
                 'entry': instance,
                 'approve_url': approve_url,
                 'reject_url': reject_url,
-                'view_url': view_url,
             }
             email_body = render_to_string('mapping_process/email_template.html', context)
-            email = EmailMessage(subject, email_body, to=[recipient_email])
+            email = EmailMessage(subject, email_body, to=recipient_emails, cc=["sales@danlawtech.com"])
             email.content_subtype = 'html'  # Set the email content type to HTML
             email.send()
 
@@ -60,33 +58,25 @@ def mapping_process_form(request):
         form = MappingProcessForm()
     return render(request, 'mapping_process/mapping_process_form.html', {'form': form})
 
-def mapping_process_editable_form(request, process_id):
-    instance = get_object_or_404(MappingProcess, id=process_id)
-    if request.method == 'POST':
-        form = MappingProcessForm(request.POST, instance=instance)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True, 'message': 'Form updated successfully!'})
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
-    else:
-        form = MappingProcessForm(instance=instance)
-    return render(request, 'mapping_process/mapping_process_editable_form.html', {'form': form, 'instance': instance})
 
 def approve_request(request, request_id):
     instance = get_object_or_404(MappingProcess, id=request_id)
+    # Prevent re-processing if already approved or rejected
+    if instance.manager_approval_status in ['Approved', 'Rejected']:
+        return HttpResponse(f"Request {instance.ticket_id} has already been processed ({instance.manager_approval_status}).")
+
     instance.manager_approval_status = 'Approved'
     instance.manager_approval_time = now()
 
     # Convert to IST and format datetime
     ist_timezone = timezone('Asia/Kolkata')
     manager_approval_time_ist = instance.manager_approval_time.astimezone(ist_timezone)
-    instance.manager_approval_time = manager_approval_time_ist.replace(microsecond=0)  # Remove microseconds
+    instance.manager_approval_time = manager_approval_time_ist.replace(microsecond=0)
     instance.save()
 
     # Notify the engineer about the approval
     if instance.submitted_by:
-        subject = f"Request {instance.ticket_id} Approved"
+        subject = f"Request {instance.ticket_id} Approved by Manager ON {instance.vin}"
         message = f"""
         Dear Engineer,
 
@@ -106,6 +96,10 @@ def approve_request(request, request_id):
 
 def reject_request(request, request_id):
     instance = get_object_or_404(MappingProcess, id=request_id)
+    # Prevent re-processing if already approved or rejected
+    if instance.manager_approval_status in ['Approved', 'Rejected']:
+        return HttpResponse(f"Request {instance.ticket_id} has already been processed ({instance.manager_approval_status}).")
+
     instance.manager_approval_status = 'Rejected'
     instance.manager_approval_time = now()
 
@@ -117,7 +111,7 @@ def reject_request(request, request_id):
 
     # Notify the engineer about the rejection
     if instance.submitted_by:
-        subject = f"Request {instance.ticket_id} Rejected"
+        subject = f"Mapping Request {instance.ticket_id} Approved by Manager ON {instance.vin}"
         message = f"""
         Dear Engineer,
 
