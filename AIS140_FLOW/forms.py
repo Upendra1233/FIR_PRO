@@ -4,21 +4,20 @@ from .models import AIS140Request
 class ManagerForm(forms.ModelForm):
     class Meta:
         model = AIS140Request
-        exclude = ['unique_id']          # <--- do not render non‑editable field
-
         fields = [
-            'unique_id','request_id',
+            'request_id','reupdated_request_al',
             'date_of_request','Customer_assigned_date','AL_assigned_date', 'customer_name', 'customer_phone', 'dealer_name', 'assigned_to',
             'state',  'rto_code', 'rto_name', 'vehicle_available_in_workshop', 'assigned_engineer_email',
             'device_mode', 'request_type', 'vin_no', 'psn', 'aadhar_card', 'teleco_status', 'teleco_type',
             'validity_expiry_date', 'sos_fitment_date', 'pan_card', 'manufacturing_year', 'engine','requested_by',
-            'requested_name','ticket_through',
-            'requested_phone_number','dealer_code',
+            'requested_name',
+            'requested_phone_number','dealer_code','Customer_Alternate_number','Cust_veh_Regn_Address','Customer_Email_ID','category','AIS140_Type','Dealer_mail',
             'vehicle_no', 'vehicle_model', 'owner_name', 'owner_phone', 'ao_name', 'ro', 'zone','remarks','AL_comments','AL_remarks',
             'completion_status', 'sim_activation_manual', 'sim_activation_service', 'request_sent_by_email'
         ]
         widgets = {
             'date_of_request': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'reupdated_request_al': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'Customer_assigned_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'AL_assigned_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'validity_expiry_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -28,6 +27,11 @@ class ManagerForm(forms.ModelForm):
             'requested_by': forms.Select(attrs={'class': 'form-control'}),
             'requested_name': forms.Select(attrs={'class': 'form-control','placeholder': 'Select Mail ID'}),
             'requested_phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Phone Number'}),
+            'Cust_veh_Regn_Address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Customer Address',
+                'rows': 1
+            }),
             'dealer_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Dealer Code'}),
             'AL_remarks': forms.TextInput(attrs={'class': 'form-control', 'rows': 1, 'placeholder': 'Enter AL Remarks'}),
             'AL_comments': forms.TextInput(attrs={'class': 'form-control', 'rows': 1, 'placeholder': 'Enter AL Comments'}),
@@ -38,10 +42,8 @@ class ManagerForm(forms.ModelForm):
 class EngineerForm(forms.ModelForm):
     class Meta:
         model = AIS140Request
-        exclude = ['unique_id']
-
         fields = [
-            'unique_id','request_id',
+            'request_id',
             'd1', 'D1_engineer', 'd2', 'D2_engineer', 'd3', 'remarks', 'communication_status', 'vehicle_running_location',
             'contact_person', 'contact_person_phone', 'sw_flashed_version', 'sw_flashed_date', 'sos_verification'
         ]
@@ -58,10 +60,8 @@ class EngineerForm(forms.ModelForm):
 class PartBForm(forms.ModelForm):
     class Meta:
         model = AIS140Request
-        exclude = ['unique_id']          # same here
-
         fields = [
-            'unique_id','request_id',
+            'request_id',
             'device_mode', 'request_type', 'icicid_no', 'imei_no', 'subscription_raised_by',
             'current_sim_status', 'existing_plan_start_date', 'existing_plan_end_date',
             'reqd_plan_start_date', 'reqd_plan_end_date', 'plan_reqd', 'top_up_reqd_for',
@@ -72,7 +72,7 @@ class PartBForm(forms.ModelForm):
             'otp_generated_date', 'otp_updated_date', 'temp_cert_reqd', 'temp_cert_date','permanent_cert_date',
             'permanent_certificate', 'responsibility',  'completion_status', 'completion_date','remarks_02',
             'upload_certificate_in_ialert','upload_certificate_in_ialert_01','upload_certificate_in_ialert_02', 'mail_to_customer','Dealer_mail', 'TSM_mail','upload_certificate_in_danlaw_server',
-            'total_tat','d1','d2','D1_engineer', 'D2_engineer','D1_comments','D2_comments','Update_to_AL_API','temp_raised_by','perm_raised_by'
+            'total_tat','d1','d2','D1_engineer', 'D2_engineer','D1_comments','D2_comments','Update_to_AL_API','temp_raised_by','perm_raised_by','additional_email_id'
         ]
 
         widgets = {
@@ -127,47 +127,47 @@ class PartBForm(forms.ModelForm):
         """Comprehensive validation for certificates and D1/D2 remarks based on Update_to_AL_API value."""
         cleaned = super().clean()
         api_value = cleaned.get('Update_to_AL_API')
-        
+
         # Check certificate file uploads
         has_temp_cert = self.files.get('upload_certificate_in_ialert') or bool(getattr(self.instance, 'upload_certificate_in_ialert', None))
         has_perm_cert = self.files.get('upload_certificate_in_ialert_01') or bool(getattr(self.instance, 'upload_certificate_in_ialert_01', None))
         has_vahan_cert = self.files.get('upload_certificate_in_ialert_02') or bool(getattr(self.instance, 'upload_certificate_in_ialert_02', None))
-        
+
         # RULE 1: If Permanent Certificate is uploaded → Update_to_AL_API MUST be "Permanent"
         if has_perm_cert and api_value != 'Permanent':
             self.add_error('Update_to_AL_API', 'When Permanent Certificate is uploaded, Update to A.L API must be set to "Permanent"')
-        
+
         # RULE 2: If only Temporary Certificate is uploaded (no Permanent) → Update_to_AL_API MUST be "Temporary"
         if has_temp_cert and not has_perm_cert and api_value != 'Temporary':
             self.add_error('Update_to_AL_API', 'When only Temporary Certificate is uploaded, Update to A.L API must be set to "Temporary"')
-        
+
         # RULE 3-6: Handle scenarios when both certificates are blank
         if not has_temp_cert and not has_perm_cert:
             d1_remarks = cleaned.get('d1')
             d1_comments = cleaned.get('D1_comments')
             d2_remarks = cleaned.get('d2')
             d2_comments = cleaned.get('D2_comments')
-            
+
             d1_remarks_filled = d1_remarks and str(d1_remarks).strip()
             d1_comments_filled = d1_comments and str(d1_comments).strip()
             d2_remarks_filled = d2_remarks and str(d2_remarks).strip()
             d2_comments_filled = d2_comments and str(d2_comments).strip()
-            
+
             d1_complete = d1_remarks_filled and d1_comments_filled
             d2_complete = d2_remarks_filled and d2_comments_filled
-            
+
             # RULE 3: Check D2 - if either is filled but not both, show error "both should be mandatory"
             d2_partially_filled = (d2_remarks_filled or d2_comments_filled) and not d2_complete
             if d2_partially_filled:
                 self.add_error('d2', '⚠️ Both D2 Remarks and D2 Comments are mandatory - either fill both or leave both empty')
                 self.add_error('D2_comments', '⚠️ Both D2 Remarks and D2 Comments are mandatory - either fill both or leave both empty')
-            
+
             # RULE 5: Check D1 - if either is filled but not both, show error "both should be mandatory"
             d1_partially_filled = (d1_remarks_filled or d1_comments_filled) and not d1_complete
             if d1_partially_filled:
                 self.add_error('d1', '⚠️ Both D1 Remarks and D1 Comments are mandatory - either fill both or leave both empty')
                 self.add_error('D1_comments', '⚠️ Both D1 Remarks and D1 Comments are mandatory - either fill both or leave both empty')
-            
+
             # RULE 4 & 6: Validate Update_to_AL_API based on which D-level is complete
             # If both D1 and D2 are complete, Update_to_AL_API should be "D2" (the latest follow-up)
             if d1_complete and d2_complete:
@@ -181,7 +181,7 @@ class PartBForm(forms.ModelForm):
             elif d1_complete and not d2_complete:
                 if api_value != 'D1':
                     self.add_error('Update_to_AL_API', 'When both D1 Remarks and D1 Comments are filled, Update to A.L API must be set to "D1"')
-        
+
         # New validations based on Update_to_AL_API value
         if api_value == 'D1':
             if not cleaned.get('d1') or not str(cleaned.get('d1')).strip():
@@ -199,7 +199,7 @@ class PartBForm(forms.ModelForm):
         elif api_value == 'Permanent':
             if not has_perm_cert:  # Assuming upload_certificate_in_ialert_01 for Permanent as per user
                 self.add_error('upload_certificate_in_ialert_01', 'Permanent Certificate is required when Update to A.L API is set to "Permanent"')
-        
+
         return cleaned
 
 

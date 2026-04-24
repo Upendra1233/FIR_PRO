@@ -14,7 +14,7 @@ import csv
 import requests
 from django.utils import timezone
 from django.utils import timezone
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 import pytz
 from django.utils import timezone
 from django.utils.timezone import localtime
@@ -25,10 +25,49 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 import json
 from psn_project.email_utils import send_email_with_config
-
+from datetime import datetime
+import pytz
 logger = logging.getLogger(__name__)
 IST = pytz.timezone("Asia/Kolkata")
 UTC = pytz.UTC
+
+# Engineer name to email mapping
+ENGINEER_EMAIL_MAP = {
+    "Arun": "arung@danlawtech.com",
+    "Rishwanth": "rishwanthr@danlawtech.com",
+    "Arun Maity": "eastdanlaw@danlawtech.com",
+    "Paribesh": "paribeshb@danlawtech.com",
+    "Narendra": "narendrareddyg@danlawtech.com",
+    "Dilip": "dilipkumarn@danlawtech.com",
+    "Dilip Kumar": "dilipkumarn@danlawtech.com",
+    "Jitendra": "pantnagarplant@danlawtech.com",
+    "Jitendra": "pantnagarplant@danlawtech.com",
+    "Gayadhar": "gayadhar@danlawtech.com",
+    "Eliyas": "eliyasp@danlawtech.com",
+    "Siva": "sivanambirajant@danlawtech.com",
+    "Rajesh": "Ennoreplant@danlawtech.com",
+    "Gowtham": "gowthamv@danlawtech.com",
+    "Yoga": "yoganandam@danlawtech.com",
+    "SR": "rajendrans@danlawtech.com",
+}
+
+def resolve_engineer_email(identifier):
+    """
+    Resolve engineer name or email to actual email address.
+    If already an email, return as-is.
+    If a name, lookup in mapping.
+    """
+    if not identifier:
+        return None
+
+    identifier = str(identifier).strip()
+
+    # If it's already an email address, return it
+    if "@" in identifier:
+        return identifier
+
+    # Otherwise, try to find it in the mapping
+    return ENGINEER_EMAIL_MAP.get(identifier, identifier)
 
 def to_ist(dt):
     if not dt:
@@ -98,6 +137,8 @@ def part_a_form(request, id=None):
         entry = get_object_or_404(AIS140Request, id=id)
     if request.method == 'POST':
         try:
+            old_assigned_email = entry.assigned_engineer_email if entry else None
+
             if entry:
                 form = ManagerForm(request.POST, request.FILES, instance=entry)
             else:
@@ -107,29 +148,43 @@ def part_a_form(request, id=None):
                 if not id:  # only set date on creation
                     entry.date_of_request = now()
                 entry.save()
-                if not id:  # send email only on creation
-                    # Generate Part B URL
-                    part_b_url = request.build_absolute_uri(reverse('part_b_form', args=[entry.id]))
-                    # Prepare email details
-                    subject = f"AIS140 Certification Request : {entry.unique_id}"
-                    html_message = render_to_string('emails/part_a_email.html', {
-                        'entry': entry,
-                        'part_b_url': part_b_url,
-                        'site_domain': request.build_absolute_uri('/')[:-1],  # Get the site domain
-                    })
-                    recipient_list = [entry.assigned_engineer_email]
-                    cc_list = ['sales@danlawtech.com', "dilipkumarn@danlawtech.com","narendrareddyg@danlawtech.com","rajendrans@danlawtech.com"]
-                    # Send email
-                    send_email_with_config(
-                        subject=subject,
-                        html_message=html_message,
-                        recipient_list=recipient_list,
-                        cc_list=cc_list,
-                        config_type='AIS140'
-                    )
-                    logger.info(f"Email sent to manager for Part-A form submission (Request ID: {entry.unique_id})")
-                # Redirect to Part A form
-                return redirect('part_a_form')
+
+                # Generate Part B URL
+                part_b_url = request.build_absolute_uri(reverse('part_b_form', args=[entry.id]))
+                # Prepare email details
+                subject = f"AIS140 Certification Request : {entry.unique_id}"
+                html_message = render_to_string('emails/part_a_email.html', {
+                    'entry': entry,
+                    'part_b_url': part_b_url,
+                    'site_domain': request.build_absolute_uri('/')[:-1],
+                })
+                engineer_email = resolve_engineer_email(entry.assigned_engineer_email)
+                recipient_list = [engineer_email] if engineer_email else []
+                cc_list = ['sales@danlawtech.com', "dilipkumarn@danlawtech.com","narendrareddyg@danlawtech.com","rajendrans@danlawtech.com"]
+
+                # Send email on NEW creation OR when assigned_engineer_email changes
+                send_email = False
+                if not id:
+                    send_email = True  # New ticket
+                elif entry.assigned_engineer_email and entry.assigned_engineer_email != old_assigned_email and entry.assigned_engineer_email != "--":
+                    send_email = True  # Assignment changed
+
+                if send_email and entry.assigned_engineer_email and entry.assigned_engineer_email != "--":
+                    try:
+                        send_email_with_config(
+                            subject=subject,
+                            html_message=html_message,
+                            recipient_list=recipient_list,
+                            cc_list=cc_list,
+                            config_type='AIS140'
+                        )
+                        logger.info(f"Email sent for Part-A (Request ID: {entry.unique_id})")
+                    except Exception as e:
+                        logger.error(f"Failed to send email (Request ID: {entry.unique_id}): {e}")
+
+                # Redirect to Part A form with success parameter
+                success_url = reverse('part_a_form') + '?success=true'
+                return redirect(success_url)
             else:
                 logger.error(f"Form errors: {form.errors}")
         except Exception as e:
@@ -139,9 +194,12 @@ def part_a_form(request, id=None):
         if entry:
             form = ManagerForm(instance=entry)
         else:
-            form = ManagerForm()
-    return render(request, 'AIS140_FLOW/part_a_form.html', {'form': form})
-
+            form = ManagerForm(initial={'Customer_assigned_date': now()})
+    success = request.GET.get('success', False)
+    return render(request, 'AIS140_FLOW/part_a_form.html', {
+        'form': form,
+        'success': success
+    })
 
 def part_b_form(request, id):
     # Fetch the entry for Part-B
@@ -152,6 +210,7 @@ def part_b_form(request, id):
         'date_of_request': entry.date_of_request,
         'Customer_assigned_date': entry.Customer_assigned_date,
         'AL_assigned_date': entry.AL_assigned_date,
+        'reupdated_request_al':entry.reupdated_request_al,
         'requested_by': entry.requested_by,
         'requested_name': entry.requested_name,
         'requested_phone_number': entry.requested_phone_number,
@@ -175,14 +234,20 @@ def part_b_form(request, id):
         'rto_code': entry.rto_code,
         'dealer_name': entry.dealer_name,
         'dealer_code': entry.dealer_code,
+        'Dealer_mail': entry.Dealer_mail,
         'ao_name': entry.ao_name,
         'ro': entry.ro,
         'zone': entry.zone,
         'remarks': entry.remarks,
         'AL_remarks':entry.AL_remarks,
         'AL_comments':entry.AL_comments,
-        'ticket_through':entry.ticket_through
-    }
+        'ticket_through':entry.ticket_through,
+        'Customer_Alternate_number':entry.Customer_Alternate_number,
+        'Cust_veh_Regn_Address': entry.Cust_veh_Regn_Address,
+        'Customer_Email_ID':entry.Customer_Email_ID,
+        'AIS140_Type':entry.AIS140_Type,
+        'Dealer_Contact':entry.Dealer_Contact
+        }
 
     # Determine if the form should be read-only
     is_read_only = entry.completion_status  in ["Permanent", "Temp + Perm","Cancelled","Reject","Third Party Device-Rejected"]
@@ -207,16 +272,59 @@ def part_b_form(request, id):
                 "Reject",
                 "Third Party Device-Rejected",
             }
-            prev_status = entry.completion_status  # entry is the DB object fetched at top of view
-            if getattr(instance, 'completion_status', None) in terminal_statuses:
-                if prev_status != instance.completion_status or not getattr(instance, 'completion_date', None):
-                    instance.completion_date = timezone.now()
-            # set closure timestamps server-side (use cleaned_data, not form.<field>)
-            if cleaned.get('d1') and not getattr(instance, 'D1_closure', None):
-                instance.D1_closure = now()
-            if cleaned.get('d2') and not getattr(instance, 'D2_closure', None):
-                instance.D2_closure = now()
+
+            # Handle datetime-local fields from form submission
+            current_time_ist = now().astimezone(IST)
+
+            # Parse and set D1_closure if provided
+            if request.POST.get('D1_closure'):
+                try:
+                    d1_closure_str = request.POST.get('D1_closure')
+                    # Parse datetime-local format (YYYY-MM-DDTHH:mm)
+                    d1_dt = datetime.strptime(d1_closure_str, '%Y-%m-%dT%H:%M')
+                    # Localize as IST
+                    d1_dt = IST.localize(d1_dt)
+                    instance.D1_closure = d1_dt
+                    logger.info(f"D1_closure set to: {d1_dt} (Request ID: {entry.unique_id})")
+                except Exception as e:
+                    logger.error(f"Error parsing D1_closure: {e}")
+
+            # Parse and set D2_closure if provided
+            if request.POST.get('D2_closure'):
+                try:
+                    d2_closure_str = request.POST.get('D2_closure')
+                    # Parse datetime-local format (YYYY-MM-DDTHH:mm)
+                    d2_dt = datetime.strptime(d2_closure_str, '%Y-%m-%dT%H:%M')
+                    # Localize as IST
+                    d2_dt = IST.localize(d2_dt)
+                    instance.D2_closure = d2_dt
+                    logger.info(f"D2_closure set to: {d2_dt} (Request ID: {entry.unique_id})")
+                except Exception as e:
+                    logger.error(f"Error parsing D2_closure: {e}")
+
+            # Parse and set completion_date if provided
+            if request.POST.get('completion_date'):
+                try:
+                    completion_date_str = request.POST.get('completion_date')
+                    # Parse datetime-local format (YYYY-MM-DDTHH:mm)
+                    completion_dt = datetime.strptime(completion_date_str, '%Y-%m-%dT%H:%M')
+                    # Localize as IST
+                    completion_dt = IST.localize(completion_dt)
+                    instance.completion_date = completion_dt
+                    logger.info(f"completion_date set to: {completion_dt} (Request ID: {entry.unique_id})")
+                except Exception as e:
+                    logger.error(f"Error parsing completion_date: {e}")
+
+            # Auto-set completion_date when status is set to terminal status
+            if instance.completion_status in terminal_statuses and not instance.completion_date:
+                instance.completion_date = current_time_ist
+                logger.info(f"Auto-set completion_date to current IST time (Request ID: {entry.unique_id})")
+
             instance.save()
+
+            # Verify saved values
+            logger.info(f"After save - D1_closure: {instance.D1_closure}, D2_closure: {instance.D2_closure}, completion_date: {instance.completion_date} (Request ID: {entry.unique_id})")
+
             entry = instance
 
             # Send to customer API
@@ -237,8 +345,17 @@ def part_b_form(request, id):
                         'entry': entry,
                         'site_domain': request.build_absolute_uri('/')[:-1],  # Get the site domain
                     })
-                    recipient_list_1 = [entry.assigned_engineer_email,entry.mail_to_customer,entry.requested_name,entry.Dealer_mail,"Athulya.T@ashokleyland.com","KRY_arunkumar@ashokleyland.com"]  # Mail with TSM, CUSTOMER,ENGINEER, ARUN DEFAULT
-                    cc_list_1 = ['sales@danlawtech.com',"dilipkumarn@danlawtech.com","narendrareddyg@danlawtech.com","rajendrans@danlawtech.com"]
+                    if entry.state=="KARNATAKA":
+                        add_email=["sales.hubli@amlmotors.com"]
+                    elif entry.state=="MAHARASHTRA":
+                        add_email=["ashish.rawat2@ashokleyland.com","suraj.khatri@ashokleyland.com","kapil.mohan@ashokleyland.com"]
+                    else:
+                        add_email=[]
+                    # Resolve engineer emails
+                    assigned_eng_email = resolve_engineer_email(entry.assigned_engineer_email)
+                    recipient_list_1 = [assigned_eng_email, entry.Customer_Email_ID, entry.Dealer_mail, entry.additional_email_id, "Athulya.T@ashokleyland.com", "KRY_arunkumar@ashokleyland.com"] + add_email
+                    recipient_list_1 = [email for email in recipient_list_1 if email]  # Remove empty/None values
+                    cc_list_1 = ['sales@danlawtech.com', "dilipkumarn@danlawtech.com", "narendrareddyg@danlawtech.com", "rajendrans@danlawtech.com"]
                     send_email_with_config(
                         subject=subject,
                         html_message=html_message,
@@ -258,8 +375,16 @@ def part_b_form(request, id):
                         'entry': entry,
                         'site_domain': request.build_absolute_uri('/')[:-1],  # Get the site domain
                     })
-
-                    recipient_list = [entry.assigned_engineer_email,entry.mail_to_customer,entry.requested_name,entry.Dealer_mail,"Athulya.T@ashokleyland.com","KRY_arunkumar@ashokleyland.com"]  # Replace with the manager's email
+                    if entry.state=="KARNATAKA":
+                        add_email=["sales.hubli@amlmotors.com"]
+                    elif entry.state=="MAHARASHTRA":
+                        add_email=["ashish.rawat2@ashokleyland.com","suraj.khatri@ashokleyland.com","kapil.mohan@ashokleyland.com"]
+                    else:
+                        add_email=[]
+                    # Resolve engineer emails
+                    assigned_eng_email = resolve_engineer_email(entry.assigned_engineer_email)
+                    recipient_list = [assigned_eng_email, entry.Customer_Email_ID, entry.Dealer_mail, entry.additional_email_id, "Athulya.T@ashokleyland.com", "KRY_arunkumar@ashokleyland.com"] + add_email
+                    recipient_list = [email for email in recipient_list if email]  # Remove empty/None values
                     cc_list = ['sales@danlawtech.com',"narendrareddyg@danlawtech.com","rajendrans@danlawtech.com"]  # Replace with additional recipients if needed
                     # Collect attachments based on completion_status
                     attachments = []
@@ -405,49 +530,73 @@ def download_part_b_csv(request):
     field_map = {
         'Unique ID': 'unique_id',
         'Date of Request': 'date_of_request',
-        'AL Remarks':'AL_remarks',
-        'AL Comments':'AL_comments',
-        'Request Type': 'request_type',
+#        'Assigned To Engineer Date': 'Customer_assigned_date',
+#        'Resp Engineer': 'assigned_engineer_email',
         'State': 'state',
+#        'Request Type': 'request_type',
         'Chassis No': 'vin_no',
-        'Engine No': 'engine',
-        'PSN No': 'psn',
-        'Device Model': 'device_mode',
-        'IMEI No': 'imei_no',
-        'Vehicle Regn No': 'vehicle_no',
-        'Vehicle Model': 'vehicle_model',
-        'Customer Name': 'customer_name',
-        'Customer Phone No': 'customer_phone',
-        'RTO Name': 'rto_name',
-        'RTO Code': 'rto_code',
-        'Dealer Name': 'dealer_name',
-        'Zone': 'zone',
-        'Remarks': 'remarks',
-        'Cert. Generation Assigned To': 'assigned_engineer_email',
-        'Ticket Through':'ticket_through',
-        'D1 Remarks': 'd1',
-        'D1 Comments': 'D1_comments',
-
-        'D1 Engineer': 'D1_engineer',
-        'D1 Closure Timestamp': 'D1_closure',
-        'D2 Remarks': 'd2',
-        'D2 Comments': 'D2_comments',
-
-        'D2 Engineer': 'D2_engineer',
-        'D2 Closure Timestamp': 'D2_closure',
+#        'PSN No': 'psn',
         'Completion Status': 'completion_status',
         'Update to A.L': 'Update_to_AL_API',
         'Completion Date': 'completion_date',
-        'Temporary Certificate Required': 'temp_cert_reqd',
-        'Temporary Certificate Date': 'temp_cert_date',
-        'Permanent Certificate Date': 'permanent_cert_date',
-        'Total TAT': 'total_tat',
-        'Temporary certificate': 'upload_certificate_in_ialert',
-        'Permanent certificate': 'upload_certificate_in_ialert_01',
-        'Vahan Certificate': 'upload_certificate_in_ialert_02',
-        'Completion Start Date': 'certification_start_date',
-        'Completion End Date': 'certification_end_date',
+        'D2 Remarks': 'd2',
+        'D2 Closure': 'D2_closure',
+
+        'D1 Remarks': 'd1',
+        'D1 Closure': 'D1_closure',
+        'Updated to DTIL':'reupdated_request_al',
+        'Dealer Name': 'dealer_name',
+        'RTO Code': 'rto_code',
+        'Customer Name': 'customer_name',
+
+#        'D1 Comments': 'D1_comments',
+#        'D1 Engineer': 'D1_engineer',
+#        'D2 Comments': 'D2_comments',
+#        'D2 Engineer': 'D2_engineer',
+
+
+#        'AL Remarks':'AL_remarks',
+#        'AL Comments':'AL_comments',
+#        'Engine No': 'engine',
+#        'Device Model': 'device_mode',
+#        'IMEI No': 'imei_no',
+#        'Vehicle Regn No': 'vehicle_no',
+#        'Vehicle Model': 'vehicle_model',
+        'Customer Phone No': 'customer_phone',
+        'Customer Alternate Phone No': 'Customer_Alternate_number',
+        'Customer Address': 'Cust_veh_Regn_Address',
+#        'Manufacturing Year':'manufacturing_year',
+#        'Vehicle Reg No':'vehicle_no',
+#        'RTO Name': 'rto_name',
+        'Dealer Contact NO':'Dealer_Contact',
+#        'Category': 'category',
+#        'Remarks': 'remarks',
+#        'Ticket Through':'ticket_through',
+#        'Temporary Certificate Required': 'temp_cert_reqd',
+#        'Temporary Certficate Raised By':'temp_raised_by',
+#        'Temporary Certificate Date': 'temp_cert_date',
+#        'Temporary certificate': 'upload_certificate_in_ialert',
+#        'Permanent Certficate Raised By':'perm_raised_by',
+#        'Permanent Certificate Date': 'permanent_cert_date',
+#        'Permanent certificate': 'upload_certificate_in_ialert_01',
+#        'Vahan Certificate': 'upload_certificate_in_ialert_02',
+
+#        'Total TAT': 'total_tat',
+#        'Completion Start Date': 'certification_start_date',
     }
+    datetime_fields_ist = {
+        'date_of_request',
+        'Customer_assigned_date',
+        'D1_closure',
+        'D2_closure',
+        'completion_date',
+        'reupdated_request_al',
+        'temp_cert_date',
+        'permanent_cert_date',
+        'certification_start_date',
+        'certification_end_date',
+    }
+
 
     # Selected columns
     columns = request.GET.get('columns', '').split(',')
@@ -459,21 +608,30 @@ def download_part_b_csv(request):
     # Base queryset (IMPORTANT FIX: use values directly)
     queryset = AIS140Request.objects.all()
 
-    # Filters
-    if request.GET.get('state'):
-        queryset = queryset.filter(state=request.GET['state'])
+    # Log initial count
+    logger.info(f"Download CSV - Initial total records: {queryset.count()}")
+
+    # Filters - with logging
+    state = request.GET.get('state')
+    if state and state.strip():
+        logger.info(f"Download CSV - Filtering by state: '{state}'")
+        queryset = queryset.filter(state=state)
+        logger.info(f"Download CSV - After state filter: {queryset.count()} records")
 
     if request.GET.get('chassis_no'):
         queryset = queryset.filter(vin_no__icontains=request.GET['chassis_no'])
+        logger.info(f"Download CSV - After chassis_no filter: {queryset.count()} records")
 
     if request.GET.get('psn_no'):
         queryset = queryset.filter(psn__icontains=request.GET['psn_no'])
+        logger.info(f"Download CSV - After psn_no filter: {queryset.count()} records")
 
     if request.GET.get('customer_name'):
         queryset = queryset.filter(customer_name__icontains=request.GET['customer_name'])
 
     if request.GET.get('assigned_engineer_email'):
         queryset = queryset.filter(assigned_engineer_email=request.GET['assigned_engineer_email'])
+        logger.info(f"Download CSV - After assigned_engineer filter: {queryset.count()} records")
 
     if request.GET.get('completion_date_from'):
         queryset = queryset.filter(completion_date__gte=request.GET['completion_date_from'])
@@ -493,8 +651,26 @@ def download_part_b_csv(request):
     if request.GET.get('unique_id'):
         queryset = queryset.filter(unique_id__icontains=request.GET['unique_id'])
 
-    if request.GET.get('completion_status'):
-        queryset = queryset.filter(completion_status=request.GET['completion_status'])
+    # Handle completion_status filter - the critical one
+    completion_status = request.GET.getlist('completion_status')
+    # Filter out empty strings to handle "nothing selected" case
+    completion_status = [s for s in completion_status if s.strip()]
+
+    logger.info(f"==================== CSV DOWNLOAD DEBUG ====================")
+    logger.info(f"All GET parameters: {dict(request.GET)}")
+    logger.info(f"Received completion_status values: {completion_status}")
+    logger.info(f"Total selected statuses: {len(completion_status)}")
+    logger.info(f"Queryset count BEFORE completion_status filter: {queryset.count()}")
+
+    if completion_status:
+        queryset = queryset.filter(completion_status__in=completion_status)
+        logger.info(f"Queryset count AFTER completion_status filter: {queryset.count()}")
+    else:
+        logger.info(f"No completion_status filter applied (empty list)")
+
+    logger.info(f"FINAL CSV export record count: {queryset.count()}")
+    logger.info(f"===========================================================")
+
 
     #  fetch only required fields & avoid model conversion
     queryset = queryset.values(*field_map.values())
@@ -514,8 +690,209 @@ def download_part_b_csv(request):
             if value is None:
                 row[col] = ''
             else:
-                # Convert everything safely to string
-                if isinstance(value, (datetime, date, time)):
+                # Check if field needs IST conversion
+                if db_field in datetime_fields_ist and isinstance(value, (datetime, date)):
+                    # Convert UTC to IST
+                    if isinstance(value, datetime):
+                        # Ensure timezone aware
+                        if timezone.is_naive(value):
+                            value = timezone.make_aware(value)
+                        # Convert to IST
+                        ist_value = value.astimezone(IST)
+                        row[col] = ist_value.strftime("%d-%m-%Y %H:%M:%S")
+                    else:
+                        row[col] = value.strftime("%d-%m-%Y")
+                elif isinstance(value, (datetime, date, time)):
+                    row[col] = value.strftime("%d-%m-%Y %H:%M:%S")
+                else:
+                    row[col] = str(value)
+
+        writer.writerow(row)
+
+    return response
+
+
+def download_full_csv(request):
+
+    # File name
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'AIS140_Full_Data_{timestamp}.csv'
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    # CSV Header -> Model Field mapping (Full fields)
+    field_map = {
+        'Unique ID': 'unique_id',
+        'Date of Request': 'date_of_request',
+        'Assigned To Engineer Date': 'Customer_assigned_date',
+        'Resp Engineer': 'assigned_engineer_email',
+        'State': 'state',
+        'Request Type': 'request_type',
+        'Chassis No': 'vin_no',
+        'PSN No': 'psn',
+        'D1 Remarks': 'd1',
+        'D1 Comments': 'D1_comments',
+        'D1 Engineer': 'D1_engineer',
+        'D1 Closure Timestamp': 'D1_closure',
+        'D2 Remarks': 'd2',
+        'D2 Comments': 'D2_comments',
+        'D2 Engineer': 'D2_engineer',
+        'D2 Closure Timestamp': 'D2_closure',
+        'Completion Status': 'completion_status',
+        'Update to A.L': 'Update_to_AL_API',
+        'Completion Date': 'completion_date',
+        'Updated to DTIL':'reupdated_request_al',
+        'AL Remarks':'AL_remarks',
+        'AL Comments':'AL_comments',
+        'Engine No': 'engine',
+        'Device Model': 'device_mode',
+        'IMEI No': 'imei_no',
+        'Vehicle Regn No': 'vehicle_no',
+        'Vehicle Model': 'vehicle_model',
+        'Customer Name': 'customer_name',
+        'Customer Phone No': 'customer_phone',
+        'Customer Alternate Phone No': 'Customer_Alternate_number',
+        'Customer Address': 'Cust_veh_Regn_Address',
+        'Manufacturing Year':'manufacturing_year',
+        'Vehicle Reg No':'vehicle_no',
+        'RTO Name': 'rto_name',
+        'RTO Code': 'rto_code',
+        'Dealer Name': 'dealer_name',
+        'Dealer Contact NO':'Dealer_Contact',
+        'Category': 'category',
+        'Remarks': 'remarks',
+        'Ticket Through':'ticket_through',
+        'Temporary Certificate Required': 'temp_cert_reqd',
+        'Temporary Certficate Raised By':'temp_raised_by',
+        'Temporary Certificate Date': 'temp_cert_date',
+        'Temporary certificate': 'upload_certificate_in_ialert',
+        'Permanent Certficate Raised By':'perm_raised_by',
+        'Permanent Certificate Date': 'permanent_cert_date',
+        'Permanent certificate': 'upload_certificate_in_ialert_01',
+        'Vahan Certificate': 'upload_certificate_in_ialert_02',
+        'Total TAT': 'total_tat',
+        'Completion Start Date': 'certification_start_date',
+        'Completion End Date': 'certification_end_date',
+    }
+    datetime_fields_ist = {
+        'date_of_request',
+        'Customer_assigned_date',
+        'D1_closure',
+        'D2_closure',
+        'completion_date',
+        'reupdated_request_al',
+        'temp_cert_date',
+        'permanent_cert_date',
+        'certification_start_date',
+        'certification_end_date',
+    }
+
+    # Selected columns
+    columns = request.GET.get('columns', '').split(',')
+    if columns == [''] or not columns:
+        fieldnames = list(field_map.keys())
+    else:
+        fieldnames = [col for col in columns if col in field_map]
+
+    # Base queryset (IMPORTANT FIX: use values directly)
+    queryset = AIS140Request.objects.all()
+
+    # Log initial count
+    logger.info(f"Download Full CSV - Initial total records: {queryset.count()}")
+
+    # Filters - with logging
+    state = request.GET.get('state')
+    if state and state.strip():
+        logger.info(f"Download Full CSV - Filtering by state: '{state}'")
+        queryset = queryset.filter(state=state)
+        logger.info(f"Download Full CSV - After state filter: {queryset.count()} records")
+
+    if request.GET.get('chassis_no'):
+        queryset = queryset.filter(vin_no__icontains=request.GET['chassis_no'])
+        logger.info(f"Download Full CSV - After chassis_no filter: {queryset.count()} records")
+
+    if request.GET.get('psn_no'):
+        queryset = queryset.filter(psn__icontains=request.GET['psn_no'])
+        logger.info(f"Download Full CSV - After psn_no filter: {queryset.count()} records")
+
+    if request.GET.get('customer_name'):
+        queryset = queryset.filter(customer_name__icontains=request.GET['customer_name'])
+
+    if request.GET.get('assigned_engineer_email'):
+        queryset = queryset.filter(assigned_engineer_email=request.GET['assigned_engineer_email'])
+        logger.info(f"Download Full CSV - After assigned_engineer filter: {queryset.count()} records")
+
+    if request.GET.get('completion_date_from'):
+        queryset = queryset.filter(completion_date__gte=request.GET['completion_date_from'])
+
+    if request.GET.get('completion_date_to'):
+        queryset = queryset.filter(completion_date__lte=request.GET['completion_date_to'])
+
+    if request.GET.get('category'):
+        queryset = queryset.filter(category=request.GET['category'])
+
+    if request.GET.get('date_of_request_from'):
+        queryset = queryset.filter(date_of_request__gte=request.GET['date_of_request_from'])
+
+    if request.GET.get('date_of_request_to'):
+        queryset = queryset.filter(date_of_request__lte=request.GET['date_of_request_to'])
+
+    if request.GET.get('unique_id'):
+        queryset = queryset.filter(unique_id__icontains=request.GET['unique_id'])
+
+    # Handle completion_status filter - the critical one
+    completion_status = request.GET.getlist('completion_status')
+    # Filter out empty strings to handle "nothing selected" case
+    completion_status = [s for s in completion_status if s.strip()]
+
+    logger.info(f"==================== FULL CSV DOWNLOAD DEBUG ====================")
+    logger.info(f"All GET parameters: {dict(request.GET)}")
+    logger.info(f"Received completion_status values: {completion_status}")
+    logger.info(f"Total selected statuses: {len(completion_status)}")
+    logger.info(f"Queryset count BEFORE completion_status filter: {queryset.count()}")
+
+    if completion_status:
+        queryset = queryset.filter(completion_status__in=completion_status)
+        logger.info(f"Queryset count AFTER completion_status filter: {queryset.count()}")
+    else:
+        logger.info(f"No completion_status filter applied (empty list)")
+
+    logger.info(f"FINAL FULL CSV export record count: {queryset.count()}")
+    logger.info(f"===========================================================")
+
+
+    #  fetch only required fields & avoid model conversion
+    queryset = queryset.values(*field_map.values())
+
+    writer = csv.DictWriter(response, fieldnames=fieldnames)
+    writer.writeheader()
+
+    # Use iterator() for large data safety
+    for entry in queryset.iterator():
+
+        row = {}
+
+        for col in fieldnames:
+            db_field = field_map[col]
+            value = entry.get(db_field)
+
+            if value is None:
+                row[col] = ''
+            else:
+                # Check if field needs IST conversion
+                if db_field in datetime_fields_ist and isinstance(value, (datetime, date)):
+                    # Convert UTC to IST
+                    if isinstance(value, datetime):
+                        # Ensure timezone aware
+                        if timezone.is_naive(value):
+                            value = timezone.make_aware(value)
+                        # Convert to IST
+                        ist_value = value.astimezone(IST)
+                        row[col] = ist_value.strftime("%d-%m-%Y %H:%M:%S")
+                    else:
+                        row[col] = value.strftime("%d-%m-%Y")
+                elif isinstance(value, (datetime, date, time)):
                     row[col] = value.strftime("%d-%m-%Y %H:%M:%S")
                 else:
                     row[col] = str(value)
@@ -605,7 +982,23 @@ def real_time_page(request):
             except Exception:
                 total_tat = ''
 
+        if entry.reupdated_request_al:
+            updated_dt = entry.reupdated_request_al
+            if timezone.is_naive(updated_dt):
+                updated_dt = timezone.make_aware(updated_dt)
+            entry.is_new = (timezone.now() - updated_dt).days < 3
+        else:
+            entry.is_new = False
+
         entry.entry_total_tat = total_tat
+
+        entry.is_new = False
+        if entry.reupdated_request_al:
+            updated_dt = entry.reupdated_request_al
+            if timezone.is_naive(updated_dt):
+                updated_dt = timezone.make_aware(updated_dt)
+            entry.is_new = (timezone.now() - updated_dt).days < 3
+
         entry_list.append(entry)
 
     unique_states = AIS140Request.objects.values_list('state', flat=True).distinct()
@@ -684,26 +1077,32 @@ def api_create_ais140_ticket(request):
                 vehicle_model=data.get('vehicle_model'),
                 customer_name=data.get('customer_name'),
                 customer_phone=data.get('customer_mobile_number'),
-                Customer_Alternate_number=data.get('Customer_Alternate_number'),
-                Customer_Email_ID=data.get('Customer_Email_ID'),
-                Cust_veh_Regn_Address=data.get('Cust_veh_Regn_Address'),
-                Cust_veh_Regn_Pincode=data.get('Cust_veh_Regn_Pincode'),
+                Customer_Alternate_number=data.get('customer_alternate_number'),
+                Customer_Email_ID=data.get('customer_email_id'),
+                Cust_veh_Regn_Address=data.get('cust_veh_regn_address'),
+                Cust_veh_Regn_Pincode=data.get('cust_veh_regn_pincode'),
                 pan_card=data.get('pan_no'),
                 aadhar_card=data.get('aadhar_no'),
                 manufacturing_year=data.get('mfg_year'),
-                request_type=data.get('request_type'),
+                request_type=data.get('ais140_type'),       #
+                AIS140_Type=data.get('ais140_type').strip().title(), #
                 rto_name=data.get('rto_name'),
                 rto_code=data.get('rto_code'),
                 dealer_name=data.get('dealer_name'),
-                Dealer_Contact=data.get('Dealer_Contact_No'),
-                Dealer_Location=data.get('Dealer_Location'),
-                Dealer_Email_ID=data.get('Dealer_Email_ID'),
-                TSM_mail=data.get('TSM_Email_ID'),
-                Ialert_Email_ID=data.get('Ialert_Email_ID'),
+                Dealer_Contact=data.get('dealer_contact'),
+                Dealer_Location=data.get('dealer_location'),
+                Dealer_mail=data.get('dealer_email_id'),
+                TSM_mail=data.get('tsm_email_id'),
+                Ialert_Email_ID=data.get('ialert_email_id'),
                 dealer_code=data.get('dealer_code'),
                 sos_fitment_date=data.get('sos_confirmed_on'),
+                zone=data.get('zoneName'),
+
+                category=data.get('category'),
                 ticket_through="A.L API",
                 assigned_engineer_email="--"
+
+
             )
 
             logger.info(f"AIS140 Ticket Created Successfully. Unique ID: {entry.unique_id}")
@@ -743,9 +1142,37 @@ def api_update_ais140_remarks(request):
 
         entry.AL_remarks = AL_remarks
         entry.AL_comments = AL_comments
-        entry.date_of_request=now().astimezone(pytz.timezone('Asia/Kolkata'))
+        entry.reupdated_request_al=now().astimezone(pytz.timezone('Asia/Kolkata'))
+        entry.completion_status="Pending"
         entry.save()
 
+        # Send email notification to assigned engineer
+        try:
+            if entry.assigned_engineer_email and entry.assigned_engineer_email != "--":
+                engineer_email = resolve_engineer_email(entry.assigned_engineer_email)
+                subject = f"AIS140 AL Remarks Updated - {entry.unique_id} ({entry.vin_no})"
+                html_message = render_to_string('emails/remarks_updated_email.html', {
+                    'entry': entry,
+                    'AL_remarks': AL_remarks,
+                    'AL_comments': AL_comments,
+                    'site_domain': request.build_absolute_uri('/')[:-1],
+                })
+                recipient_list = [engineer_email, "narendrareddyg@danlawtech.com", "rajendrans@danlawtech.com"]
+                recipient_list = [email for email in recipient_list if email]  # Remove empty/None values
+                cc_list = ['sales@danlawtech.com', "dilipkumarn@danlawtech.com"]
+
+                send_email_with_config(
+                    subject=subject,
+                    html_message=html_message,
+                    recipient_list=recipient_list,
+                    cc_list=cc_list,
+                    config_type='AIS140'
+                )
+                logger.info(f"Remarks update email sent to engineer for request_id={request_id}, unique_id={entry.unique_id}")
+            else:
+                logger.warning(f"No engineer assigned for request_id={request_id}, skipping email")
+        except Exception as e:
+            logger.error(f"Failed to send remarks update email for request_id={request_id}: {e}")
 
         logger.info("Updated remarks for request_id=%s vin=%s", request_id, entry.vin_no)
 

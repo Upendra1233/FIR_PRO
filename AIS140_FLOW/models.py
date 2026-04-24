@@ -4,11 +4,7 @@ from django.utils.timezone import localtime
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 class AIS140Request(models.Model):
-    REQUEST_TYPES = [
-        ('--', 'Please Select'),
-        ('New', 'New'),
-        ('Renewal', 'Renewal'),
-    ]
+
 
     TELECO_STATUS = [
         ('--', 'Please Select'),
@@ -53,30 +49,19 @@ class AIS140Request(models.Model):
         ('OTHERS', 'OTHERS'),
     ]
 
-    REQUEST_TYPE_CHOICES = [
-        ('--', 'Please Select'),
-        ('New', 'New'),
-        ('Renewal', 'Renewal'),
-    ]
-
-    CATEGORY_CHOICES = [
-    ('--', 'Please Select'),
-    ('AIS140', 'AIS140'),
-    ('Mining', 'Mining'),
-    ('Waste management', 'Waste management'),
-    ('Others', 'Others'),
-]
-
     # Fields for manager_form.html
-    date_of_request = models.DateTimeField(null=True, blank=True,verbose_name="Date of Request")
+    date_of_request = models.DateTimeField(verbose_name="AL Assigned Date")
     Customer_assigned_date = models.DateTimeField(
-        verbose_name="Customer Assigned Date"
+        verbose_name="Assigned to Engineer Date"
     )
-
+    reupdated_request_al = models.DateTimeField(
+        verbose_name="=Updated To DTIL",
+        null=True, blank=True,
+    )
     AL_assigned_date = models.DateTimeField(
         verbose_name="A.L Assigned Date",
-        null=True
-)
+        null=True, blank=True,
+    )
     AL_remarks =models.CharField(max_length=150, null=True, blank=True)  # New field for User ID
     AL_comments  =models.CharField(max_length=150, null=True, blank=True)  # New field for User ID
 
@@ -92,7 +77,7 @@ class AIS140Request(models.Model):
     rto_code = models.CharField(max_length=50, null=True, blank=True,verbose_name="RTO Code")
     rto_name = models.CharField(max_length=100, null=True, blank=True,verbose_name="RTO Name")
     vehicle_available_in_workshop = models.BooleanField(default=False, null=True, blank=True)
-    assigned_engineer_email = models.EmailField(null=True, blank=True)
+    assigned_engineer_email = models.CharField(max_length=100,null=True, blank=True)
     device_mode = models.CharField(max_length=50,  null=True, blank=True)
     request_type = models.CharField(max_length=50, default="Please Select", null=True, blank=True)
     request_id=models.CharField(max_length=50, null=True, blank=True)
@@ -102,7 +87,6 @@ class AIS140Request(models.Model):
     teleco_status = models.CharField(max_length=50, choices=TELECO_STATUS, null=True, blank=True)
     teleco_type = models.CharField(max_length=50, choices=TELECO_TYPE, null   =True, blank=True)
     validity_expiry_date = models.DateField(null=True, blank=True)
-    sos_fitment_date = models.DateField(null=True, blank=True)
     pan_card = models.CharField(max_length=50, null=True, blank=True,verbose_name="PAN No")
     manufacturing_year = models.CharField(max_length=50,null=True, blank=True, verbose_name="Manufacturing Year")
     ticket_through = models.CharField(max_length=50,null=True, blank=True, verbose_name="Ticket Through")
@@ -115,7 +99,6 @@ class AIS140Request(models.Model):
     ao_name = models.CharField(max_length=100, null=True, blank=True, verbose_name="AO Name")
     ro = models.CharField(max_length=100, null=True, blank=True, verbose_name="RO Name")
     zone = models.CharField(max_length=100, null=True, blank=True)
-    completion_status = models.CharField(max_length=50, null=True, blank=True)
     sim_activation_manual = models.BooleanField(default=False, null=True, blank=True)
     sim_activation_service = models.BooleanField(default=False, null=True, blank=True)
     request_sent_by_email = models.EmailField(null=True, blank=True)
@@ -123,12 +106,13 @@ class AIS140Request(models.Model):
     imei_no = models.CharField(max_length=17, null=True, blank=True)
     AIS140_Type=models.CharField(max_length=50, null=True, blank=True, verbose_name="AIS140 Type")
     Cust_veh_Regn_Pincode=models.CharField(max_length=50, null=True, blank=True, verbose_name="AIS140 Type")
-    Customer_mobile_number = models.CharField(max_length=10, null=True, blank=True)
-    Customer_Alternate_number= models.CharField(max_length=10, null=True, blank=True)
+    Customer_mobile_number = models.CharField(max_length=15, null=True, blank=True)
+    Customer_Alternate_number= models.CharField(max_length=15, null=True, blank=True,verbose_name="Cust Alt Contact No")
     Customer_Email_ID= models.EmailField(null=True, blank=True)
+    additional_email_id=models.EmailField(null=True, blank=True)
     temp_raised_by= models.CharField(max_length=100, null=True, blank=True, verbose_name="Temparary Raised By")
     perm_raised_by= models.CharField(max_length=100, null=True, blank=True, verbose_name="Permanent Raised By")
-    Cust_veh_Regn_Address= models.TextField(null=True, blank=True, verbose_name="Customer Vehicle Registration Address")
+    Cust_veh_Regn_Address= models.TextField(null=True, blank=True, verbose_name="Cust Veh Regn Address")
     Dealer_Contact= models.CharField(max_length=15, null=True, blank=True)
     Dealer_Location= models.CharField(max_length=100, null=True, blank=True)
     Dealer_Email_ID= models.EmailField(null=True, blank=True)
@@ -148,7 +132,6 @@ class AIS140Request(models.Model):
     )
     category = models.CharField(
         max_length=50,
-        choices=CATEGORY_CHOICES,
         default='--',
         null=True,
         blank=True,
@@ -163,7 +146,6 @@ class AIS140Request(models.Model):
     reqd_plan_end_date = models.DateTimeField(null=True, blank=True)
     plan_reqd = models.CharField(max_length=50, choices=PLAN_CHOICES, null=True, blank=True)
     top_up_reqd_for = models.TextField(null=True, blank=True)
-    subscription_raised_by = models.CharField(max_length=100, null=True, blank=True)
     sr_req_no = models.CharField(max_length=50, null=True, blank=True)
     sr_req_date = models.DateTimeField(null=True, blank=True)
     sr_success_date = models.DateTimeField(null=True, blank=True)
@@ -251,7 +233,6 @@ class AIS140Request(models.Model):
     D2_comments= models.TextField(blank=True, null=True)
     D2_closure= models.DateTimeField(null=True, blank=True)
     d3 = models.TextField(blank=True, null=True)
-    remarks = models.TextField(blank=True, null=True)
     communication_status = models.CharField(max_length=100, null=True, blank=True)
     vehicle_running_location = models.CharField(
         max_length=50,
@@ -340,8 +321,4 @@ class AIS140Request(models.Model):
     def clean(self):
         if self.date_of_request is None:
             raise ValidationError("Date of Request cannot be null.")
-    @property
-    def assigned_engineer_username(self):
-        if self.assigned_engineer_email:
-            return self.assigned_engineer_email.split('@')[0]
-        return ""
+

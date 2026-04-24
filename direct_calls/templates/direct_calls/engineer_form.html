@@ -1523,27 +1523,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (callStatus && callStatus !== 'Pending') {
                 let missingFields = [];
                 const requiredFields = [
-                    'psn', 'veh_reg_no', 'device_model', 'telco_status', 'active_profile',
-                    'C_trigger_date', 'activation_start_date', 'activation_end_date',
-                    's_trigger_completion_date', 'first_communication_in_darby',
-                    'last_communication_in_darby', 'card_status', 'main_battery_voltage',
-                    'exist_software', 'nrd_category', 'customer_contact_no', 'al_mfg_plant',
-                    'vehicle_type', 'veh_model', 'vehicle_sale_date', 'state', 'region',
-                    'vehicle_run', 'kilometers_hours', 'vehicle_running_location',
-                    'Latency_3_months', 'V_packet_3_months', 'Latency_7_days', 'V_packet_7_days',
-                    'contact_person_name', 'contact_person_number', 'contact_category',
-                    'owner_contact_no', 'issue_identified', 'issue_analysis', 'D1_engineer',
-                    'D1_remark', 'D2_engineer',  'D2_exp_date',
-                    'D3_engineer',  'D3_exp_date',
-                    'remarks_in_ialert', 'dealer_name', 'finalised_issue_category',
-                    'call_closure_cat',  'analysis', 'no_of_complaint_received',
-                    'call_closed_by', 'issue_category'
+
                 ];
 
                 // Additional mandatory fields for specific call_status
                 const firStatuses = ['FIR-For Approval', 'FIR-Repair', 'FIR-Replace', 'FIR-Replace_Repair'];
                 if (firStatuses.includes(callStatus)) {
-                    requiredFields.push('engineer_recommendation', 'device_to_be_sent', 'device_ICCID', 'dealer_address');
+                    requiredFields.push('');
                 }
 
                 requiredFields.forEach(fieldName => {

@@ -116,8 +116,8 @@ def manager_form(request, id=None):
                 customer_subject = f"Ticket Created: {entry.unique_id} ON Your Request"
                 customer_email_body = render_to_string('direct_calls/customer_email.html', context)
                 sales_cc = ["sales@danlawtech.com", "yoganandam@danlawtech.com", "eliyasp@danlawtech.com",
-                            "swamyv@danlawtech.com", "narendrareddyg@danlawtech.com", "rajendrans@danlawtech.com", "sivanambirajant@danlawtech.com"]
-                cust_emails = [e for e in [email.strip() for email in (entry.customer_mail_id or '').split(';') if email.strip()] + [entry.submitted_to_email] if e]
+                            "narendrareddyg@danlawtech.com", "rajendrans@danlawtech.com"]
+                cust_emails =  [e for e in [email.strip() for email in (entry.customer_mail_id or '').split(';') if email.strip()] + [entry.submitted_to_email] if e]
 
                 if cust_emails:
                     try:
@@ -207,6 +207,8 @@ def engineer_form(request, id):
                 "D3 - CUSTOMER ISSUE - THIRDPARTY DEVICE",
                 "D3 - CUSTOMER ISSUE - VEHICLE WIRING",
                 "D3 - CUSTOMER ISSUE - WATER INGRESS",
+                "D3 - OUT OF WARRANTY",
+                "D3 - NO ISSUE - CUSTOMER COMPLAINT",
 
                 # ISSUE RESOLVED
                 "D1 - ISSUE RESOLVED",
@@ -265,6 +267,7 @@ def engineer_form(request, id):
                 "D3 - MONITORING",
                 "D3 - VEHICLE PHYSICAL SUPPORT - WAITING",
                 "D3 - VIDEO CALL SUPPORT - WAITING",
+                "D3 - iALERT ISSUE",
 
                 "SIM EXPIRED",
                 "DEVICE TO BE SENT FOR REPAIR",
@@ -351,7 +354,7 @@ def engineer_form(request, id):
                 }
                 subject_pending = f"Ticket Status  Update: {entry.unique_id} - {entry.vin}"
                 email_body_pending = render_to_string('direct_calls/ticket_update.html', context)
-                customer_emails = [e for e in [email.strip() for email in (entry.customer_mail_id or '').split(';') if email.strip()] + [entry.submitted_to_email] if e]
+                customer_emails =  [e for e in [email.strip() for email in (entry.customer_mail_id or '').split(';') if email.strip()] + [entry.submitted_to_email] if e]
 
                 try:
                     engineer_email = entry.customer_mail_id
@@ -376,7 +379,7 @@ def engineer_form(request, id):
                     'feedback_form_url': request.build_absolute_uri(reverse('submit_feedback', args=[entry.id]))
                 }
                 if call_status in ["Cancelled", "Resolved", "Closed","Closed-CI"]:
-                    subject_confirm = f"CRSC {call_status}:Awating for Review {entry.unique_id} - {entry.vin}"
+                    subject_confirm = f"CRSC {call_status}: {entry.unique_id} - {entry.vin}"
                 else:
                     subject_confirm = f"CRSC {call_status}: {entry.unique_id} - {entry.vin}"
                 subject_customer = f"Customer Feedback Request - CRSC Ticket {entry.unique_id} Status {call_status} ON {entry.vin}"
@@ -396,6 +399,16 @@ def engineer_form(request, id):
                         cc=cc_emails
                     )
                     email.content_subtype = 'html'
+                    file_path = os.path.join(settings.MEDIA_ROOT, 'StaticFile', 'Warranty Form.docx')
+                    if os.path.exists(file_path):
+                        try:
+                            email.attach_file(file_path)
+                            logger.info("Attached Warranty Form %s for FIR-For Approval ticket %s", file_path, entry.unique_id)
+                        except Exception as e:
+                            logger.error("Error attaching warranty form %s for %s: %s", file_path, entry.unique_id, e)
+                    else:
+                        logger.warning("Warranty Form not found at %s for ticket %s", file_path, entry.unique_id)
+
                     email.send()
                     logger.info(f"{call_status} email sent to engineer ({engineer_email}) and CC ({cc_emails}) for: {entry.unique_id}")
 
@@ -413,18 +426,6 @@ def engineer_form(request, id):
                                 cc=cc_email_customer
                             )
                             email.content_subtype = 'html'
-
-                            # Attach Warranty Form only when call_status == 'FIR-For Approval'
-                            if getattr(entry, 'call_status', '') == 'FIR-For Approval':
-                                file_path = os.path.join(settings.MEDIA_ROOT, 'StaticFile', 'Warranty Form.docx')
-                                if os.path.exists(file_path):
-                                    try:
-                                        email.attach_file(file_path)
-                                        logger.info("Attached Warranty Form %s for ticket %s", file_path, entry.unique_id)
-                                    except Exception:
-                                        logger.exception("Error attaching warranty form %s for %s", file_path, entry.unique_id)
-                                else:
-                                    logger.warning("Warranty Form not found at %s for ticket %s", file_path, entry.unique_id)
 
                             try:
                                 email.send(fail_silently=False)
@@ -526,7 +527,7 @@ def engineer_form(request, id):
                             body=alt_device_email_body,
                             from_email=settings.DEFAULT_FROM_EMAIL,
                             to=[entry.submitted_to_email],
-                            cc=["sales@danlawtech.com", "sivanambirajant@danlawtech.com", "yoganandam@danlawtech.com", "eliyasp@danlawtech.com","sivanambirajant@danlawtech.com"]
+                            cc=["sales@danlawtech.com", "sivanambirajant@danlawtech.com", "yoganandam@danlawtech.com", "eliyasp@danlawtech.com"]
                         )
                         alt_device_email.content_subtype = 'html'
                         alt_device_email.send()
@@ -1523,6 +1524,7 @@ def fetch_darby_communication(request, id):
         exist_software = asset.get("fwCategory", "")
         active_profile = asset.get("profileStatus", "")
         nrd_category = asset.get("nrdCategory", "")
+        device_ICCID= asset.get("iccid", "")
         customer_contact_no=asset.get("consumerMobileNumber","")
         created_at = asset.get("createdAt", None)
         created_at_formatted = ""
@@ -1691,6 +1693,7 @@ def fetch_darby_communication(request, id):
             "card_status": card_status,
             "psn": psn,
             "nrd_category": nrd_category,
+            "device_ICCID":device_ICCID,
             "customer_contact_no":customer_contact_no,
             "last_communication_in_darby": last_communication_str,
             "first_communication_in_darby": first_communication_str,

@@ -2,38 +2,43 @@
 {% for entry in entries %}
 <tr>
     <td><a href="/ais140/part_b_form/{{ entry.id }}" target="_blank" class="button">{{ entry.unique_id|default:"" }}</a></td>
-    <td>{{ entry.date_of_request|date:"Y-m-d H:i:s"|default:"" }}</td>
-    <td>{{ entry.Customer_assigned_date|date:"Y-m-d H:i:s"|default:"" }}</td>
-    <td>{{ entry.AL_assigned_date|date:"Y-m-d H:i:s"|default:"" }}</td>
-
+    <td>{{ entry.AL_assigned_date|date:"d-m-Y H:i:s"|default:"" }}</td>
+    <td>{{ entry.assigned_engineer_email|default:"" }}</td>
     <td>{{ entry.state|default:"" }}</td>
     <td>{{ entry.vin_no|default:"" }}</td>
     <td>{{ entry.psn|default:"" }}</td>
     <td>{{ entry.request_type|default:"" }}</td>
     <td>{{ entry.customer_name|default:"" }}</td>
-                        <td>
-                            {% if entry.assigned_engineer_email == "--" %}
-                                <a href="/ais140/part_a_form/{{ entry.id }}/" style="color: blue;">
-                                  --
-                                </a>
-                            {% else %}
-                                {{ entry.assigned_engineer_email|default:"" }}
-                            {% endif %}
-                        </td>    
-                        <td>{{ entry.ticket_through|default:"" }}</td>
-
+    <td>{{ entry.assigned_to|default:"" }}</td>
+    <td>{{ entry.ticket_through|default:"" }}</td>
     <td>{{ entry.d1|default:"" }}</td>
     <td>{{ entry.D1_comments|default:"" }}</td>
     <td>{{ entry.d2|default:"" }}</td>
     <td>{{ entry.D2_comments|default:"" }}</td>
     <td>{{ entry.completion_status|default:"" }}</td>
-    <td>{{ entry.completion_date|date:"Y-m-d H:i:s"|default:"" }}</td>
-    <td>{{ entry.total_tat|default:"" }}</td>
-    <td>{{ entry.certification_start_date|date:"Y-m-d"|default:"" }}</td>
-    <td>{{ entry.certification_end_date|date:"Y-m-d"|default:"" }}</td>
+    <td>{{ entry.completion_date|date:"d-m-Y H:i:s"|default:"" }}</td>
+    <td>{{ entry.entry_total_tat|default:"" }}</td>
+    <td class="dynamic-col rto_code" style="display:none;">{{ entry.rto_code|default:"" }}</td>
+    <td class="dynamic-col dealer_name" style="display:none;">{{ entry.dealer_name|default:"" }}</td>
+    <td class="dynamic-col device_model" style="display:none;">{{ entry.device_mode|default:"" }}</td>
+    <td class="dynamic-col engine_no" style="display:none;">{{ entry.engine|default:"" }}</td>
+    <td class="dynamic-col vehicle_model" style="display:none;">{{ entry.vehicle_model|default:"" }}</td>
+    <td class="dynamic-col customer_phone_no" style="display:none;">{{ entry.customer_phone|default:"" }}</td>
+    <td class="dynamic-col pan_no" style="display:none;">{{ entry.pan_card|default:"" }}</td>
+    <td class="dynamic-col aadhar_no" style="display:none;">{{ entry.aadhar_card|default:"" }}</td>
+    <td class="dynamic-col zone" style="display:none;">{{ entry.zone|default:"" }}</td>
+    <td class="dynamic-col remarks" style="display:none;">{{ entry.remarks|default:"" }}</td>
+    <td class="dynamic-col category" style="display:none;">{{ entry.category|default:"" }}</td>
+    <td class="dynamic-col icicid_no" style="display:none;">{{ entry.iccid|default:"" }}</td>
+    <td class="dynamic-col imei_no" style="display:none;">{{ entry.imei_no|default:"" }}</td>
+    <td class="dynamic-col subscription_raised_by" style="display:none;">{{ entry.subscription_raised_by|default:"" }}</td>
+    <td class="dynamic-col current_sim_status" style="display:none;">{{ entry.current_sim_status|default:"" }}</td>
+    <td>{{ entry.certification_start_date|date:"d-m-Y"|default:"" }}</td>
+    <td>{{ entry.certification_end_date|date:"d-m-Y"|default:"" }}</td>
 </tr>
 {% empty %}
 <tr>
-    <td colspan="21" class="text-center">No data available</td>
+    <td colspan="38" class="text-center">No data available</td>
 </tr>
 {% endfor %}
+
