@@ -132,7 +132,10 @@
 <div class="header-card d-flex justify-content-center align-items-center" style="gap: 10px;">
     <h2 class="mb-0">Real-Time Data - AIS140</h2>
     <button id="downloadCsvBtn" class="btn btn-success ms-2">
-        <i class="bi bi-download"></i>
+        <i class="bi bi-download"></i> Download
+    </button>
+    <button id="downloadFullCsvBtn" class="btn btn-primary ms-2">
+        <i class="bi bi-download"></i> Download Full
     </button>
 </div>
         <!-- Filter Form -->
@@ -317,6 +320,8 @@
                         <th>Unique ID</th>
                         <th>AL Assigned Date</th>
                         <th>Assigned to Engineer</th>
+                        <th>Updated TO DTIL</th>
+
                         <th>State</th>
                         <th>Chassis No</th>
                         <th>PSN No</th>
@@ -353,43 +358,41 @@
                 <tbody>
                     {% for entry in entries %}
                     <tr>
-                   <td><a href="/ais140/part_b_form/{{ entry.id }}" target="_blank" class="button">{{ entry.unique_id }}</a></td>
-                        <td>{{ entry.date_of_request }}</td>
-                        <td>{{ entry.Customer_assigned_date }}</td>
-                        <td>{{ entry.AL_assigned_date }}</td>
+                        <td><a href="/ais140/part_b_form/{{ entry.id }}" target="_blank" class="button">{{ entry.unique_id }}</a></td>
+                        <td>{{ entry.date_of_request|date:"d-m-Y H:i:s" }}</td>
+                        <td>{{ entry.assigned_engineer_email }}</td>
+                        <td>{{ entry.reupdated_request_al|date:"d-m-Y H:i:s" }}</td>
                         <td>{{ entry.state }}</td>
                         <td>{{ entry.vin_no }}</td>
                         <td>{{ entry.psn }}</td>
                         <td>{{ entry.request_type }}</td>
                         <td>{{ entry.customer_name }}</td>
-                        <td>{{ entry.assigned_engineer_email }}</td>
+                        <td>{{ entry.assigned_to }}</td>
                         <td>{{ entry.ticket_through }}</td>
-
                         <td>{{ entry.d1 }}</td>
                         <td>{{ entry.D1_comments }}</td>
                         <td>{{ entry.d2 }}</td>
                         <td>{{ entry.D2_comments }}</td>
-                        <td>{{ entry.assigned_engineer_email }}</td>
-                        <td class=>{{ entry.completion_status }}</td>
-                        <td>{{ entry.completion_date|date:"Y-m-d H:i:s" }}</td>
-                        <td>{{ entry.total_tat }}</td>
+                        <td>{{ entry.completion_status }}</td>
+                        <td>{{ entry.completion_date|date:"d-m-Y H:i:s" }}</td>
+                        <td>{{ entry.entry_total_tat }}</td>
                         <td class="dynamic-col rto_code" style="display:none;">{{ entry.rto_code }}</td>
                         <td class="dynamic-col dealer_name" style="display:none;">{{ entry.dealer_name }}</td>
-                        <td class="dynamic-col device_model" style="display:none;">{{ entry.device_model }}</td>
-                        <td class="dynamic-col engine_no" style="display:none;">{{ entry.engine_no }}</td>
+                        <td class="dynamic-col device_model" style="display:none;">{{ entry.device_mode }}</td>
+                        <td class="dynamic-col engine_no" style="display:none;">{{ entry.engine }}</td>
                         <td class="dynamic-col vehicle_model" style="display:none;">{{ entry.vehicle_model }}</td>
-                        <td class="dynamic-col customer_phone_no" style="display:none;">{{ entry.customer_phone_no }}</td>
-                        <td class="dynamic-col pan_no" style="display:none;">{{ entry.pan_no }}</td>
-                        <td class="dynamic-col aadhar_no" style="display:none;">{{ entry.aadhar_no }}</td>
+                        <td class="dynamic-col customer_phone_no" style="display:none;">{{ entry.customer_phone }}</td>
+                        <td class="dynamic-col pan_no" style="display:none;">{{ entry.pan_card }}</td>
+                        <td class="dynamic-col aadhar_no" style="display:none;">{{ entry.aadhar_card }}</td>
                         <td class="dynamic-col zone" style="display:none;">{{ entry.zone }}</td>
                         <td class="dynamic-col remarks" style="display:none;">{{ entry.remarks }}</td>
                         <td class="dynamic-col category" style="display:none;">{{ entry.category }}</td>
-                        <td class="dynamic-col icicid_no" style="display:none;">{{ entry.icicid_no }}</td>
+                        <td class="dynamic-col icicid_no" style="display:none;">{{ entry.iccid }}</td>
                         <td class="dynamic-col imei_no" style="display:none;">{{ entry.imei_no }}</td>
                         <td class="dynamic-col subscription_raised_by" style="display:none;">{{ entry.subscription_raised_by }}</td>
                         <td class="dynamic-col current_sim_status" style="display:none;">{{ entry.current_sim_status }}</td>
-                        <td>{{ entry.certification_start_date }}</td>
-                        <td>{{ entry.certification_end_date }}</td>
+                        <td>{{ entry.certification_start_date|date:"d-m-Y" }}</td>
+                        <td>{{ entry.certification_end_date|date:"d-m-Y" }}</td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -412,60 +415,73 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(document).ready(function () {
-            // Clear all filters on page load
+        let currentPage = 1;
+
+        $(document).ready(function() {
             $('#filterForm')[0].reset();
+            fetchFilteredData(1);
 
-            // Fetch all data on page load
-            fetchFilteredData();
-
-            // Auto-fetch on any filter change
+            // ========== FILTER CHANGE HANDLERS ==========
             $('#filterForm input, #filterForm select').on('change keyup', function () {
                 fetchFilteredData(1);
             });
-            // Also trigger on completion status checkbox change
+
             $('.completion-status-checkbox, #all_completion_status').on('change', function () {
                 fetchFilteredData(1);
             });
 
+            // ========= ALL COMPLETION STATUS CHECKBOX ==========
+            $('#all_completion_status').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('.completion-status-checkbox').prop('checked', true);
+                } else {
+                    $('.completion-status-checkbox').prop('checked', false);
+                }
+            });
+
+            // ========= INDIVIDUAL COMPLETION STATUS CHECKBOX ==========
+            $('.completion-status-checkbox').on('change', function () {
+                const totalCheckboxes = $('.completion-status-checkbox').length;
+                const checkedCheckboxes = $('.completion-status-checkbox:checked').length;
+                
+                if (checkedCheckboxes === totalCheckboxes) {
+                    $('#all_completion_status').prop('checked', true);
+                } else {
+                    $('#all_completion_status').prop('checked', false);
+                }
+            });
+
+            // ========== FETCH FILTERED DATA ==========
             function fetchFilteredData(page = 1) {
                 currentPage = page;
-                const state = $('#state').val();
-                const chassisNo = $('#chassis_no').val();
-                const psnNo = $('#psn_no').val();
-                const customerName = $('#customer_name').val();
-                const assignedEngineerEmail = $('#assigned_engineer_email').val();
-                const completionDateFrom = $('#completion_date_from').val();
-                const completionDateTo = $('#completion_date_to').val();
-                const category = $('#category').val();
-                const dateOfRequestFrom = $('#date_of_request_from').val();
-                const dateOfRequestTo = $('#date_of_request_to').val();
-                const uniqueId = $('#unique_id').val();
-                // Get checked values from checkboxes
-                const completionStatus = $('.completion-status-checkbox:checked').map(function(){ return this.value; }).get();
+
+                // Collect all filter values
+                const filters = {
+                    state: $('#state').val() || '',
+                    chassis_no: $('#chassis_no').val() || '',
+                    psn_no: $('#psn_no').val() || '',
+                    customer_name: $('#customer_name').val() || '',
+                    assigned_engineer_email: $('#assigned_engineer_email').val() || '',
+                    completion_date_from: $('#completion_date_from').val() || '',
+                    completion_date_to: $('#completion_date_to').val() || '',
+                    category: $('#category').val() || '',
+                    date_of_request_from: $('#date_of_request_from').val() || '',
+                    date_of_request_to: $('#date_of_request_to').val() || '',
+                    unique_id: $('#unique_id').val() || '',
+                    completion_status: $('.completion-status-checkbox:checked').map(function() { 
+                        return $(this).val(); 
+                    }).get(),
+                    page: page
+                };
 
                 $.ajax({
                     url: "{% url 'real_time_page' %}",
                     method: "GET",
-                    data: {
-                        state: state,
-                        chassis_no: chassisNo,
-                        psn_no: psnNo,
-                        customer_name: customerName,
-                        assigned_engineer_email: assignedEngineerEmail,
-                        completion_date_from: completionDateFrom,
-                        completion_date_to: completionDateTo,
-                        category: category,
-                        date_of_request_from: dateOfRequestFrom,
-                        date_of_request_to: dateOfRequestTo,
-                        unique_id: uniqueId,
-                        completion_status: completionStatus, // now an array
-                        page: page
-                    },
-                    traditional: true, // important for sending arrays as repeated params
+                    data: filters,
+                    traditional: true,
                     success: function (response) {
-                        // Update the table body with filtered data
                         $('tbody').html(response.table_data);
                         $('#pageInfo').text(`Page ${response.page} of ${response.num_pages}`);
                         $('#prevPage').prop('disabled', !response.has_previous);
@@ -477,200 +493,251 @@
                 });
             }
 
+            // ========== PAGINATION ==========
             $('#prevPage').on('click', function () {
                 if (currentPage > 1) {
                     fetchFilteredData(currentPage - 1);
                 }
             });
+
             $('#nextPage').on('click', function () {
                 fetchFilteredData(currentPage + 1);
             });
 
-            // On filter change, reset to page 1
-            $('#filterForm input, #filterForm select').on('change keyup', function () {
-                fetchFilteredData(1);
-            });
-
-            // On page load
-            $(document).ready(function () {
-                fetchFilteredData(1);
-            });
-
+            // ========== CSV DOWNLOAD ==========
             $('#downloadCsvBtn').on('click', function (e) {
                 e.preventDefault();
-                // Collect current filter values
-                const params = {
-                    state: $('#state').val(),
-                    chassis_no: $('#chassis_no').val(),
-                    psn_no: $('#psn_no').val(),
-                    customer_name: $('#customer_name').val(),
-                    assigned_engineer_email: $('#assigned_engineer_email').val(),
-                    completion_date_from: $('#completion_date_from').val(),
-                    completion_date_to: $('#completion_date_to').val(),
-                    category: $('#category').val(),
-                    date_of_request_from: $('#date_of_request_from').val(),
-                    date_of_request_to: $('#date_of_request_to').val(),
-                    unique_id: $('#unique_id').val(),
-                    completion_status: $('#completion_status').val(),
-                    // Get selected columns as a comma-separated string
-                    columns: $('.dropdown-menu .column-checkbox:checked').map(function(){ return this.value; }).get().join(',')
-                };
+                
+                const baseUrl = "{% url 'download_part_b_csv' %}";
+                const params = new URLSearchParams();
 
-                // Build query string
-                const query = $.param(params);
-                // Redirect to download URL with filters and columns
-                window.location.href = "{% url 'download_part_b_csv' %}?" + query;
-            });
-
-            // Enable select2 for better UX
-            $('#select_columns').select2({
-                placeholder: "Select columns to display",
-                width: '100%'
-            });
-
-            // Show/hide columns based on selection, handle "All"
-            $('#select_columns').on('change', function () {
-                let selected = $(this).val() || [];
-                const allOptions = [
-                    'rto_code', 'dealer_name', 'sr_request_date', 'sr_success_date', 'device_model',
-                    'engine_no', 'vehicle_model', 'customer_phone_no', 'pan_no', 'aadhar_no',
-                    'zone', 'remarks', 'category', 'icicid_no', 'imei_no', 'subscription_raised_by', 'current_sim_status'
-                ];
-
-                // If "All" is selected, select all options (except "all" itself)
-                if (selected.includes('all')) {
-                    $('#select_columns').val(['all', ...allOptions]).trigger('change.select2');
-                    selected = allOptions;
-                } else {
-                    // Remove "all" if not all are selected
-                    $('#select_columns option[value="all"]').prop('selected', false);
+                // Add state filter
+                const state = $('#state').val();
+                if (state && state.trim() !== '') {
+                    params.append('state', state);
                 }
 
-                // Hide all dynamic columns
-                $('.dynamic-col').hide();
-                // Show selected columns
-                selected.forEach(function(col) {
-                    $('.' + col).show();
-                });
+                // Add chassis_no filter
+                const chassisNo = $('#chassis_no').val();
+                if (chassisNo && chassisNo.trim() !== '') {
+                    params.append('chassis_no', chassisNo);
+                }
+
+                // Add psn_no filter
+                const psnNo = $('#psn_no').val();
+                if (psnNo && psnNo.trim() !== '') {
+                    params.append('psn_no', psnNo);
+                }
+
+                // Add customer_name filter
+                const customerName = $('#customer_name').val();
+                if (customerName && customerName.trim() !== '') {
+                    params.append('customer_name', customerName);
+                }
+
+                // Add assigned_engineer_email filter
+                const assignedEngineer = $('#assigned_engineer_email').val();
+                if (assignedEngineer && assignedEngineer.trim() !== '') {
+                    params.append('assigned_engineer_email', assignedEngineer);
+                }
+
+                // Add completion_date_from filter
+                const completionDateFrom = $('#completion_date_from').val();
+                if (completionDateFrom && completionDateFrom.trim() !== '') {
+                    params.append('completion_date_from', completionDateFrom);
+                }
+
+                // Add completion_date_to filter
+                const completionDateTo = $('#completion_date_to').val();
+                if (completionDateTo && completionDateTo.trim() !== '') {
+                    params.append('completion_date_to', completionDateTo);
+                }
+
+                // Add category filter
+                const category = $('#category').val();
+                if (category && category.trim() !== '') {
+                    params.append('category', category);
+                }
+
+                // Add date_of_request_from filter
+                const dateOfRequestFrom = $('#date_of_request_from').val();
+                if (dateOfRequestFrom && dateOfRequestFrom.trim() !== '') {
+                    params.append('date_of_request_from', dateOfRequestFrom);
+                }
+
+                // Add date_of_request_to filter
+                const dateOfRequestTo = $('#date_of_request_to').val();
+                if (dateOfRequestTo && dateOfRequestTo.trim() !== '') {
+                    params.append('date_of_request_to', dateOfRequestTo);
+                }
+
+                // Add unique_id filter
+                const uniqueId = $('#unique_id').val();
+                if (uniqueId && uniqueId.trim() !== '') {
+                    params.append('unique_id', uniqueId);
+                }
+
+                // *** CRITICAL: Add completion_status as REPEATED PARAMETERS ***
+                const completionStatuses = $('.completion-status-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                
+                if (completionStatuses.length > 0) {
+                    completionStatuses.forEach(function(status) {
+                        params.append('completion_status', status);
+                    });
+                }
+
+                // Add selected columns
+                const selectedColumns = $('.dropdown-menu .column-checkbox:checked').map(function() {
+                    return $(this).value;
+                }).get();
+                
+                if (selectedColumns.length > 0) {
+                    params.append('columns', selectedColumns.join(','));
+                }
+
+                const finalUrl = baseUrl + '?' + params.toString();
+
+                console.log('📥 DOWNLOAD URL:', finalUrl);
+                console.log('State:', state);
+                console.log('Completion Statuses:', completionStatuses);
+                console.log('Selected Columns Count:', selectedColumns.length);
+
+                window.location.href = finalUrl;
             });
 
-            // Optionally, trigger change on page load to apply persisted selection
-            $('#select_columns').trigger('change');
-        });
-    </script>
+            // ========== FULL CSV DOWNLOAD ==========
+            $('#downloadFullCsvBtn').on('click', function (e) {
+                e.preventDefault();
+                
+                const baseUrl = "{% url 'download_full_csv' %}";
+                const params = new URLSearchParams();
 
-    <script>
-        $(document).ready(function () {
-            // Show/hide columns based on checkbox selection
-            function updateColumns() {
-                // Hide all dynamic columns
+                // Add state filter
+                const state = $('#state').val();
+                if (state && state.trim() !== '') {
+                    params.append('state', state);
+                }
+
+                // Add chassis_no filter
+                const chassisNo = $('#chassis_no').val();
+                if (chassisNo && chassisNo.trim() !== '') {
+                    params.append('chassis_no', chassisNo);
+                }
+
+                // Add psn_no filter
+                const psnNo = $('#psn_no').val();
+                if (psnNo && psnNo.trim() !== '') {
+                    params.append('psn_no', psnNo);
+                }
+
+                // Add customer_name filter
+                const customerName = $('#customer_name').val();
+                if (customerName && customerName.trim() !== '') {
+                    params.append('customer_name', customerName);
+                }
+
+                // Add assigned_engineer_email filter
+                const assignedEngineer = $('#assigned_engineer_email').val();
+                if (assignedEngineer && assignedEngineer.trim() !== '') {
+                    params.append('assigned_engineer_email', assignedEngineer);
+                }
+
+                // Add completion_date_from filter
+                const completionDateFrom = $('#completion_date_from').val();
+                if (completionDateFrom && completionDateFrom.trim() !== '') {
+                    params.append('completion_date_from', completionDateFrom);
+                }
+
+                // Add completion_date_to filter
+                const completionDateTo = $('#completion_date_to').val();
+                if (completionDateTo && completionDateTo.trim() !== '') {
+                    params.append('completion_date_to', completionDateTo);
+                }
+
+                // Add category filter
+                const category = $('#category').val();
+                if (category && category.trim() !== '') {
+                    params.append('category', category);
+                }
+
+                // Add date_of_request_from filter
+                const dateOfRequestFrom = $('#date_of_request_from').val();
+                if (dateOfRequestFrom && dateOfRequestFrom.trim() !== '') {
+                    params.append('date_of_request_from', dateOfRequestFrom);
+                }
+
+                // Add date_of_request_to filter
+                const dateOfRequestTo = $('#date_of_request_to').val();
+                if (dateOfRequestTo && dateOfRequestTo.trim() !== '') {
+                    params.append('date_of_request_to', dateOfRequestTo);
+                }
+
+                // Add unique_id filter
+                const uniqueId = $('#unique_id').val();
+                if (uniqueId && uniqueId.trim() !== '') {
+                    params.append('unique_id', uniqueId);
+                }
+
+                // *** CRITICAL: Add completion_status as REPEATED PARAMETERS ***
+                const completionStatuses = $('.completion-status-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                
+                if (completionStatuses.length > 0) {
+                    completionStatuses.forEach(function(status) {
+                        params.append('completion_status', status);
+                    });
+                }
+
+                const finalUrl = baseUrl + '?' + params.toString();
+
+                console.log('📥 FULL DOWNLOAD URL:', finalUrl);
+                console.log('State:', state);
+                console.log('Completion Statuses:', completionStatuses);
+
+                window.location.href = finalUrl;
+            });
+
+            // ========== COLUMN VISIBILITY ==========
+            function updateColumnVisibility() {
                 $('.dynamic-col').hide();
-                // Show checked columns
-                $('#select_columns_checkboxes .column-checkbox:checked').each(function () {
+                $('.dropdown-menu .column-checkbox:checked').each(function() {
                     $('.' + $(this).val()).show();
                 });
             }
 
-            // Handle "All" checkbox
-            $('#all_columns').on('change', function () {
-                if ($(this).is(':checked')) {
-                    $('#select_columns_checkboxes .column-checkbox').prop('checked', true);
-                } else {
-                    $('#select_columns_checkboxes .column-checkbox').prop('checked', false);
-                }
-                updateColumns();
-            });
-
-            // If any individual checkbox is unchecked, uncheck "All"
-            $('#select_columns_checkboxes .column-checkbox').on('change', function () {
-                if (!$(this).is(':checked')) {
-                    $('#all_columns').prop('checked', false);
-                } else if ($('#select_columns_checkboxes .column-checkbox:checked').length === $('#select_columns_checkboxes .column-checkbox').length) {
-                    $('#all_columns').prop('checked', true);
-                }
-                updateColumns();
-            });
-
-            // Initialize columns on page load
-            updateColumns();
-        });
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            // Prevent dropdown from closing when clicking on a checkbox
-            $('.dropdown-menu').on('click', function(e) {
-                e.stopPropagation();
-            });
-
-            function updateColumns() {
-                $('.dynamic-col').hide();
-                $('.dropdown-menu .column-checkbox:checked').each(function () {
-                    $('.' + $(this).val()).show();
-                });
-            }
-
-            // Handle "All" checkbox
-            $('#all_columns').on('change', function () {
+            // Handle "All" columns checkbox
+            $('#all_columns').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('.dropdown-menu .column-checkbox').prop('checked', true);
                 } else {
                     $('.dropdown-menu .column-checkbox').prop('checked', false);
                 }
-                updateColumns();
+                updateColumnVisibility();
             });
 
-            // If any individual checkbox is unchecked, uncheck "All"
-            $('.dropdown-menu .column-checkbox').on('change', function () {
-                if (!$(this).is(':checked')) {
-                    $('#all_columns').prop('checked', false);
-                } else if ($('.dropdown-menu .column-checkbox:checked').length === $('.dropdown-menu .column-checkbox').length) {
+            // Handle individual column checkboxes
+            $('.dropdown-menu').on('click', function(e) {
+                e.stopPropagation();
+            });
+
+            $('.dropdown-menu .column-checkbox').on('change', function() {
+                const totalColumns = $('.dropdown-menu .column-checkbox').length;
+                const checkedColumns = $('.dropdown-menu .column-checkbox:checked').length;
+                
+                if (checkedColumns === totalColumns) {
                     $('#all_columns').prop('checked', true);
+                } else {
+                    $('#all_columns').prop('checked', false);
                 }
-                updateColumns();
+                updateColumnVisibility();
             });
 
             // Initialize columns on page load
-            updateColumns();
+            updateColumnVisibility();
         });
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-$(document).ready(function() {
-    $('#data-table tbody tr').each(function() {
-        var $row = $(this);
-        var completion = $row.find('.completion-date').data('completion');
-        var swsch = $row.find('.sw-sch-date').data('swsch');
-        var $tatCell = $row.find('.total-tat');
-
-
-
-        if (completion && swsch) {
-            var completionDate = new Date(completion);
-            var swschDate = new Date(swsch);
-            if (!isNaN(completionDate) && !isNaN(swschDate)) {
-                var diffMs = completionDate - swschDate;
-                if (diffMs > 0) {
-                    var days = Math.floor(diffMs / (24 * 3600000)); // Calculate days
-                    var hours = Math.floor((diffMs % (24 * 3600000)) / 3600000); // Calculate hours
-                    var minutes = Math.floor((diffMs % 3600000) / 60000); // Calculate minutes
-                    var tatStr =
-                        String(days).padStart(2, '0') + ':' +
-                        String(hours).padStart(2, '0') + ':' +
-                        String(minutes).padStart(2, '0');
-                    $tatCell.text(tatStr);
-                } else {
-                    $tatCell.text('--');
-                }
-            } else {
-                $tatCell.text('--');
-            }
-        } else {
-            $tatCell.text('--');
-        }
-    });
-});
-</script>
 </body>
 </html>

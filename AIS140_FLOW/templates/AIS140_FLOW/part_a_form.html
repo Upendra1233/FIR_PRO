@@ -5,264 +5,688 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIS 140 -Part A</title>
+    <title>AIS 140 - Part A</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f4f6f9;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
         }
+
         .form-container {
-            max-width: 95%;
-            margin: 30px auto;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
         }
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background: linear-gradient(to right, #007bff, #00c6ff);
+
+        /* Header Section */
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+            padding: 30px;
             border-radius: 12px 12px 0 0;
-            padding: 15px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
         }
-        .form-control, .form-select {
-            border-radius: 8px;
-            box-shadow: none;
-            transition: all 0.3s ease-in-out;
+
+        .form-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .form-control:focus, .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+
+        .form-header-icon {
+            font-size: 2.5rem;
+            opacity: 0.9;
         }
-        .btn-submit {
-            background: linear-gradient(to right, #28a745, #218838);
+
+        .header-action {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-download {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
             color: white;
-            font-size: 1.2rem;
-            padding: 12px;
-            width: 100%;
+            padding: 8px 20px;
             border-radius: 8px;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
+
+        .btn-download:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* Main Card */
+        .form-card {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .form-body {
+            padding: 40px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin: 0 0 25px 0;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-right: 15px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: none;
+        }
+
+        .section-description {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 3px;
+            display: none;
+        }
+
+        /* Form Groups */
+        .form-group-wrapper {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+
+        .form-label .required {
+            color: var(--danger-color);
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background-color: #fafbfc;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+            font-style: italic;
+        }
+
+        /* Input Grid */
+        .form-row-2col {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .form-row-3col {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .form-row-6col {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 1200px) {
+            .form-row-2col, .form-row-3col, .form-row-6col {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row-2col, .form-row-3col, .form-row-6col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-row-2col, .form-row-3col, .form-row-6col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Success Modal */
+        .success-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .success-modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.4s ease;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .success-modal-content h2 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+
+        .success-modal-content p {
+            font-size: 0.95rem;
+            color: #666;
+            margin: 0 0 20px 0;
+            line-height: 1.6;
+        }
+
+        .success-details {
+            background: #f0f4f8;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .success-details p {
+            margin: 5px 0;
+            font-size: 0.85rem;
+            color: #444;
+        }
+
+        .btn-success-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        /* Validation Feedback */
+        .validation-feedback {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            padding: 6px 8px;
+            display: none !important;
+            font-weight: 600;
+            border-radius: 4px;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .validation-feedback.valid {
+            color: #155724 !important;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            display: flex !important;
+        }
+
+        .validation-feedback.valid::before {
+            content: "✓";
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .validation-feedback.invalid {
+            color: #721c24 !important;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            display: flex !important;
+        }
+
+        .validation-feedback.invalid::before {
+            content: "✕";
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success-color) !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(.375em + .1875rem) center;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+            padding-right: calc(1.5em + .75rem);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color) !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(.375em + .1875rem) center;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+            padding-right: calc(1.5em + .75rem);
+        }
+
+        /* Conditional Field */
+        .conditional-field {
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
         .btn-submit:hover {
-            background: linear-gradient(to right, #218838, #1e7e34);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        /* Tabs/Navigation */
+        .form-nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .form-nav-tab {
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid var(--info-color);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .info-box i {
+            color: var(--info-color);
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .info-box-text {
+            color: #004085;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .form-divider {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            margin: 35px 0;
         }
     </style>
 </head>
 <body>
-    <div class="container form-container">
-        <div class="card">
-            <div class="card-header">
-                AIS140 Form - PART A
-                <span style="float: right;">
-                    <div class="text-end mb-3">
-                        <a href="{% url 'download_part_b_csv' %}" class="btn btn-primary">
-                            <i class="bi bi-download"></i> Download AIS140 Data
-                        </a>
-                    </div>
-                </span>
+    <div class="form-container">
+        <div class="form-card">
+            <!-- Header -->
+            <div class="form-header">
+                <div>
+                    <h1><i class="fas fa-certificate form-header-icon"></i> AIS140 Certification</h1>
+                    <p style="margin: 8px 0 0 0; font-size: 0.95rem; opacity: 0.9;">Request Form - Part A</p>
+                </div>
+                <div class="header-action">
+                    <a href="{% url 'download_part_b_csv' %}" class="btn-download" title="Download AIS140 Data">
+                        <i class="fas fa-download"></i> Download Data
+                    </a>
+                </div>
             </div>
-            <div class="card-body">
+
+            <!-- Form Body -->
+            <div class="form-body">
                 <form method="post" enctype="multipart/form-data" id="managerForm">
                     {% csrf_token %}
-                    <div class="row">
-                        <!-- Row 1 -->
 
-                        <div class="col-md-3 mb-3">
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="info-box-text">
+                            Please fill all marked fields carefully. Fields marked with <span style="color: #dc3545;">*</span> are mandatory.
+                        </div>
+                    </div>
+
+                    <!-- All Form Fields Combined -->
+                    <!-- Row 1: Date, Type, VIN, PSN, Vehicle No, Engine -->
+                    <div class="form-row-6col">
+                        <div class="form-group-wrapper">
+                            <label class="form-label">Assigned To <span class="required">*</span></label>
+                            <select id="assigned_engineer_email" name="assigned_engineer_email" class="form-control" onchange="toggleAssignedEngineerOther()" required>
+                                <option value="">-- Select --</option>
+                                <option value="Dilip Kumar">Dilip Kumar</option>
+                                <option value="Jitendra">Jitendra</option>
+                                <option value="Siva">Siva</option>
+                                <option value="Narendra">Narendra</option>
+                                <option value="Arun G">Arun G</option>
+                                <option value="Eliyas">Eliyas</option>
+                                <option value="Rishwanth">Rishwanth</option>
+                                <option value="Gayadhar">Gayadhar</option>
+                                <option value="Paribesh">Paribesh</option>
+
+                                <option value="Rajesh">Rajesh</option>
+                                <option value="Gowtham">Gowtham</option>
+                                <option value="Yoga">Yoga</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <div id="assigned_engineer_email_other_wrapper" class="conditional-field" style="display: none; margin-top: 8px;">
+                                <input type="text" id="assigned_engineer_email_other" name="assigned_engineer_email_other" class="form-control" placeholder="Please specify name..." />
+                            </div>
+                        </div>
+                        <div class="form-group-wrapper">
                             {{ form.date_of_request|as_crispy_field }}
                         </div>
-
-                        <div class="col-md-3 mb-3">
+                        <div class="form-group-wrapper">
                             {{ form.Customer_assigned_date|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
-                            {{ form.AL_assigned_date|as_crispy_field }}
+
+                        <div class="form-group-wrapper">
+                            {{ form.request_type|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="requested_by">Requested By:</label>
-                            <select id="requested_by" name="requested_by" class="form-control">
-                                <option value="--">--</option>
-                                <option value="Customer">Customer</option>
-                                <option value="Ashok Leyland">Ashok Leyland</option>
-                                <option value="Dealer">Dealer</option>
-                                <option value="Switch">Switch</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <input type="text" id="requested_by_other" name="requested_by_other"
-                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="requested_name">Requestor Name:</label>
-                            <select id="requested_name" name="requested_name" class="form-control">
-                                <option value="--">--</option>
-                                <option value="KRY_arunkumar@ashokleyland.com">arun</option>
-                                <option value="Athulya.T@ashokleyland.com">Athulya</option>
-                                <option value="Diwakar.B@switchmobilityev.com">Diwakar</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <input type="text" id="assigned_to_other" name="assigned_to_other"
-                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            {{ form.requested_phone_number|as_crispy_field }}
-                        </div>
-<div class="col-md-3 mb-3">
-        <label for="state">State:</label>
-        <select id="state" name="state" class="form-control" onchange="toggleStateOther()">
-            <option value="--" {% if form.state.value == "--" %}selected{% endif %}>--</option>
-
-            <option value="ANDHRA PRADESH" {% if form.state.value == "ANDHRA PRADESH" %}selected{% endif %}>ANDHRA PRADESH</option>
-            <option value="ARUNACHAL PRADESH" {% if form.state.value == "ARUNACHAL PRADESH" %}selected{% endif %}>ARUNACHAL PRADESH</option>
-            <option value="ASSAM" {% if form.state.value == "ASSAM" %}selected{% endif %}>ASSAM</option>
-            <option value="BIHAR" {% if form.state.value == "BIHAR" %}selected{% endif %}>BIHAR</option>
-            <option value="CHHATTISGARH" {% if form.state.value == "CHHATTISGARH" %}selected{% endif %}>CHHATTISGARH</option>
-            <option value="CHANDIGARH" {% if form.state.value == "CHANDIGARH" %}selected{% endif %}>CHANDIGARH</option>
-            <option value="DELHI" {% if form.state.value == "DELHI" %}selected{% endif %}>DELHI</option>
-            <option value="PONDICHERRY" {% if form.state.value == "PONDICHERRY" %}selected{% endif %}>PONDICHERRY</option>
-            <option value="GOA" {% if form.state.value == "GOA" %}selected{% endif %}>GOA</option>
-            <option value="GUJARAT" {% if form.state.value == "GUJARAT" %}selected{% endif %}>GUJARAT</option>
-            <option value="HARYANA" {% if form.state.value == "HARYANA" %}selected{% endif %}>HARYANA</option>
-            <option value="HIMACHAL PRADESH" {% if form.state.value == "HIMACHAL PRADESH" %}selected{% endif %}>HIMACHAL PRADESH</option>
-            <option value="JHARKHAND" {% if form.state.value == "JHARKHAND" %}selected{% endif %}>JHARKHAND</option>
-            <option value="KARNATAKA" {% if form.state.value == "KARNATAKA" %}selected{% endif %}>KARNATAKA</option>
-            <option value="KERALA" {% if form.state.value == "KERALA" %}selected{% endif %}>KERALA</option>
-            <option value="MADHYA PRADESH" {% if form.state.value == "MADHYA PRADESH" %}selected{% endif %}>MADHYA PRADESH</option>
-            <option value="MAHARASHTRA" {% if form.state.value == "MAHARASHTRA" %}selected{% endif %}>MAHARASHTRA</option>
-            <option value="MANIPUR" {% if form.state.value == "MANIPUR" %}selected{% endif %}>MANIPUR</option>
-            <option value="MEGHALAYA" {% if form.state.value == "MEGHALAYA" %}selected{% endif %}>MEGHALAYA</option>
-            <option value="MIZORAM" {% if form.state.value == "MIZORAM" %}selected{% endif %}>MIZORAM</option>
-            <option value="NAGALAND" {% if form.state.value == "NAGALAND" %}selected{% endif %}>NAGALAND</option>
-            <option value="ODISHA" {% if form.state.value == "ODISHA" %}selected{% endif %}>ODISHA</option>
-            <option value="PUNJAB" {% if form.state.value == "PUNJAB" %}selected{% endif %}>PUNJAB</option>
-            <option value="RAJASTHAN" {% if form.state.value == "RAJASTHAN" %}selected{% endif %}>RAJASTHAN</option>
-            <option value="TAMIL NADU" {% if form.state.value == "TAMIL NADU" %}selected{% endif %}>TAMIL NADU</option>
-            <option value="TELANGANA" {% if form.state.value == "TELANGANA" %}selected{% endif %}>TELANGANA</option>
-            <option value="TRIPURA" {% if form.state.value == "TRIPURA" %}selected{% endif %}>TRIPURA</option>
-            <option value="UTTAR PRADESH" {% if form.state.value == "UTTAR PRADESH" %}selected{% endif %}>UTTAR PRADESH</option>
-            <option value="UTTARAKHAND" {% if form.state.value == "UTTARAKHAND" %}selected{% endif %}>UTTARAKHAND</option>
-            <option value="WEST BENGAL" {% if form.state.value == "WEST BENGAL" %}selected{% endif %}>WEST BENGAL</option>
-
-            <option value="OTHERS" {% if form.state.value == "OTHERS" %}selected{% endif %}>OTHERS</option>
-        </select>
-
-    <input type="text" id="state_other" name="state_other"
-           class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-</div>
-
-<script>
-    function toggleStateOther() {
-        const stateSelect = document.getElementById('state');
-        const stateOtherInput = document.getElementById('state_other');
-        if (stateSelect.value === 'Others') {
-            stateOtherInput.style.display = 'block';
-        } else {
-            stateOtherInput.style.display = 'none';
-            stateOtherInput.value = ''; // Clear the input if not "Others"
-        }
-    }
-
-    // Ensure the "Others" input is displayed if the page is reloaded with "Others" selected
-    document.addEventListener('DOMContentLoaded', function () {
-        toggleStateOther();
-    });
-</script>
-                        <div class="col-md-3 mb-3">
+                        <div class="form-group-wrapper">
                             {{ form.vin_no|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="form-group-wrapper">
                             {{ form.psn|as_crispy_field }}
                         </div>
-
-                        <div class="col-md-3 mb-3">
-                            <label for="request_type">Request Type:</label>
-                            <select id="request_type" name="request_type" class="form-control">
-                                <option value="New" {% if form.instance.request_type == "New" %}selected{% endif %}>New</option>
-                                <option value="Renewal" {% if form.instance.request_type == "Renewal" %}selected{% endif %}>Renewal</option>
-                            </select>
+                    </div>
+<!-- Row 2: Engine, Vehicle Model, Year, Customer Name, Phone, State -->
+                    <div class="form-row-6col">
+                        <div class="form-group-wrapper">
+                            {{ form.vehicle_no|as_crispy_field }}
                         </div>
 
-                        <div class="col-md-3 mb-3">
 
+
+
+                        <div class="form-group-wrapper">
                             {{ form.customer_name|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
-
+                        <div class="form-group-wrapper">
                             {{ form.customer_phone|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="form-group-wrapper">
+                            {{ form.Customer_Alternate_number|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
+                            {{ form.Cust_veh_Regn_Address|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
+                            {{ form.Customer_Email_ID|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
+                            {{ form.engine|as_crispy_field }}
+                        </div>
 
+
+
+                        <div class="form-group-wrapper">
+                            {{ form.vehicle_model|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
+                            {{ form.manufacturing_year|as_crispy_field }}
+                        </div>
+
+                        <div class="form-group-wrapper">
+                            {{ form.state|as_crispy_field }}
+                        </div>
+
+
+                    <!-- Row 3: PAN, Aadhar, RTO Name, RTO Code, Dealer Name, Dealer Code -->
+                        <div class="form-group-wrapper">
+                            {{ form.pan_card|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
+                            {{ form.aadhar_card|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
                             {{ form.rto_name|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
-
+                        <div class="form-group-wrapper">
                             {{ form.rto_code|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
-
+                        <div class="form-group-wrapper">
                             {{ form.dealer_name|as_crispy_field }}
                         </div>
-                        <div class="col-md-3 mb-3">
-
+                        <div class="form-group-wrapper">
                             {{ form.dealer_code|as_crispy_field }}
                         </div>
 
-                        <div class="col-md-3 mb-3">
+
+                    <!-- Row 4: Category, Assigned Engineer, User ID, (empty 3) -->
+
+
+                        <div class="form-group-wrapper">
+                            {{ form.dealer_code|as_crispy_field }}
+                        </div>
+                        <div class="form-group-wrapper">
+                            {{ form.category|as_crispy_field }}
+                        </div>
+
+
+
+                        <div class="form-group-wrapper">
                             {{ form.remarks|as_crispy_field }}
                         </div>
+                    </div>
 
 
-                        <div class="col-md-3 mb-3">
-                            <label for="category">Category:</label>
-                            <select id="category" name="category" class="form-control">
-                                <option value="--">--</option>
-                                <option value="AIS140">AIS140</option>
-                                <option value="Waste management">Waste management</option>
-                                <option value="Mining">Mining</option>
-                    <option value="Maharastra ILMS Mining">Maharastra ILMS Mining</option>
-                    <option value="Maharastra Mahakhanij Mining">Maharastra Mahakhanij Mining</option>
-                                <option value="Others">Others</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="assigned_engineer_email">Cert. Generation Assigned To:</label>
-                            <select id="assigned_engineer_email" name="assigned_engineer_email" class="form-control">
-                                <option value="--">--</option>
-                                <option value="dilipkumarn@danlawtech.com">dilipkumarn@danlawtech.com</option>
-                                <option value="sivanambirajant@danlawtech.com">sivanambirajant@danlawtech.com</option>
-                                <option value="narendrareddyg@danlawtech.com">narendrareddyg@danlawtech.com</option>
-                                <option value="arung@danlawtech.com">arung@danlawtech.com</option>
-                                <option value="eliyasp@danlawtech.com">eliyasp@danlawtech.com</option>
-                                <option value="rishwanthr@danlawtech.com">rishwanthr@danlawtech.com</option>
-                                <option value="eastdanlaw@danlawtech.com">eastdanlaw@danlawtech.com</option>
-                                <option value="others">Others</option>
-                            </select>
-                            <input type="text" id="assigned_engineer_email_other" name="assigned_engineer_email_other"
-                                   class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="user_id">User ID:</label>
-                            <input type="text" id="user_id" name="user_id" class="form-control" value="{{ form.user_id.value|default_if_none:'' }}">
-                        </div>
-
-
-
-<!-- Submit Button -->
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-submit">Submit</button>
+                    <!-- Submit Section -->
+                    <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid var(--border-color);">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i> Submit Request
+                        </button>
                     </div>
                 </form>
+            </div>
+
+            <!-- Success Modal -->
+            <div id="successModal" class="success-modal{% if success %} show{% endif %}">
+                <div class="success-modal-content">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>Success!</h2>
+                    <p>Your AIS140 Certification Request has been submitted successfully.</p>
+                    <div class="success-details" id="successDetails">
+                        <p><strong>Request ID:</strong> Auto-generated</p>
+                        <p><strong>Status:</strong> Submitted</p>
+                        <p><strong>Next Step:</strong> Please proceed to Part B form</p>
+                    </div>
+                    <button type="button" class="btn-success-close" onclick="closeSuccessModal()">OK</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript for Validations -->
     <script>
+        // Toggle functions for conditional fields
+
+
+
+
+        function toggleStateOther() {
+            const wrapper = document.getElementById('state_other_wrapper');
+            const select = document.getElementById('state');
+            wrapper.style.display = select.value === 'OTHERS' ? 'block' : 'none';
+        }
+
+        function toggleAssignedEngineerOther() {
+            const wrapper = document.getElementById('assigned_engineer_email_other_wrapper');
+            const select = document.getElementById('assigned_engineer_email');
+            wrapper.style.display = select.value === 'others' ? 'block' : 'none';
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize conditional fields visibility
+
+            toggleStateOther();
+            toggleAssignedEngineerOther();
+
             const form = document.getElementById('managerForm');
 
             // Fields to convert to uppercase
@@ -296,9 +720,22 @@
                 { id: 'id_pan_card', length: 10, message: 'PAN card must be exactly 10 alphanumeric characters.' }
             ];
 
+            console.log("Initializing validation for " + lengthValidationFields.length + " fields");
+
             lengthValidationFields.forEach(fieldInfo => {
                 const field = document.getElementById(fieldInfo.id);
                 if (field) {
+                    console.log("Setting up validation for: " + fieldInfo.id);
+
+                    // Create validation feedback element
+                    let feedbackEl = document.createElement('div');
+                    feedbackEl.className = 'validation-feedback';
+                    feedbackEl.setAttribute('data-field', fieldInfo.id);
+                    feedbackEl.textContent = fieldInfo.message;
+
+                    // Insert feedback immediately after the field
+                    field.parentNode.insertBefore(feedbackEl, field.nextSibling);
+
                     field.addEventListener('input', function () {
                         // Allow only numeric characters for specific fields
                         if (['id_customer_phone', 'id_owner_phone', 'id_aadhar_card'].includes(fieldInfo.id)) {
@@ -310,110 +747,128 @@
                         }
                         // Limit the length
                         this.value = this.value.slice(0, fieldInfo.length);
+
+                        // Update validation feedback in real-time
+                        updateValidationDisplay(this, fieldInfo, feedbackEl);
                     });
 
                     field.addEventListener('blur', function () {
-                        if (this.value.length !== fieldInfo.length) {
+                        if (this.value.length > 0 && this.value.length !== fieldInfo.length) {
                             alert(fieldInfo.message);
                             this.focus();
                         }
                     });
+
+                    field.addEventListener('focus', function () {
+                        updateValidationDisplay(this, fieldInfo, feedbackEl);
+                    });
+                } else {
+                    console.warn("Field not found: " + fieldInfo.id);
                 }
             });
-        });
 
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('managerForm');
+            // Function to update validation display
+            function updateValidationDisplay(field, fieldInfo, feedbackEl) {
+                if (field.value.length === 0) {
+                    // Empty field - remove validation classes
+                    field.classList.remove('is-valid', 'is-invalid');
+                    feedbackEl.classList.remove('valid', 'invalid');
+                    feedbackEl.style.display = 'none';
+                } else if (field.value.length === fieldInfo.length) {
+                    // Valid field
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    feedbackEl.classList.remove('invalid');
+                    feedbackEl.classList.add('valid');
+                    feedbackEl.textContent = '✓ Valid';
+                    feedbackEl.style.display = 'flex';
+                } else {
+                    // Invalid field
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    feedbackEl.classList.remove('valid');
+                    feedbackEl.classList.add('invalid');
+                    feedbackEl.textContent = `${fieldInfo.message} (${field.value.length}/${fieldInfo.length})`;
+                    feedbackEl.style.display = 'flex';
+                }
+            }
 
-        // Fields to validate for specific lengths
-        const lengthValidationFields = [
-            { id: 'id_customer_phone', length: 10, message: 'Customer phone must be exactly 10 digits.' },
-            { id: 'id_psn', length: 10, message: 'PSN must be exactly 10 digits.' },
-            { id: 'id_owner_phone', length: 10, message: 'Owner phone must be exactly 10 digits.' },
-            { id: 'id_vin_no', length: 17, message: 'VIN must be exactly 17 alphanumeric characters.' },
-            { id: 'id_aadhar_card', length: 12, message: 'Aadhar card must be exactly 12 digits.' },
-            { id: 'id_pan_card', length: 10, message: 'PAN card must be exactly 10 alphanumeric characters.' }
-        ];
+            // Handle form submission
+            form.addEventListener('submit', function (e) {
+                // Check if there are validation errors
+                const invalidFields = form.querySelectorAll('.is-invalid');
+                if (invalidFields.length === 0 && form.checkValidity() === true) {
+                    // Form is valid, proceed with submission
+                    // The form will submit normally
+                } else if (form.checkValidity() === false) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
 
-        lengthValidationFields.forEach(fieldInfo => {
-            const field = document.getElementById(fieldInfo.id);
-            if (field) {
-                field.addEventListener('input', function () {
-                    // Allow only numeric characters for specific fields
-                    if (['id_customer_phone','id_owner_phone', 'id_aadhar_card'].includes(fieldInfo.id)) {
-                        this.value = this.value.replace(/[^0-9]/g, '');
-                    }
-                    // Allow only alphanumeric characters for VIN, Vehicle No, and PAN card
-                    if (['id_vin_no', 'id_vehicle_no', 'id_pan_card'].includes(fieldInfo.id)) {
-                        this.value = this.value.replace(/[^A-Z0-9]/g, '');
-                    }
-                    // Limit the length
-                    this.value = this.value.slice(0, fieldInfo.length);
-                });
-
-                field.addEventListener('blur', function () {
-                    if (this.value.length !== fieldInfo.length) {
-                        alert(fieldInfo.message);
-                        this.value = ''; // Clear the field to prevent repeated alerts
-                    }
-                });
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true') {
+                showSuccessModal();
+                setTimeout(closeSuccessModal, 1000);
             }
         });
-    });
-</script>
+
+        // Function to show success modal
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        // Function to close success modal
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('show');
+            // Remove success parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // Close modal on background click
+        window.addEventListener('click', function (e) {
+            const modal = document.getElementById('successModal');
+            if (e.target === modal) {
+                closeSuccessModal();
+            }
+        });
+
+        // Auto-fill Customer_assigned_date with current datetime
+        function setCurrentDateTime() {
+            const dateField = document.getElementById('id_Customer_assigned_date');
+            if (dateField) {
+                const now = new Date();
+
+                // Format datetime for Django datetime-local input
+                // YYYY-MM-DDTHH:MM format for datetime-local input
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+
+                const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+                dateField.value = formattedDateTime;
+
+                console.log('Customer_assigned_date set to:', formattedDateTime);
+            } else {
+                console.warn('Customer_assigned_date field not found');
+            }
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only set if empty or not explicitly set
+            const dateField = document.getElementById('id_Customer_assigned_date');
+            if (dateField && !dateField.value) {
+                setCurrentDateTime();
+            }
+        });
+    </script>
 </body>
 </html>
 {% endblock %}
-
-<!-- add somewhere between </form> and </body>, after other scripts -->
-<script>
-function showStylishPopup(message, type) {
-    const div = document.createElement('div');
-    div.className = 'stylish-popup';
-    const bg = type === 'success' ? '#28a745' : '#dc3545';
-    div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index:1055;
-        padding: 12px 20px; color: #fff; background: ${bg};
-        border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        font-size: 1rem; max-width: 300px; word-break: break-word;
-    `;
-    div.textContent = message;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 5000);
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const frm = document.getElementById('engineerForm');
-    if (!frm) return;
-
-    frm.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        const url = frm.action || window.location.href;
-        const data = new FormData(frm);
-
-        fetch(url, {
-            method: 'POST',
-            body: data,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(r => r.json())
-        .then(d => {
-            if (d.success) {
-                showStylishPopup(d.message || 'Form submitted successfully!', 'success');
-                // reload after a short delay so user sees the popup
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                const err = d.error || 'Submission failed';
-                showStylishPopup(err, 'error');
-                console.warn('submission error details', d.details || '');
-            }
-        })
-        .catch(err => {
-            console.error('fetch error', err);
-            showStylishPopup('Network/server error – please try again.', 'error');
-        });
-    });
-});
-</script>

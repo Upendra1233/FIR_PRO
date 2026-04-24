@@ -291,12 +291,12 @@
     </div>
     <!-- Date of Request -->
     <div class="col-md-3 mb-3">
-        <label for="date_of_request">Date of Request:</label>
+        <label for="date_of_request">AL Assigned Date:</label>
         <input type="text" id="date_of_request" class="form-control" value="{{ part_a_data.date_of_request|date:'d-m-Y H:i:s' }}" readonly>
     </div>
 <!-- Requested By -->
 <div class="col-md-3 mb-3">
-    <label>Customer Assigned Date:</label>
+    <label>Assigned to Engineer:</label>
     <input
         type="text"
         class="form-control"
@@ -304,33 +304,15 @@
         readonly
     >
 </div>
-
 <div class="col-md-3 mb-3">
-    <label>AL Assigned Date:</label>
+    <label>Updated to DTIL:</label>
     <input
         type="text"
         class="form-control"
-        value="{{ part_a_data.AL_assigned_date|date:'d-m-Y H:i:s' }}"
+        value="{{ part_a_data.reupdated_request_al|date:'d-m-Y H:i:s' }}"
         readonly
     >
 </div>
-
-        <!-- Requested By -->
-        <div class="col-md-3 mb-3">
-            <label for="requested_by">Requested By:</label>
-            <input type="text" id="requested_by" class="form-control" value="{{ part_a_data.requested_by|default_if_none:'N/A' }}" readonly>
-        </div>
-        <!-- Requested Name -->
-        <div class="col-md-3 mb-3">
-            <label for="requested_name">Requestor Name:</label>
-            <input type="text" id="requested_name" class="form-control" value="{{ part_a_data.requested_name|default_if_none:'' }}" readonly>
-        </div>
-
-        <!-- Requested Phone Number -->
-        <div class="col-md-3 mb-3">
-            <label for="requested_phone_number">Requestor Phone Number:</label>
-            <input type="text" id="requested_phone_number" class="form-control" value="{{ part_a_data.requested_phone_number|default_if_none:'' }}" readonly>
-        </div>
 
     <!-- State -->
     <div class="col-md-3 mb-3">
@@ -358,11 +340,7 @@
 
 
 
-    <!-- Request Type -->
-    <div class="col-md-3 mb-3">
-        <label for="request_type">Request Type:</label>
-        <input type="text" id="request_type" class="form-control" value="{{ part_a_data.request_type|default_if_none:'' }}" readonly>
-    </div>
+
 
     <!-- Vehicle Regd No -->
     <div class="col-md-3 mb-3">
@@ -387,8 +365,39 @@
         <label for="customer_phone">Customer Phone No:</label>
         <input type="text" id="customer_phone" class="form-control" value="{{ part_a_data.customer_phone|default_if_none:'' }}" readonly>
     </div>
-
-
+    <div class="col-md-3 mb-3">
+        <label for="Customer_Alternate_number">Customer Alternate Contact Number:</label>
+        <input type="text" id="Customer_Alternate_number" class="form-control" value="{{ part_a_data.Customer_Alternate_number|default_if_none:'' }}" readonly>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="Cust_veh_Regn_Address">Customer Address:</label>
+        <textarea id="Cust_veh_Regn_Address" class="form-control" rows="1" readonly>{{ part_a_data.Cust_veh_Regn_Address|default_if_none:'' }}</textarea>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="Cust_veh_Regn_Pincode">PIN Code:</label>
+        <input type="text" id="Cust_veh_Regn_Pincode" class="form-control" value="{{ part_a_data.Cust_veh_Regn_Pincode|default_if_none:'' }}" readonly>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="Customer_Email_ID">Customer Email ID:</label>
+        <input type="text" id="Customer_Email_ID" class="form-control" value="{{ part_a_data.Customer_Email_ID|default_if_none:'' }}" readonly>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="category">Category:</label>
+        <input type="text" id="category" class="form-control" value="{{ part_a_data.category|default_if_none:'' }}" readonly>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="AIS140_Type">AIS140 Type:</label>
+        <input type="text" id="AIS140_Type" class="form-control" value="{{ part_a_data.AIS140_Type|default_if_none:'' }}" readonly>
+    </div>
+    <!-- Dealer Name -->
+    <div class="col-md-3 mb-3">
+        <label for="dealer_name">Dealer Name:</label>
+        <input type="text" id="dealer_name" class="form-control" value="{{ part_a_data.dealer_name|default_if_none:'' }}" readonly>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="Dealer_Contact">Dealer Contact No:</label>
+        <input type="text" id="Dealer_Contact" class="form-control" value="{{ part_a_data.Dealer_Contact|default_if_none:'' }}" readonly>
+    </div>
     <!-- RTO Name -->
     <div class="col-md-3 mb-3">
         <label for="rto_name">RTO Name:</label>
@@ -400,17 +409,9 @@
         <label for="rto_code">RTO Code:</label>
         <input type="text" id="rto_code" class="form-control" value="{{ part_a_data.rto_code|default_if_none:'' }}" readonly>
     </div>
-
-    <!-- Dealer Name -->
     <div class="col-md-3 mb-3">
-        <label for="dealer_name">Dealer Name:</label>
-        <input type="text" id="dealer_name" class="form-control" value="{{ part_a_data.dealer_name|default_if_none:'' }}" readonly>
-    </div>
-
-    <!-- Zone -->
-    <div class="col-md-3 mb-3">
-        <label for="zone">Zone:</label>
-        <input type="text" id="zone" class="form-control" value="{{ part_a_data.zone|default_if_none:'' }}" readonly>
+        <label for="manufacturing_year">Manufacturing Year:</label>
+        <input type="text" id="manufacturing_year" class="form-control" value="{{ part_a_data.manufacturing_year|default_if_none:'' }}" readonly>
     </div>
 
     <!-- Remarks -->
@@ -424,13 +425,10 @@
     </div>
     <div class="col-md-3 mb-3">
         <label for="AL_comments">AL Comments:</label>
-        <textarea id="AL_comments" class="form-control" rows="1" readonly>{{ part_a_data.remarks|default_if_none:'' }}</textarea>
+        <textarea id="AL_comments" class="form-control" rows="1" readonly>{{ part_a_data.AL_comments|default_if_none:'' }}</textarea>
     </div>
     <!-- Category -->
-    <div class="col-md-3 mb-3">
-        <label for="category">Category:</label>
-        <input type="text" id="category" class="form-control" value="{{ part_a_data.category|default_if_none:'' }}" readonly>
-    </div>
+
     <!-- Complaint Assigned To -->
     <div class="col-md-3 mb-3">
     <label for="assigned_engineer_email">Cert. Generation Assigned To:</label>
@@ -454,7 +452,7 @@
     {% if error_message %}<div data-error-message="{{ error_message }}" data-error-reasons="{{ error_reasons }}"></div>{% endif %}
     {% if show_success_modal %}<div data-success-message="{{ success_message }}"></div>{% endif %}
 
-                    <h5 class="text-primary"><i class="fas fa-mobile-alt"></i> Device Information</h5>
+                    <h5 class="text-primary"><i class="fas fa-mobile-alt"></i> Device Information & Follow Up</h5>
                     <div class="row">
 
                         <div class="col-md-3 mb-3">
@@ -475,23 +473,31 @@
                                    value="{{ form.instance.device_mode|default_if_none:'' }}" placeholder="Ente Device Model">
                         </div>
                         <div class="col-md-3 mb-3">
+                            <label for="additional_email_id">Additional Email ID:</label>
+                            <input type="text" id="additional_email_id" name="additional_email_id" class="form-control"
+                                   value="{{ form.instance.additional_email_id|default_if_none:'' }}"placeholder="Enter Email ID">
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <label for="D1_engineer">D1 Engineer : </label>
                             <select id="D1_engineer" name="D1_engineer" class="form-control">
                             <option value="" {% if form.D1_engineer.value == "" %}selected{% endif %}>--</option>
-                            <option value="arung@danlawtech.com" {% if form.D1_engineer.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
-                            <option value="eliyasp@danlawtech.com" {% if form.D1_engineer.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
-                            <option value="gayadhar@danlawtech.com" {% if form.D1_engineer.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
-                            <option value="pantnagarplant@danlawtech.com" {% if form.D1_engineer.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
-                            <option value="sales@danlawtech.com" {% if form.D1_engineer.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
+                            <option value="Arun G" {% if form.D1_engineer.value == "Arun G" %}selected{% endif %}>Arun G</option>
+                            <option value="Eliyas" {% if form.D1_engineer.value == "Eliyas" %}selected{% endif %}>Eliyas</option>
+                            <option value="Gayadhar" {% if form.D1_engineer.value == "Gayadhar" %}selected{% endif %}>Gayadhar</option>
+                            <option value="Jitendra" {% if form.D1_engineer.value == "Jitendra" %}selected{% endif %}>Jitendra</option>
+                            <option value="Rajesh" {% if form.D1_engineer.value == "Rajesh" %}selected{% endif %}>Rajesh</option>
+                            <option value="Paribesh" {% if form.D1_engineer.value == "Paribesh" %}selected{% endif %}>Paribesh</option>
 
-                            <option value="dilipkumarn@danlawtech.com" {% if form.D1_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                            <option value="swamy@danlawtech.com" {% if form.D1_engineer.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
-                            <option value="rishwanthr@danlawtech.com" {% if form.D1_engineer.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
-                            <option value="yoganandam@danlawtech.com" {% if form.D1_engineer.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
-                            <option value="narendrareddyg@danlawtech.com" {% if form.D1_engineer.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
-                            <option value="dilipkumarn@danlawtech.com" {% if form.D1_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                            <option value="sivanambirajant@danlawtech.com" {% if form.D1_engineer.value == "sivanambirajant@danlawtech.com" %}selected{% endif %}>Siva</option>
-                            <option value="others" {% if form.D1_engineer.value == "others" %}selected{% endif %}>Others</option>
+                            <option value="Dilip Kumar" {% if form.D1_engineer.value == "Dilip Kumar" %}selected{% endif %}>Dilip Kumar</option>
+                            <option value="Rishwanth" {% if form.D1_engineer.value == "Rishwanth" %}selected{% endif %}>Rishwanth</option>
+                            <option value="Yoga" {% if form.D1_engineer.value == "Yoga" %}selected{% endif %}>Yoga</option>
+                            <option value="Narendra" {% if form.D1_engineer.value == "Narendra" %}selected{% endif %}>Narendra</option>
+                            <option value="Siva" {% if form.D1_engineer.value == "Siva" %}selected{% endif %}>Siva</option>
+                            <option value="Gowtham" {% if form.D1_engineer.value == "Gowtham" %}selected{% endif %}>Gowtham</option>
+
+                            <option value="SR" {% if form.D1_engineer.value == "SR" %}selected{% endif %}>SR</option>
+
+                            <option value="Others" {% if form.D1_engineer.value == "Others" %}selected{% endif %}>Others</option>
                             </select>
                             <input type="text" id="D1_engineer_other" name="D1_engineer_other"
                                    class="form-control mt-2" style="display: none;" placeholder="Please specify...">
@@ -504,7 +510,7 @@
         <option value="">--</option>
 
         <option value="CONTACT DETAIL WRONG"
-            {% if form.instance.d1 == "CONTACT DETAIL WRONGg" %}selected{% endif %}>
+            {% if form.instance.d1 == "CONTACT DETAIL WRONG" %}selected{% endif %}>
             CONTACT DETAIL WRONG
         </option>
 
@@ -513,9 +519,9 @@
             CUSTOMER NOT ANSWERING
         </option>
 
-        <option value="SOS NOT FITTED"
-            {% if form.instance.d1 == "SOS NOT FITTED" %}selected{% endif %}>
-            SOS NOT FITTED
+        <option value="SOS NOT FITTED TO CANCEL"
+            {% if form.instance.d1 == "SOS NOT FITTED TO CANCEL" %}selected{% endif %}>
+            SOS NOT FITTED TO CANCEL
         </option>
 
         <option value="SOS NOT WORKING"
@@ -528,9 +534,9 @@
             WIRE CUT ALERT
         </option>
 
-        <option value="VEHICLE IN BODY BUILDING"
-            {% if form.instance.d1 == "VEHICLE IN BODY BUILDING" %}selected{% endif %}>
-            VEHICLE IN BODY BUILDING
+        <option value="VEH IN BODY BUILDING"
+            {% if form.instance.d1 == "VEH IN BODY BUILDING" %}selected{% endif %}>
+            VEH IN BODY BUILDING
         </option>
 
         <option value="TP- DEVICE TO UNTAG"
@@ -556,9 +562,9 @@
             {% if form.instance.d1 == "MISMAPPING" %}selected{% endif %}>
             MISMAPPING
         </option>
-        <option value="TP- DEVICE FITTED"
-            {% if form.instance.d1 == "TP- DEVICE FITTED" %}selected{% endif %}>
-            TP- DEVICE FITTED
+        <option value="TP- FITTED AND TO CANCEL"
+            {% if form.instance.d1 == "TP- FITTED AND TO CANCEL" %}selected{% endif %}>
+            TP- FITTED AND TO CANCEL
         </option>
         <option value="VEHICLE OUT OF STATE"
             {% if form.instance.d1 == "VEHICLE OUT OF STATE" %}selected{% endif %}>
@@ -582,8 +588,8 @@
 
     <div class="col-md-3 mb-3">
         <label for="D1_closure">D1 Closure Date:</label>
-        <input type="text" id="D1_closure" name="D1_closure" class="form-control"
-               value="{{ form.instance.D1_closure|default_if_none:'' }}">
+        <input type="datetime-local" id="D1_closure" name="D1_closure" class="form-control"
+               value="{% if form.instance.D1_closure %}{{ form.instance.D1_closure|date:'Y-m-d\TH:i' }}{% endif %}">
     </div>
 
 <!-- JAVASCRIPT -->
@@ -601,7 +607,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "CUSTOMER NOT ANSWERING":
             "Called given number ( ). Not answering",
 
-        "SOS NOT FITTED":
+        "SOS NOT FITTED TO CANCEL":
             "Verified in the vehicle and found NO SOS switch fitted. Customer /AL to re assign / call ( )",
 
         "SOS NOT WORKING":
@@ -610,7 +616,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "WIRE CUT ALERT":
             "Verified in the vehicle and found Wire cut / Tamper alert being recd in STU server. Pl check SOS wiring. Customer /AL to re assign / call ( )",
 
-        "VEHICLE IN BODY BUILDING":
+        "VEH IN BODY BUILDING":
             "Verified and found vehicle in Body Building. Customer /AL to re assign / call ( ) once Body building is completed and Vehicle in LIVE status with ignition ON.",
 
         "TP- DEVICE TO UNTAG":
@@ -627,6 +633,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         "VEHICLE REPORT TO WS":
             "",
+        "TP- FITTED AND TO CANCEL":"",
 
         "MISMAPPING":
             "Device   found  with  wrong PSN physically . ",
@@ -657,19 +664,22 @@ document.addEventListener("DOMContentLoaded", function () {
                             <label for="D2_engineer">D2 Engineer :</label>
                             <select id="D2_engineer" name="D2_engineer" class="form-control">
                                 <option value="" {% if form.D2_engineer.value == "" %}selected{% endif %}>--</option>
-                                <option value="arung@danlawtech.com" {% if form.D2_engineer.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
-                                <option value="eliyasp@danlawtech.com" {% if form.D2_engineer.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
-                                <option value="gayadhar@danlawtech.com" {% if form.D2_engineer.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
-                                <option value="pantnagarplant@danlawtech.com" {% if form.D2_engineer.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
-                                <option value="sales@danlawtech.com" {% if form.D2_engineer.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
+                                <option value="Arun G" {% if form.D2_engineer.value == "Arun G" %}selected{% endif %}>Arun G</option>
+                                <option value="Eliyas" {% if form.D2_engineer.value == "Eliyas" %}selected{% endif %}>Eliyas</option>
+                                <option value="Gayadhar" {% if form.D2_engineer.value == "Gayadhar" %}selected{% endif %}>Gayadhar</option>
+                                <option value="Jitendra" {% if form.D2_engineer.value == "Jitendra" %}selected{% endif %}>Jitendra</option>
+                                <option value="Rajesh" {% if form.D2_engineer.value == "Rajesh" %}selected{% endif %}>Rajesh</option>
+                                <option value="Paribesh" {% if form.D2_engineer.value == "Paribesh" %}selected{% endif %}>Paribesh</option>
 
-                                <option value="dilipkumarn@danlawtech.com" {% if form.D2_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                                <option value="swamy@danlawtech.com" {% if form.D2_engineer.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
-                                <option value="rishwanthr@danlawtech.com" {% if form.D2_engineer.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
-                                <option value="yoganandam@danlawtech.com" {% if form.D2_engineer.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
-                                <option value="narendrareddyg@danlawtech.com" {% if form.D2_engineer.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
-                                <option value="dilipkumarn@danlawtech.com" {% if form.D2_engineer.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                                <option value="swamy@danlawtech.com" {% if form.D2_engineer.value == "swamy@danlawtech.com" %}selected{% endif %}>Siva</option>
+                                <option value="Dilip Kumar" {% if form.D2_engineer.value == "Dilip Kumar" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="Rishwanth" {% if form.D2_engineer.value == "Rishwanth" %}selected{% endif %}>Rishwanth</option>
+                                <option value="Yoga" {% if form.D2_engineer.value == "Yoga" %}selected{% endif %}>Yoga</option>
+                                <option value="Narendra" {% if form.D2_engineer.value == "Narendra" %}selected{% endif %}>Narendra</option>
+                                <option value="Siva" {% if form.D2_engineer.value == "Siva" %}selected{% endif %}>Siva</option>
+                                <option value="Gowtham" {% if form.D2_engineer.value == "Gowtham" %}selected{% endif %}>Gowtham</option>
+
+                                <option value="SR" {% if form.D2_engineer.value == "SR" %}selected{% endif %}>SR</option>
+
                                 <option value="Others" {% if form.D2_engineer.value == "Others" %}selected{% endif %}>Others</option>
                             </select>
                             <input type="text" id="D2_engineer_other" name="D2_engineer_other"
@@ -682,16 +692,16 @@ document.addEventListener("DOMContentLoaded", function () {
                             <option value="" {% if form.d2.value == "" %}selected{% endif %}>--</option>
                             <option value="CONTACT DETAIL WRONG" {% if form.d2.value == "CONTACT DETAIL WRONG" %}selected{% endif %}>CONTACT DETAIL WRONG</option>
                             <option value="CUSTOMER NOT ANSWERING" {% if form.d2.value == "CUSTOMER NOT ANSWERING" %}selected{% endif %}>CUSTOMER NOT ANSWERING</option>
-                            <option value="SOS NOT FITTED" {% if form.d2.value == "SOS NOT FITTED" %}selected{% endif %}>SOS NOT FITTED</option>
+                            <option value="SOS NOT FITTED TO CANCEL" {% if form.d2.value == "SOS NOT FITTED TO CANCEL" %}selected{% endif %}>SOS NOT FITTED TO CANCEL</option>
                             <option value="SOS NOT WORKING" {% if form.d2.value == "SOS NOT WORKING" %}selected{% endif %}>SOS NOT WORKING</option>
                             <option value="WIRE CUT ALERT" {% if form.d2.value == "WIRE CUT ALERT" %}selected{% endif %}>WIRE CUT ALERT</option>
-                            <option value="VEHICLE IN BODY BUILDING" {% if form.d2.value == "VEHICLE IN BODY BUILDING" %}selected{% endif %}>VEHICLE IN BODY BUILDING</option>
+                            <option value="VEH IN BODY BUILDING" {% if form.d2.value == "VEH IN BODY BUILDING" %}selected{% endif %}>VEH IN BODY BUILDING</option>
                             <option value="TP- DEVICE TO UNTAG" {% if form.d2.value == "TP- DEVICE TO UNTAG" %}selected{% endif %}>TP- DEVICE TO UNTAG</option>
                             <option value="DEVICE GETTING NOT POWERING ON" {% if form.d2.value == "DEVICE GETTING NOT POWERING ON" %}selected{% endif %}>DEVICE GETTING NOT POWERING ON</option>
                             <option value="SIM VALIDITY NOT OK" {% if form.d2.value == "SIM VALIDITY NOT OK" %}selected{% endif %}>SIM VALIDITY NOT OK</option>
                             <option value="VEHICLE REPORT TO WS" {% if form.d2.value == "VEHICLE REPORT TO WS" %}selected{% endif %}>VEHICLE REPORT TO WS</option>
                             <option value="MISMAPPING" {% if form.d2.value == "MISMAPPING" %}selected{% endif %}>MISMAPPING</option>
-                            <option value="TP- DEVICE FITTED" {% if form.d2.value == "TP- DEVICE FITTED" %}selected{% endif %}>TP- DEVICE FITTED</option>
+                            <option value="TP- FITTED AND TO CANCEL" {% if form.d2.value == "TP- FITTED AND TO CANCEL" %}selected{% endif %}>TP- FITTED AND TO CANCEL</option>
                             <option value="VEHICLE OUT OF STATE" {% if form.d2.value == "VEHICLE OUT OF STATE" %}selected{% endif %}>VEHICLE OUT OF STATE</option>
                             <option value="SERVER ISSUE" {% if form.d2.value == "SERVER ISSUE" %}selected{% endif %}>SERVER ISSUE</option>
 
@@ -705,9 +715,10 @@ document.addEventListener("DOMContentLoaded", function () {
 </div>
     <div class="col-md-3 mb-3">
         <label for="D2_closure">D2 Closure Date:</label>
-        <input type="text" id="D2_closure" name="D2_closure" class="form-control"
-               value="{{ form.instance.D2_closure|default_if_none:'' }}">
+        <input type="datetime-local" id="D2_closure" name="D2_closure" class="form-control"
+               value="{% if form.instance.D2_closure %}{{ form.instance.D2_closure|date:'Y-m-d\TH:i' }}{% endif %}">
     </div>
+
     <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -722,7 +733,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "CUSTOMER NOT ANSWERING":
             "Called given number ( ). Not answering",
 
-        "SOS NOT FITTED":
+        "SOS NOT FITTED TO CANCEL":
             "Verified in the vehicle and found NO SOS switch fitted. Customer /AL to re assign / call ( )",
 
         "SOS NOT WORKING":
@@ -731,7 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "WIRE CUT ALERT":
             "Verified in the vehicle and found Wire cut / Tamper alert being recd in STU server. Pl check SOS wiring. Customer /AL to re assign / call ( )",
 
-        "VEHICLE IN BODY BUILDING":
+        "VEH IN BODY BUILDING":
             "Verified and found vehicle in Body Building. Customer /AL to re assign / call ( ) once Body building is completed and Vehicle in LIVE status with ignition ON.",
 
         "TP- DEVICE TO UNTAG":
@@ -748,7 +759,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         "VEHICLE REPORT TO WS":
             "",
-
+        "TP- FITTED AND TO CANCEL":"",
         "MISMAPPING":
             "Device   found  with  wrong PSN physically . ",
         "VEHICLE OUT OF STATE":
@@ -1053,18 +1064,22 @@ document.addEventListener("DOMContentLoaded", function () {
                             <label for="temp_raised_by">Temporary Certificate Raised By:</label>
                             <select id="temp_raised_by" name="temp_raised_by" class="form-control">
                                 <option value="" {% if form.temp_raised_by.value == "" %}selected{% endif %}>--</option>
-                                <option value="arung@danlawtech.com" {% if form.temp_raised_by.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
-                                <option value="eliyasp@danlawtech.com" {% if form.temp_raised_by.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
-                                <option value="gayadhar@danlawtech.com" {% if form.temp_raised_by.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
-                                <option value="pantnagarplant@danlawtech.com" {% if form.temp_raised_by.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
-                                <option value="sales@danlawtech.com" {% if form.temp_raised_by.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
-                                <option value="dilipkumarn@danlawtech.com" {% if form.temp_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                                <option value="swamy@danlawtech.com" {% if form.temp_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
-                                <option value="rishwanthr@danlawtech.com" {% if form.temp_raised_by.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
-                                <option value="yoganandam@danlawtech.com" {% if form.temp_raised_by.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
-                                <option value="narendrareddyg@danlawtech.com" {% if form.temp_raised_by.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
-                                <option value="dilipkumarn@danlawtech.com" {% if form.temp_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                                <option value="swamy@danlawtech.com" {% if form.temp_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Siva</option>
+                                <option value="Arun G" {% if form.temp_raised_by.value == "Arun G" %}selected{% endif %}>Arun G</option>
+                                <option value="Eliyas" {% if form.temp_raised_by.value == "Eliyas" %}selected{% endif %}>Eliyas</option>
+                                <option value="Gayadhar" {% if form.temp_raised_by.value == "Gayadhar" %}selected{% endif %}>Gayadhar</option>
+                                <option value="Jitendra" {% if form.temp_raised_by.value == "Jitendra" %}selected{% endif %}>Jitendra</option>
+                                <option value="Rajesh" {% if form.temp_raised_by.value == "Rajesh" %}selected{% endif %}>Rajesh</option>
+                                <option value="Paribesh" {% if form.temp_raised_by.value == "Paribesh" %}selected{% endif %}>Paribesh</option>
+
+                                <option value="Dilip Kumar" {% if form.temp_raised_by.value == "Dilip Kumar" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="Rishwanth" {% if form.temp_raised_by.value == "Rishwanth" %}selected{% endif %}>Rishwanth</option>
+                                <option value="Yoga" {% if form.temp_raised_by.value == "Yoga" %}selected{% endif %}>Yoga</option>
+                                <option value="Narendra" {% if form.temp_raised_by.value == "Narendra" %}selected{% endif %}>Narendra</option>
+                                <option value="Siva" {% if form.temp_raised_by.value == "Siva" %}selected{% endif %}>Siva</option>
+                                <option value="Gowtham" {% if form.temp_raised_by.value == "Gowtham" %}selected{% endif %}>Gowtham</option>
+
+                                <option value="SR" {% if form.temp_raised_by.value == "SR" %}selected{% endif %}>SR</option>
+
                                 <option value="Others" {% if form.temp_raised_by.value == "Others" %}selected{% endif %}>Others</option>
                             </select>
                             <input type="text" id="temp_raised_by_other" name="temp_raised_by_other"
@@ -1109,23 +1124,27 @@ document.addEventListener("DOMContentLoaded", function () {
                             <label for="perm_raised_by">Permanent Certificate Raised By:</label>
                             <select id="perm_raised_by" name="perm_raised_by" class="form-control">
                                 <option value="" {% if form.perm_raised_by.value == "" %}selected{% endif %}>--</option>
-                                <option value="arung@danlawtech.com" {% if form.perm_raised_by.value == "arung@danlawtech.com" %}selected{% endif %}>Arun G</option>
-                                <option value="eliyasp@danlawtech.com" {% if form.perm_raised_by.value == "eliyasp@danlawtech.com" %}selected{% endif %}>Eliyas</option>
-                                <option value="gayadhar@danlawtech.com" {% if form.perm_raised_by.value == "gayadhar@danlawtech.com" %}selected{% endif %}>Gayadhar</option>
-                                <option value="pantnagarplant@danlawtech.com" {% if form.perm_raised_by.value == "pantnagarplant@danlawtech.com" %}selected{% endif %}>Jitendra</option>
-                                <option value="sales@danlawtech.com" {% if form.perm_raised_by.value == "sales@danlawtech.com" %}selected{% endif %}>Rajesh</option>
-                                <option value="dilipkumarn@danlawtech.com" {% if form.perm_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                                <option value="swamy@danlawtech.com" {% if form.perm_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Swamy</option>
-                                <option value="rishwanthr@danlawtech.com" {% if form.perm_raised_by.value == "rishwanthr@danlawtech.com" %}selected{% endif %}>Rishwanth</option>
-                                <option value="yoganandam@danlawtech.com" {% if form.perm_raised_by.value == "yoganandam@danlawtech.com" %}selected{% endif %}>Yoga</option>
-                                <option value="narendrareddyg@danlawtech.com" {% if form.perm_raised_by.value == "narendrareddyg@danlawtech.com" %}selected{% endif %}>Narendra</option>
-                                <option value="dilipkumarn@danlawtech.com" {% if form.perm_raised_by.value == "dilipkumarn@danlawtech.com" %}selected{% endif %}>Dilip Kumar</option>
-                                <option value="swamy@danlawtech.com" {% if form.perm_raised_by.value == "swamy@danlawtech.com" %}selected{% endif %}>Siva</option>
+                                <option value="Arun G" {% if form.perm_raised_by.value == "Arun G" %}selected{% endif %}>Arun G</option>
+                                <option value="Eliyas" {% if form.perm_raised_by.value == "Eliyas" %}selected{% endif %}>Eliyas</option>
+                                <option value="Gayadhar" {% if form.perm_raised_by.value == "Gayadhar" %}selected{% endif %}>Gayadhar</option>
+                                <option value="Jitendra" {% if form.perm_raised_by.value == "Jitendra" %}selected{% endif %}>Jitendra</option>
+                                <option value="Rajesh" {% if form.perm_raised_by.value == "Rajesh" %}selected{% endif %}>Rajesh</option>
+                                <option value="Dilip Kumar" {% if form.perm_raised_by.value == "Dilip Kumar" %}selected{% endif %}>Dilip Kumar</option>
+                                <option value="Paribesh" {% if form.perm_raised_by.value == "Paribesh" %}selected{% endif %}>Paribesh</option>
+
+                                <option value="Rishwanth" {% if form.perm_raised_by.value == "Rishwanth" %}selected{% endif %}>Rishwanth</option>
+                                <option value="Yoga" {% if form.perm_raised_by.value == "Yoga" %}selected{% endif %}>Yoga</option>
+                                <option value="Narendra" {% if form.perm_raised_by.value == "Narendra" %}selected{% endif %}>Narendra</option>
+                                <option value="Siva" {% if form.perm_raised_by.value == "Siva" %}selected{% endif %}>Siva</option>
+                                <option value="Gowtham" {% if form.perm_raised_by.value == "Gowtham" %}selected{% endif %}>Gowtham</option>
+
+                                <option value="SR" {% if form.perm_raised_by.value == "SR" %}selected{% endif %}>SR</option>
+
                                 <option value="Others" {% if form.perm_raised_by.value == "Others" %}selected{% endif %}>Others</option>
                             </select>
                             <input type="text" id="perm_raised_by_other" name="perm_raised_by_other"
                                    class="form-control mt-2" style="display: none;" placeholder="Please specify...">
-                        </div>    
+                        </div>
 <!--
     <div class="col-md-3 mb-3">
         <label for="mail_to_customer">Mail to Customer:</label>
@@ -1216,7 +1235,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 -->
 
-   
+
     <div class="col-md-3 mb-3">
         <label for="completion_status">Completion Status:</label>
         <select id="completion_status" name="completion_status" class="form-control">
@@ -1226,7 +1245,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <option value="Cancelled" {% if form.instance.completion_status == "Cancelled" %}selected{% endif %}>Cancelled</option>
             <option value="Hold" {% if form.instance.completion_status == "Hold" %}selected{% endif %}>Hold</option>
             <option value="Reject" {% if form.instance.completion_status == "Reject" %}selected{% endif %}>Reject</option>
-            <option value="Third Party Device-Rejected" {% if form.instance.completion_status == "Third Party Device-Rejected" %}selected{% endif %}>Third Party Device-Rejected</option>
+            <option value="TP Device-Rejected" {% if form.instance.completion_status == "TP Device-Rejected" %}selected{% endif %}>TP Device-Rejected</option>
 
         </select>
     </div>
@@ -1238,11 +1257,11 @@ document.addEventListener("DOMContentLoaded", function () {
             <option value="Temporary" {% if form.instance.Update_to_AL_API == "Temporary" %}selected{% endif %}>Temporary</option>
             <option value="Permanent" {% if form.instance.Update_to_AL_API == "Permanent" %}selected{% endif %}>Permanent</option>
         </select>
-    </div> 
+    </div>
     <div class="col-md-3 mb-3">
         <label for="completion_date">Completion Date:</label>
         <input type="datetime-local" id="completion_date" name="completion_date" class="form-control"
-               value="{{ form.instance.completion_date|date:'Y-m-d\\TH:i' }}">
+               value="{% if form.instance.completion_date %}{{ form.instance.completion_date|date:'Y-m-d\TH:i' }}{% endif %}">
     </div>
 <div class="col-md-3 mb-3">
     <label for="total_tat">Total TAT:</label>
@@ -1596,7 +1615,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         missing.push('Temporary Certificate');
                     } else if (fieldName === 'upload_certificate_in_ialert_01') {
                         missing.push('Permanent Certificate');
-                    } 
+                    }
                 }
             }
 
@@ -1724,6 +1743,19 @@ document.addEventListener('DOMContentLoaded', function() {
         permanentCertificateInput.addEventListener('change', function () {
             if (permanentCertificateInput.files && permanentCertificateInput.files.length > 0) {
                 setCurrentDatetimeField('permanent_cert_date');
+            }
+        });
+    }
+
+    const completionStatusSelect = document.getElementById('completion_status');
+    if (completionStatusSelect) {
+        completionStatusSelect.addEventListener('change', function () {
+            const terminalStatuses = ['Permanent', 'Temp + Perm', 'Temporary', 'Cancelled', 'Reject', 'Third Party Device-Rejected'];
+            if (terminalStatuses.includes(completionStatusSelect.value)) {
+                const completionDateField = document.getElementById('completion_date');
+                if (completionDateField && !completionDateField.value) {
+                    setCurrentDatetimeField('completion_date');
+                }
             }
         });
     }
